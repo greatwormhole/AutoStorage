@@ -29,9 +29,9 @@ class consumerInfinityThread(object):
 
         while not self.threading.stopped():
 
-                time.sleep(0.2)
+                time.sleep(3)
 
-                message = ['gyyg']
+                message = ['This is socket message']
                 
 
                 # data = testsData.objects.all().order_by('-id')[0]
