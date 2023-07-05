@@ -7,6 +7,11 @@ from .utils import CustomWriter
 from transliterate import translit
 
 
+class base(View):
+    def get(self, request):
+        return render(request, 'main/home.html')
+
+
 class DeliveryView(View):
 
     def get(self, request):

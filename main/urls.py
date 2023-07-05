@@ -1,12 +1,13 @@
 from django.contrib import admin
 from django.urls import path
-from .views import DeliveryView
+from .views import DeliveryView, base
 
 from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path('barcode', DeliveryView.as_view())
+    path('barcode', DeliveryView.as_view()),
+    path('', base.as_view(), name="base"),
 ]
 
 if settings.DEBUG:
