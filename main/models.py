@@ -106,7 +106,7 @@ class Flaw(models.Model):
     datetime = models.DateTimeField(primary_key=True, default=datetime.now())
     worker_add = models.ForeignKey(Worker, on_delete=models.RESTRICT, related_name='worker_addition')
     worker_decision = models.ForeignKey(Worker, on_delete=models.RESTRICT, related_name='worker_decision', blank=True)
-    decision = models.BooleanField()
+    decision = models.BooleanField(blank=True)
     
     def __str__(self):
         return self.nomenclature

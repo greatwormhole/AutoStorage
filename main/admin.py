@@ -1,10 +1,11 @@
 from django.contrib import admin
-from django.apps import apps
+from .models import *
 
-post_models = apps.get_app_config('main').get_models()
-
-for model in post_models:
-    try:
-        admin.site.register(model)
-    except admin.sites.AlreadyRegistered:
-        pass
+admin.site.register(Storage)
+admin.site.register(Nomenclature)
+admin.site.register(Flaw)
+admin.site.register(Worker)
+admin.site.register(ProductionStorage)
+admin.site.register(DeliveryNote)
+admin.site.register(Specification)
+admin.site.register(Crates)

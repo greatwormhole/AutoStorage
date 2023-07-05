@@ -7,7 +7,7 @@ SECRET_KEY = 'django-insecure-!5ib!paivpjc3q3gf)l9q*yu-2kl%secy#jyzw^(gi8x5%ickh
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost']
+ALLOWED_HOSTS = ['*']
 CORS_ORIGIN_ALLOW_ALL = True
 
 # Application definition
@@ -72,8 +72,8 @@ DATABASES = {
         'NAME': 'Apro',
         'USER': 'postgres',
         'PASSWORD': 'ybrbnjc123',
-        'HOST': 'localhost',
-        'PORT': '',
+        'HOST': '192.168.8.61',
+        'PORT': '5432',
     }
 }
 
