@@ -6,6 +6,7 @@ from .utils import CustomWriter
 
 from transliterate import translit
 
+
 class DeliveryView(View):
 
     def get(self, request):
