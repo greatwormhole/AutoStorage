@@ -15,5 +15,11 @@ function nonAuthorized(){
 
 /// choose THD screen///
 function chooseTHD(){
+    $.ajax({
+        method:"GET",
+        async: false,
+        url: "{% url 'settings' %}",
+        data:{'action':action},
 
+    })
 }

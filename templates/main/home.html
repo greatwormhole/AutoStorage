@@ -3,7 +3,9 @@
 {% load static %}
     <script  src="{% static 'main/js/home.js' %}" rel="stylesheet" ></script>
     <link rel="stylesheet" href="{% static 'main/css/home.css' %}">
-
+    <script>
+        const THDList = "{% url 'THD_list' %}"
+    </script>
 {% endblock %}
 {% block content %}
     <div class="content">
