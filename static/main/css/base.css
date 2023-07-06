@@ -1,9 +1,77 @@
+/* header style*/
 .div-header{
+    display:flex;
+    width:100%;
+    height:60px;
+    background-color: #ffe967;
+    margin:0;
+    align-items:center;
+    box-shadow: inset 0 -1px 0 rgb(0 0 0 / 10%);
+    justify-content:space-between;
+}
+/* general css place*/
+body{
+background-color:#fffef1;
+overflow:hidden;
+}
+.block-ui{
+display:none;
+position:absolute;
+z-index:10000;
+background-color: rgba(210, 223, 223,0.3);
+height:110%;
+width:100%;
+top:60px;
+left:0;
+}
+
+/* text non-selectable, open-sans*/
+.text{
+    font-family: 'Open Sans';
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10 and IE 11 */
+    user-select: none; /* Standard syntax */
+}
+.button{
+    cursor:pointer;
+}
+.button:hover{
+
+}
+
+#main{
 display:flex;
 width:100%;
-height:80px;
-background-color: #EEEEE2;
-margin:0;
-align-items:center;
-box-shadow: inset 0 -1px 0 rgb(0 0 0 / 10%);
+height:auto;
+
+}
+/* local base element place*/
+/* header - element style*/
+#AWP-name{
+    margin-left:15px;
+    font-weight: bold;
+}
+#username{
+    font-size:25px;
+    margin-right:5px;
+}
+#user-info{
+    margin-right:15px;
+    display: inline-flex;
+    align-items:center;
+}
+/* login/logout visualisation*/
+#logout{
+    width:32px;
+    height:32px;
+    background:url('/media/icons/logout.png');
+    background-size:cover;
+}
+
+#login{
+    width:64px;
+    height:64px;
+    background:url('/media/icons/barcode.png');
+    background-size:cover;
+    margin-right:15px;
 }
