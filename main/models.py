@@ -120,6 +120,8 @@ class Flaw(models.Model):
 class THD(models.Model):
     THD_number = models.IntegerField()
     ip = models.CharField(max_length=250)
+    is_using = models.BooleanField(default=False)
+    worker_id = models.ForeignKey(Worker, on_delete=models.RESTRICT, blank=True, null=True)
 
     def __str__(self):
         return str(self.THD_number)

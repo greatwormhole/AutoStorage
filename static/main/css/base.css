@@ -46,13 +46,100 @@ height:auto;
 
 }
 
+button:disabled,
+button[disabled]{
+  border: 1px solid #999999;
+  background-color: #cccccc;
+  color: #666666;
+}
+/* prompt settings*/
+
 #prompt{
     display:flex;
-    justify-content:center;
-    position:absolute;
-    margin:auto;
-    margin-top:200px;
+    margin-left:calc(50% - 15%);
+    margin-top:calc(25% - 20%);
+    width:30%;
 }
+
+@media all and (max-width:800px) and (max-height:750px){
+#prompt{
+    display:flex;
+    width:250px;
+    margin-left:calc(50% - 125px);
+    margin-top:calc(25% - 15%);
+}
+}
+
+#prompt-header{
+    width:100%;
+    display:flex;
+    align-items:center;
+    border-bottom:1px solid black
+}
+#prompt-name-container{
+    width:100%
+}
+#prompt-name{
+    text-align:center;
+    width:100%;
+    margin-bottom:0px;
+    padding-left:25px;
+}
+#prompt-close{
+    width:32px;
+    height:32px;
+    margin-right:5px;
+    background:url('/media/icons/cross.png');
+    background-size:cover;
+}
+#prompt-content{
+    box-sizing:border-box;
+    height:100%;
+    margin:10px 10px 0 10px;
+    overflow-x:hidden;
+    overflow-y:auto;
+}
+
+.prompt-row{
+    display:flex;
+    box-sizing:border-box;
+    width:100%;
+    margin-top:5px;
+    margin-bottom:5px;
+}
+
+.prompt-cell{
+    height:100%;
+    display:flex;
+    text-align:center;
+
+}
+
+.prompt-cell span{
+    display:block;
+    width:100%;
+    font-size:calc(100%);
+    vertical-align:middle;
+}
+.prompt-cell button{
+    margin:auto;
+    border:1px solid black;
+    border-radius:5px 5px 5px 5px;
+}
+
+.positive{
+    background-color:#b0e3b0;
+}
+
+.positive:hover{
+    background-color:#75e375;
+}
+
+.negative{
+    background-color:#f47474;
+}
+
+
 /* local base element place*/
 /* header - element style*/
 #AWP-name{
