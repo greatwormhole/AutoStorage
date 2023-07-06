@@ -115,3 +115,15 @@ class Flaw(models.Model):
         verbose_name = "Брак"
         verbose_name_plural = "Бракованные детали"
         ordering=['-datetime']
+
+
+class THD(models.Model):
+    THD_number = models.IntegerField()
+    ip = models.CharField(max_length=250)
+
+    def __str__(self):
+        return str(self.THD_number)
+
+    class Meta:
+        verbose_name = "Номер ТСД"
+        verbose_name_plural = "Номер ТСД"

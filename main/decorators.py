@@ -13,7 +13,16 @@ def check_access(action=None, redirect_to='login'):
             if cookie is not None:
                 access_key = json.loads(cookie)
             else:
-                return redirect(redirect_to)
+                cookie = {
+                    'id': -1,
+                    'name': "NA",
+                    'storage_right': 'false',
+                    'plan_right': 'false',
+                    'quality_control_right': 'false',
+                }
+                response = redirect('base')
+                response.set_cookie(key='AccessKey', value=json.dumps(cookie))
+                return response
             
             if action is None or access_key.get(action):
                 return view_func(self, request, *args, **kwargs)

@@ -9,5 +9,11 @@ function authorized(){
 function nonAuthorized(){
 
     $('#login-BU').css('display','block')
+    $('.content').append('<h2 class="text" id="auth-prompt-text">Необходима авторизация!</h2>')
+}
+
+
+/// choose THD screen///
+function chooseTHD(){
 
 }
