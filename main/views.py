@@ -1,11 +1,12 @@
-from django.http import JsonResponse, HttpResponseNotFound
+from django.http import JsonResponse, HttpResponse, HttpResponseNotFound
 from django.shortcuts import render, redirect
 from django.views import View
 from django.core.exceptions import ObjectDoesNotExist, BadRequest
 from django.views.decorators.csrf import csrf_exempt
 from .decorators import check_access
+from django.core import serializers
 
-from .models import Worker
+from .models import Worker, THD
 
 from barcode import Code39
 from .utils import CustomWriter
@@ -74,3 +75,15 @@ class DeliveryView(View):
 
     def post(self, request):
         pass
+
+class THDList(View):
+
+    model = THD
+
+    def get(self, request):
+        
+        data = THD.objects.all()
+
+        response_json = serializers.serialize('json', data)
+
+        return HttpResponse(response_json, content_type='application/json')
