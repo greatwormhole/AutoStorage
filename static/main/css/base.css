@@ -75,3 +75,14 @@ height:auto;
     background-size:cover;
     margin-right:15px;
 }
+
+#auth-prompt{
+    background:url('/media/icons/login-prompt.png');
+    position:absolute;
+    z-index:20000;
+    right:0px;
+    top:-10px;
+    width:200px;
+    height:200px;
+    background-size:cover;
+}

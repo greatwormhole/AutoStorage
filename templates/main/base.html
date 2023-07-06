@@ -16,13 +16,23 @@
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap" rel="stylesheet">
     <script  src="{% static 'main/js/base.js' %}" rel="stylesheet" ></script>
     <link rel="stylesheet" href="{% static 'main/css/base.css' %}">
+    <script>
+    $(document).ready(function(){
+        {% if internalUser != "NA" %}
+            authorized()
+        {% else %}
+            nonAuthorized()
+        {% endif %}
+    })
+    </script>
     {% block link %}
 
     {% endblock %}
+
 </head>
 <body>
-    <div class="block-ui">
-
+    <div class="block-ui" id="login-BU">
+        <div id="auth-prompt"></div>
     </div>
     <header>
         <div class="div-header">
@@ -33,7 +43,7 @@
                     <div id="logout" class = "button"></div>
                 </div>
             {% else %}
-                <login id="login" class = "button"></login>
+                <div id="login" class = "button"></div>
             {% endif %}
         </div>
     </header>
