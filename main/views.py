@@ -9,7 +9,9 @@ from transliterate import translit
 
 class base(View):
     def get(self, request):
-        return render(request, 'main/home.html')
+        user = "NA"
+        context = {"internalUser": user}
+        return render(request, 'main/home.html', context=context)
 
 
 class DeliveryView(View):
