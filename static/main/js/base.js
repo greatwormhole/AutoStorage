@@ -17,9 +17,21 @@ function nonAuthorized(){
 function chooseTHD(){
     $.ajax({
         method:"GET",
-        async: false,
-        url: "{% url 'settings' %}",
-        data:{'action':action},
+        async: true,
+        url: THDList,
+        success: function (response){
+            viewTHDList(response)
+        }
 
     })
 }
+function viewTHDList(response){
+    $('#prompt').css({'width':'250px','flex-direction':'column', 'border':'1px solid black', 'background-color':'white', 'border-radius':'10px 10px 10px 10px'})
+    var html = "<div class = 'prompt-body'>"
+    for (let i = 0; i<response.length; i++){
+        html += ""+response[i].fields.id+""
+    }
+    html += "</div>"
+    $('#prompt-block-UI').show()
+}
+//////

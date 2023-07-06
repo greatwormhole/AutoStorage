@@ -45,6 +45,14 @@ width:100%;
 height:auto;
 
 }
+
+#prompt{
+    display:flex;
+    justify-content:center;
+    position:absolute;
+    margin:auto;
+    margin-top:200px;
+}
 /* local base element place*/
 /* header - element style*/
 #AWP-name{

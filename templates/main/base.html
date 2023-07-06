@@ -17,6 +17,7 @@
     <script  src="{% static 'main/js/base.js' %}" rel="stylesheet" ></script>
     <link rel="stylesheet" href="{% static 'main/css/base.css' %}">
     <script>
+    const THDList = "{% url 'THD_list' %}"
     $(document).ready(function(){
         {% if internalUser != "NA" %}
             authorized()
@@ -24,6 +25,7 @@
             nonAuthorized()
         {% endif %}
     })
+
     </script>
     {% block link %}
 
@@ -45,13 +47,21 @@
             {% else %}
                 <div id="login" class = "button" onclick="chooseTHD()"></div>
             {% endif %}
+
         </div>
     </header>
 
-    {% block content %}
-    <div id="main">
 
+    <div id="main">
+        <div class="block-ui" id="prompt-block-UI">
+            <div id="prompt">
+
+            </div>
+        </div>
+        {% block content %}
+
+        {% endblock %}
     </div>
-    {% endblock %}
+
 </body>
 </html>
