@@ -11,6 +11,7 @@ class Nomenclature(models.Model):
     units = models.CharField(max_length=60)
     maximum = models.FloatField(null=True)
     minimum = models.FloatField(null=True)
+    mass = models.FloatField(blank=True, null=True)
 
     def __str__(self):
         return self.title
@@ -80,6 +81,7 @@ class Storage(models.Model):
     cell_size = models.CharField(max_length=60)
     size_left = models.FloatField()
     storage_name = models.CharField(max_length=60)
+    mass = models.PositiveIntegerField(default=700)
 
     def __str__(self):
         return self.adress

@@ -2,7 +2,7 @@ from django.shortcuts import redirect
 from django.core.exceptions import PermissionDenied
 import json
 
-def check_access(action=None, redirect_to='login'):
+def check_access(action=None):
         
     def inner_func(view_func):
 
@@ -16,12 +16,14 @@ def check_access(action=None, redirect_to='login'):
                 cookie = {
                     'id': -1,
                     'name': "NA",
-                    'storage_right': 'false',
-                    'plan_right': 'false',
-                    'quality_control_right': 'false',
+                    'storage_right': False,
+                    'plan_right': False,
+                    'quality_control_right': False,
                 }
+
                 response = redirect('base')
                 response.set_cookie(key='AccessKey', value=json.dumps(cookie))
+
                 return response
             
             if action is None or access_key.get(action):
