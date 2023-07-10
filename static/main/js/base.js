@@ -19,7 +19,7 @@ function promptHide(obj){
 }
 
 /// choose THD screen///
-function chooseTHD(){
+function viewListOfTHD(){
     $.ajax({
         method:"GET",
         async: true,
@@ -44,12 +44,12 @@ function viewTHDList(response){
     for (let i = 0; i<response.length; i++){
 
         html += "<div class = 'prompt-row'>"
-        html += "<div class = 'prompt-cell'><span>"+response[i].fields.THD_number+"</span></div>"
+        html += "<div class = 'prompt-cell' id='THD_"+response[i].fields.THD_number+"_num'><span>"+response[i].fields.THD_number+"</span></div>"
         html += "<div class = 'prompt-cell'><span>"+response[i].fields.ip+"</span></div>"
         if (!response[i].fields.is_using){
-            html += "<div class = 'prompt-cell'><button class = 'positive'>Выбрать</button></div>"
+            html += "<div class = 'prompt-cell'><button class = 'positive' id='"+response[i].fields.THD_number+"' onclick='selectTHD(this, this.id)'>Выбрать</button></div>"
         } else{
-            html += "<div class = 'prompt-cell'><button disabled>В работе</button></div>"
+            html += "<div class = 'prompt-cell'><button disabled>В работе!</button></div>"
         }
         html += "</div>"
     }
@@ -60,5 +60,19 @@ function viewTHDList(response){
     $('#prompt-block-UI').show()
 }
 
-
+function selectTHD(obj, id){
+    $.ajax({
+        method:"POST",
+        async: true,
+        url: THDSelect,
+        data:{'THD_num':id, 'PC':1},
+        success: function (response){
+            $(obj).attr("disabled", 'disabled');
+            $(obj).prop("onclick", null).off("click");
+            $(obj).removeClass('positive')
+            $(obj).text('В работе!')
+        }
+    
+        })
+}
 //////

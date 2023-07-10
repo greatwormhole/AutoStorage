@@ -139,3 +139,28 @@ class MainView(View):
         thd.save()
 
         return JsonResponse({'status': True})
+    
+
+class THDSelect(View):
+
+    def post(self, request):
+        
+        THD_num = request.POST.get('THD_num')
+
+        is_comp = request.POST.get('PC')
+
+        try:
+
+            thd = THD.objects.get(THD_number=THD_num)
+
+        except:
+
+            return JsonResponse(data={'error':'ТСД с таким ip нет в базе'}, status=404)
+        
+        thd.is_comp = is_comp
+        
+        thd.is_using = True
+
+        thd.save()
+
+        return JsonResponse(data={}, status=200)

@@ -17,7 +17,8 @@
     <script  src="{% static 'main/js/base.js' %}" rel="stylesheet" ></script>
     <link rel="stylesheet" href="{% static 'main/css/base.css' %}">
     <script>
-    const THDList = "{% url 'THD_list' %}"
+    const THDList = "{% url 'THD_list' %}",
+        THDSelect = "{% url 'THD_select' %}"
     $(document).ready(function(){
         {% if internalUser != "NA" %}
             authorized()
@@ -45,7 +46,7 @@
                     <div id="logout" class = "button"></div>
                 </div>
             {% else %}
-                <div id="login" class = "button" onclick="chooseTHD()"></div>
+                <div id="login" class = "button" onclick="viewListOfTHD()"></div>
             {% endif %}
 
         </div>
