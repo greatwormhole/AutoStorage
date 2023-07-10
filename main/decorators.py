@@ -21,12 +21,12 @@ def check_access(action=None):
                     'quality_control_right': False,
                 }
 
-                response = redirect('base')
+                response = redirect('login')
                 response.set_cookie(key='AccessKey', value=json.dumps(cookie))
 
                 return response
             
-            if action is None or access_key.get(action):
+            if action is None or access_key.get(action, False) or access_key.get('name', None) not in ('NA', None):
                 return view_func(self, request, *args, **kwargs)
             else:
                 raise PermissionDenied('У вас нет прав, чтобы выполнить это действие')

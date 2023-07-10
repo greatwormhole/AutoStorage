@@ -1,7 +1,7 @@
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
 from django.views import View
-from django.core.exceptions import ObjectDoesNotExist, BadRequest
+from django.core.exceptions import ObjectDoesNotExist, BadRequest, PermissionDenied
 from .decorators import check_access
 from django.core import serializers
 
@@ -13,7 +13,7 @@ from .utils import CustomWriter
 from transliterate import translit
 import json
 
-class base(View):
+class HomeView(View):
 
     @check_access()
     def get(self, request):
@@ -37,27 +37,27 @@ class LoginView(View):
         if get_id is None:
             raise BadRequest('В запросе нет id пользователя')
         
-        workers = Worker.objects.filter(id=get_id)
+        worker = Worker.objects.get(id=get_id)
 
-        if not workers:
+        if not worker:
             raise ObjectDoesNotExist("Данного работника нет в базе")
 
         cookie = {
-            'id': id,
-            'name': str(workers[0].name),
-            'storage_right': bool(workers[0].storage_right),
-            'plan_right': bool(workers[0].plan_right),
-            'quality_control_right': bool(workers[0].quality_control_right),
+            'id': get_id,
+            'name': str(worker.name),
+            'storage_right': bool(worker.storage_right),
+            'plan_right': bool(worker.plan_right),
+            'quality_control_right': bool(worker.quality_control_right),
         }
 
-        response = redirect('base')
+        response = redirect('home')
         response.set_cookie(key='AccessKey', value=json.dumps(cookie))
         
         return response
 
 class DeliveryView(View):
 
-    # @check_access('storage_right')
+    @check_access()
     def get(self, request):
     
         article = translit('2222', language_code='ru', reversed=True)
@@ -80,6 +80,7 @@ class THDList(View):
 
     model = THD
 
+    @check_access()
     def get(self, request):
         
         data = THD.objects.all()
@@ -88,8 +89,14 @@ class THDList(View):
 
         return HttpResponse(response_json, content_type='application/json')
     
+    def post(self, request):
+        
+        thd = self.model()
+
+    
 class NomenclatureView(View):
 
+    @check_access()
     def get(self, request):
         
         get_article = request.GET.get('article', None)
@@ -97,17 +104,38 @@ class NomenclatureView(View):
         if get_article is None:
             raise BadRequest('GET запрос составлен неверно')
         
-        nomenclatures = Nomenclature.objects.filter(article=get_article)
+        nomenclature = Nomenclature.objects.get(article=get_article)
 
-        if not nomenclatures:
+        if not nomenclature:
             raise ObjectDoesNotExist('Данного артикула нет в базе')
         
         data = {
-            'nomenclature': nomenclatures[0].title,
-            'units': nomenclatures[0].units,
-            'mass': nomenclatures[0].mass
+            'nomenclature': nomenclature.title,
+            'units': nomenclature.units,
+            'mass': nomenclature.mass
         }
 
         response = JsonResponse(data=data)
 
         return response
+    
+class MainView(View):
+    
+    def get(self, request):
+        pass
+
+    def post(self, request):
+        
+        get_ip = request.META.get('REMOTE_ADDR')
+        thd = THD.objects.get(ip=get_ip)
+
+        if not thd:
+            raise ObjectDoesNotExist('ТСД с таким ip нет в базе')
+
+        if thd.is_using:
+            raise PermissionDenied('Данное устройство уже занято')
+        
+        thd.is_using = True
+        thd.save()
+
+        return JsonResponse({'status': True})
