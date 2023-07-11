@@ -8,7 +8,7 @@ from .models import Worker, THD, Nomenclature
 import random
 from barcode import Code39
 from .utils import CustomWriter
-from WS_cache import WS_CACHE_CONNECTION, WS_CACHE_MESSAGE
+from main.WS_cache import WS_CACHE_CONNECTION, WS_CACHE_MESSAGE
 
 from transliterate import translit
 import json
@@ -162,11 +162,9 @@ class THDSelect(View):
             return JsonResponse(data={'error':'ТСД с таким ip нет в базе'}, status=404)
         
         thd.is_comp = is_comp
-        
         thd.is_using = True
 
         thd.save()
-
         return JsonResponse(data={}, status=200)
     
 class WebSocketTHDcheck(View):
@@ -182,6 +180,29 @@ class WebSocketTHDcheck(View):
             return JsonResponse({'status': False}, status=200)
 
         return JsonResponse({'status': True}, status=200)
+
+class LogoutView(View):
+
+    def get(self, request):
+        
+        request_id = request.GET.get('id', None)
+
+        if not request_id:
+            return JsonResponse({'error': 'GET запрос составлен неверно'}, status=400)
+        
+        try:
+            thd = THD.objects.get(id=request_id)
+        except:
+            return JsonResponse(data={'error':'ТСД с таким ip нет в базе'}, status=404)
+        
+        thd.is_comp = False
+        thd.is_using = False
+
+        thd.save()
+        response = JsonResponse({'status': True}, status=200)
+        response.delete_cookie('AccessKey')
+
+        return response
 
 def get_ws(request):
     return render(request, 'main/main.html') 
