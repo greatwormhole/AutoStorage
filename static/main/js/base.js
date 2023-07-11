@@ -71,8 +71,22 @@ function selectTHD(obj, id){
             $(obj).prop("onclick", null).off("click");
             $(obj).removeClass('positive')
             $(obj).text('В работе!')
+            var wsStart = 'ws://',
+                loc = window.location;
+            if (loc.protocol == 'https:') {
+                 wsStart = 'wss://'
+            }
+            var socket = new WebSocket(wsStart+window.location.hostname+':8000/ws/THD-ws/'+id)
+            /// test///
+           /// $(socket).on('open', function(){
+             ///   socket.send(JSON.stringify({"code":"101"}))
+           /// })
+            /// test///
+            $('.prompt-message-text').text('Отсканируйте свой бэйдж!')
+            $('.prompt-message').show()
+
         }
     
-        })
+    })
 }
 //////

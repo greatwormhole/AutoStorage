@@ -3,9 +3,9 @@ from django.shortcuts import render, redirect
 from django.views import View
 from .decorators import check_access
 from django.core import serializers
-
+from .WS_cache import WS_CACHE_CONNECTION, WS_CACHE_MESSAGE
 from .models import Worker, THD, Nomenclature
-
+import random
 from barcode import Code39
 from .utils import CustomWriter
 
@@ -124,10 +124,10 @@ class MainView(View):
 
         get_ip = request.META.get('REMOTE_ADDR')
         thd = THD.objects.get(ip=get_ip)
-        print(get_ip)
+
         if not thd:
             return JsonResponse(data = {'error': 'ТСД с таким ip нет в базе'}, status=404)
-        print(thd.is_comp)
+
         return JsonResponse(data = {'is_comp': thd.is_comp, 'id':thd.THD_number}, status=200)
 
     def post(self, request):
