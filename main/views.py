@@ -8,8 +8,6 @@ from .models import Worker, THD, Nomenclature
 import random
 from barcode import Code39
 from .utils import CustomWriter
-from main.WS_cache import WS_CACHE_CONNECTION, WS_CACHE_MESSAGE
-
 from transliterate import translit
 import json
 
@@ -24,9 +22,6 @@ class HomeView(View):
         response = render(request, 'main/home.html', context=context)
         
         return response
-    
-    def post(self, request):
-        pass
 
 class LoginView(View):
 
@@ -35,36 +30,40 @@ class LoginView(View):
         get_id = request.GET.get('id', None)
 
         if get_id is None:
-            return JsonResponse({'error': 'GET запрос составлен неверно'}, status=400)
+            return JsonResponse({'status': False, 'error': 'GET запрос составлен неверно'}, status=400)
         
         worker = Worker.objects.get(id=get_id)
 
         if not worker:
-            return JsonResponse({'error': 'Данного работника нет в базе'}, status=404)
+            return JsonResponse({'status': False, 'error': 'Данного работника нет в базе'}, status=404)
 
         cookie = {
-            'id': get_id,
+            'id': int(get_id),
             'name': str(worker.name),
             'storage_right': bool(worker.storage_right),
             'plan_right': bool(worker.plan_right),
             'quality_control_right': bool(worker.quality_control_right),
         }
 
-        response = redirect('home')
+        response = JsonResponse({'status': True, 'name': cookie.get('name')}, status=200)
         response.set_cookie(key='AccessKey', value=json.dumps(cookie))
         
         return response
 
 class DeliveryView(View):
 
+    """
+    Генерация накладной
+    """
+
     @check_access()
     def get(self, request):
     
-        article = translit('111111111', language_code='ru', reversed=True)
+        article = translit('22222222', language_code='ru', reversed=True)
         print(article)
         nomenclature = 'Болт М5'
 
-        ean = Code39(article, writer=CustomWriter(nomenclature))
+        ean = Code39(article, writer=CustomWriter(nomenclature), add_checksum=False)
         name = ean.save(f'media/{article}')
 
         context = {
@@ -73,12 +72,7 @@ class DeliveryView(View):
 
         return render(request, 'main/barcode.html', context=context)
 
-    def post(self, request):
-        pass
-
 class THDList(View):
-
-    model = THD
 
     @check_access()
     def get(self, request):
@@ -88,11 +82,6 @@ class THDList(View):
         response_json = serializers.serialize('json', data)
 
         return HttpResponse(response_json, content_type='application/json')
-    
-    def post(self, request):
-        
-        thd = self.model()
-
     
 class NomenclatureView(View):
 
@@ -121,7 +110,16 @@ class NomenclatureView(View):
     
 class MainView(View):
     
+    """
+    View для резервирования ТСД
+    """
+
     def get(self, request):
+
+        """
+        Проверка по GET запросу является ли авторизация с компьютера или с ТСД,
+        необходима для отправки на ТСД информации отображения определенного экрана
+        """
 
         get_ip = request.META.get('REMOTE_ADDR')
         thd = THD.objects.get(ip=get_ip)
@@ -131,27 +129,39 @@ class MainView(View):
 
         return JsonResponse(data={'is_comp': thd.is_comp, 'id':thd.THD_number}, status=200)
 
-    def post(self, request):
+    # def post(self, request):
         
-        get_ip = request.META.get('REMOTE_ADDR')
-        thd = THD.objects.get(ip=get_ip)
+    #     """
+    #     Блокировка ТСД с определнным id в базе по POST запросу
+    #     """
 
-        if not thd:
-            return JsonResponse(data = {'error': 'ТСД с таким ip нет в базе'}, status=404)
+    #     get_ip = request.META.get('REMOTE_ADDR')
+    #     thd = THD.objects.get(ip=get_ip)
 
-        if thd.is_using:
-            return JsonResponse({'error': 'Данное устройство уже занято'}, status=403)
+    #     if not thd:
+    #         return JsonResponse(data = {'error': 'ТСД с таким ip нет в базе'}, status=404)
+
+    #     if thd.is_using:
+    #         return JsonResponse({'error': 'Данное устройство уже занято'}, status=403)
         
-        thd.is_using = True
-        thd.save()
+    #     thd.is_using = True
+    #     thd.save()
 
-        return JsonResponse({'status': True})
+    #     return JsonResponse({'status': True})
     
 
 class THDSelect(View):
 
+    """
+    View для резервирования ТСД с компьютера
+    """
+
     def post(self, request):
         
+        """
+        Блокировка определенного ТСД за компьютером по POST запросу
+        """
+
         THD_num = request.POST.get('THD_num')
 
         is_comp = request.POST.get('PC')
@@ -168,6 +178,10 @@ class THDSelect(View):
         return JsonResponse(data={}, status=200)
     
 class WebSocketTHDcheck(View):
+
+    """
+    View для реализации проверки подключения ТСД к вебсокету
+    """
 
     def get(self, request):
 
@@ -198,9 +212,13 @@ class WebSocketTHDcheck(View):
 
 class LogoutView(View):
 
-    def get(self, request):
-        
-        request_id = request.GET.get('id', None)
+    """
+    View для реализации выхода пользователя из системы
+    """
+
+    def post(self, request):
+
+        request_id = request.POST.get('id', None)
 
         if not request_id:
             return JsonResponse({'error': 'GET запрос составлен неверно'}, status=400)
@@ -218,6 +236,3 @@ class LogoutView(View):
         response.delete_cookie('AccessKey')
 
         return response
-
-def get_ws(request):
-    return render(request, 'main/main.html') 

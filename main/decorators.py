@@ -2,8 +2,13 @@ from django.shortcuts import redirect
 from django.core.exceptions import PermissionDenied
 import json
 
-def check_access(action=None):
-        
+def check_access(action: str | None = None):
+    
+    """
+    Декоратор для проверки уровня доступа зарегистрированного сотрудника к определенному контенту,
+    параметром ``action`` передается уровень прав сотрудника согласно базе данных
+    """
+
     def inner_func(view_func):
 
         def wrapper(self, request, *args, **kwargs):
