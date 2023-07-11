@@ -1,3 +1,19 @@
+// Make the function wait until the connection is made...
+function waitForSocketConnection(socket, msg){
+    setTimeout(
+        function () {
+            if (socket.readyState === 1) {
+
+                 socket.send(msg);
+
+            } else {
+
+                waitForSocketConnection(socket, msg);
+            }
+
+        }, 5);
+}
+
 /// authorization logic///
 function authorized(){
 
@@ -77,13 +93,33 @@ function selectTHD(obj, id){
                  wsStart = 'wss://'
             }
             var socket = new WebSocket(wsStart+window.location.hostname+':8000/ws/THD-ws/'+id)
+            setWSHandler(socket)
             /// test///
            /// $(socket).on('open', function(){
              ///   socket.send(JSON.stringify({"code":"101"}))
            /// })
             /// test///
-            $('.prompt-message-text').text('Отсканируйте свой бэйдж!')
-            $('.prompt-message').show()
+            $.ajax({
+                method:"GET",
+                url:THDCheck,
+                data:{'id':id},
+                success: function (response){
+                    console.log(response.status)
+                    switch (response.status){
+                        case true:
+                            $('.prompt-message-text').text('Отсканируйте свой бэйдж!')
+                            $('.prompt-message').show()
+                            waitForSocketConnection(socket, JSON.stringify({"code":"0"}))
+
+                            break;
+                        case false:
+                            $('.prompt-message-text').text('Откройте приложение для аутентификации!')
+                             $('.prompt-message').show()
+                            break;
+                    }
+                }
+            })
+
 
         }
     

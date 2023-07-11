@@ -88,6 +88,13 @@ class THDWS(WebsocketConsumer):
 
         text_data_json = json.loads(text_data)
 
+        async_to_sync(self.channel_layer.group_send)(self.room_name, {
+            "type": "chat.message",
+            "room_id": self.room_name,
+            "username": self.scope["user"].username,
+            "message": text_data,
+        })
+
         if text_data_json['code'] == 11:
 
             WS_CACHE_CONNECTION[text_data_json['data']['ip']] = True
@@ -97,17 +104,6 @@ class THDWS(WebsocketConsumer):
         if text_data_json['code'] == 101:
 
             WS_CACHE_CONNECTION[text_data_json['data']['ip']] = False
-
-            return
-
-        if text_data_json['code'] == 'resend':
-
-            async_to_sync(self.channel_layer.group_send)(self.room_name, {
-                "type": "chat.message",
-                "room_id": self.room_name,
-                "username": self.scope["user"].username,
-                "message": text_data,
-                })
 
             return
 

@@ -15,10 +15,12 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap" rel="stylesheet">
     <script  src="{% static 'main/js/base.js' %}" rel="stylesheet" ></script>
+    <script  src="{% static 'main/js/base-ws.js' %}" rel="stylesheet" ></script>
     <link rel="stylesheet" href="{% static 'main/css/base.css' %}">
     <script>
     const THDList = "{% url 'THD_list' %}",
-        THDSelect = "{% url 'THD_select' %}"
+        THDSelect = "{% url 'THD_select' %}",
+        THDCheck = "{% url 'websocket_THD_check' %}"
     $(document).ready(function(){
         {% if internalUser != "NA" %}
             authorized()

@@ -127,9 +127,9 @@ class MainView(View):
         thd = THD.objects.get(ip=get_ip)
 
         if not thd:
-            return JsonResponse(data = {'error': 'ТСД с таким ip нет в базе'}, status=404)
+            return JsonResponse(data ={'error': 'ТСД с таким ip нет в базе'}, status=404)
 
-        return JsonResponse(data = {'is_comp': thd.is_comp, 'id':thd.THD_number}, status=200)
+        return JsonResponse(data={'is_comp': thd.is_comp, 'id':thd.THD_number}, status=200)
 
     def post(self, request):
         
@@ -172,14 +172,29 @@ class WebSocketTHDcheck(View):
     def get(self, request):
 
         request_id = request.GET.get('id', None)
-
+        print(WS_CACHE_CONNECTION)
         if not request_id:
             return JsonResponse({'error': 'GET запрос составлен неверно'}, status=400)
+        try:
 
-        if request_id not in WS_CACHE_CONNECTION.keys():
+            ip = THD.objects.get(THD_number=request_id).ip
+
+        except:
+
+            return JsonResponse({'error': 'GET запрос составлен неверно'}, status=400)
+
+        if ip not in WS_CACHE_CONNECTION.keys():
+
             return JsonResponse({'status': False}, status=200)
 
-        return JsonResponse({'status': True}, status=200)
+        if WS_CACHE_CONNECTION[ip]:
+
+            return JsonResponse({'status': True}, status=200)
+
+        else:
+
+            return JsonResponse({'status': False}, status=200)
+
 
 class LogoutView(View):
 
