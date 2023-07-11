@@ -2,8 +2,10 @@ import time
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 import json
-
+from.WS_cache import WS_CACHE_CONNECTION
 import threading
+from channels.layers import get_channel_layer
+
 connectionDict = {}
 threadList = {}
 
@@ -29,7 +31,7 @@ class consumerInfinityThread(object):
 
         while not self.threading.stopped():
 
-                time.sleep(1)
+                time.sleep(30)
 
                 message = 'true'
 
@@ -55,34 +57,6 @@ class ConnectionThread(threading.Thread):
 
         return self._stop.is_set()
 
-class test(WebsocketConsumer):
-
-    def connect(self):
-
-        self.id = self.scope['url_route']['kwargs']['room']
-
-        self.room_name = 'room_%s' % self.id
-
-        #connectionDict[self.robot_ip] = opcConnection(self.robot_ip).connect()
-
-        async_to_sync(self.channel_layer.group_add)(
-            self.room_name,
-            self.channel_name
-        )
-
-        self.accept()
-
-        self.thread = consumerInfinityThread(self)
-
-    def disconnect(self, close_code):
-
-        self.thread.infinite_stop()
-
-        async_to_sync(self.channel_layer.group_discard)(
-            self.room_name,
-            self.channel_name
-        )
-
 
 class THDWS(WebsocketConsumer):
 
@@ -90,7 +64,7 @@ class THDWS(WebsocketConsumer):
 
         self.id = self.scope['url_route']['kwargs']['room']
 
-        self.room_name = 'room_%s' % self.id
+        self.room_name = 'THD_%s' % self.id
 
         #connectionDict[self.robot_ip] = opcConnection(self.robot_ip).connect()
 
@@ -101,11 +75,47 @@ class THDWS(WebsocketConsumer):
 
         self.accept()
 
+
     def disconnect(self, close_code):
-        
+
         async_to_sync(self.channel_layer.group_discard)(
             self.room_name,
             self.channel_name
         )
 
-  
+
+    def receive(self, text_data=None, bytes_data=None):
+
+        text_data_json = json.loads(text_data)
+
+        if text_data_json['code'] == 11:
+
+            WS_CACHE_CONNECTION[text_data_json['data']['ip']] = True
+
+            return
+
+        if text_data_json['code'] == 101:
+
+            WS_CACHE_CONNECTION[text_data_json['data']['ip']] = False
+
+            return
+
+        if text_data_json['code'] == 'resend':
+
+            async_to_sync(self.channel_layer.group_send)(self.room_name, {
+                "type": "chat.message",
+                "room_id": self.room_name,
+                "username": self.scope["user"].username,
+                "message": text_data,
+                })
+
+            return
+
+    def chat_message(self, event):
+
+        self.send(text_data=json.dumps(
+            {
+                "room": event["room_id"],
+                "username": event["username"],
+                "message": event["message"],
+            }))

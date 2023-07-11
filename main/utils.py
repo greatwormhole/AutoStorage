@@ -7,6 +7,14 @@ from barcode.writer import (
 from PIL import Image, ImageDraw, ImageFont
 from transliterate import translit, slugify
 
+SYSTEM_CODE = {
+    '0': {'message': 'Подключение с компьютера!', 'action': 'change screen', 'scanner':'none'},
+    '10': {'message': 'Отсканируйте код сотрудника!', 'action': 'Show message, scanner response2server', 'scanner': 'on until scan'},
+    '11': {'message': '-', 'action': 'connect to ws by THD', 'scanner': '-'},
+    '100': {'message': '-', 'action': 'disconnect to ws by THD', 'scanner': '-'},
+    '101': {'message': '-', 'action': 'ws resend message', 'scanner':'-'}
+}
+
 class CustomWriter(ImageWriter):
 
     def __init__(self, upper_text: str, *args, **kwargs):
