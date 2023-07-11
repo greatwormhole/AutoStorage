@@ -1,7 +1,6 @@
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
 from django.views import View
-from django.core.exceptions import ObjectDoesNotExist, BadRequest, PermissionDenied
 from .decorators import check_access
 from django.core import serializers
 
@@ -35,12 +34,12 @@ class LoginView(View):
         get_id = request.GET.get('id', None)
 
         if get_id is None:
-            raise BadRequest('В запросе нет id пользователя')
+            return JsonResponse({'error': 'GET запрос составлен неверно'}, status=400)
         
         worker = Worker.objects.get(id=get_id)
 
         if not worker:
-            raise ObjectDoesNotExist("Данного работника нет в базе")
+            return JsonResponse({'error': 'Данного работника нет в базе'}, status=404)
 
         cookie = {
             'id': get_id,
@@ -102,12 +101,12 @@ class NomenclatureView(View):
         get_article = request.GET.get('article', None)
 
         if get_article is None:
-            raise BadRequest('GET запрос составлен неверно')
+            return JsonResponse({'error': 'GET запрос составлен неверно'}, status=400)
         
         nomenclature = Nomenclature.objects.get(article=get_article)
 
         if not nomenclature:
-            raise ObjectDoesNotExist('Данного артикула нет в базе')
+            return JsonResponse({'error': 'Данного артикула нет в базе'}, status=404)
         
         data = {
             'nomenclature': nomenclature.title,
@@ -137,10 +136,10 @@ class MainView(View):
         thd = THD.objects.get(ip=get_ip)
 
         if not thd:
-            raise ObjectDoesNotExist('ТСД с таким ip нет в базе')
+            return JsonResponse(data = {'error': 'ТСД с таким ip нет в базе'}, status=404)
 
         if thd.is_using:
-            raise PermissionDenied('Данное устройство уже занято')
+            return JsonResponse({'error': 'Данное устройство уже занято'}, status=403)
         
         thd.is_using = True
         thd.save()
@@ -157,11 +156,8 @@ class THDSelect(View):
         is_comp = request.POST.get('PC')
 
         try:
-
             thd = THD.objects.get(THD_number=THD_num)
-
         except:
-
             return JsonResponse(data={'error':'ТСД с таким ip нет в базе'}, status=404)
         
         thd.is_comp = is_comp
