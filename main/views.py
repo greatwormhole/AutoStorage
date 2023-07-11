@@ -17,7 +17,10 @@ class HomeView(View):
     def get(self, request):
 
         username = json.loads(request.COOKIES.get('AccessKey')).get('name')
-        context = {"internalUser": username}
+
+        THD = json.loads(request.COOKIES.get('AccessKey')).get('THD')
+
+        context = {"internalUser": username, 'THD': THD}
 
         response = render(request, 'main/home.html', context=context)
         
@@ -37,12 +40,21 @@ class LoginView(View):
         if not worker:
             return JsonResponse({'status': False, 'error': 'Данного работника нет в базе'}, status=404)
 
+        try:
+
+            reserved_THD = THD.ojects.get(worker_id=get_id).THD_number
+
+        except:
+
+            reserved_THD = '-1'
+
         cookie = {
             'id': int(get_id),
             'name': str(worker.name),
             'storage_right': bool(worker.storage_right),
             'plan_right': bool(worker.plan_right),
             'quality_control_right': bool(worker.quality_control_right),
+            'THD': reserved_THD
         }
 
         response = JsonResponse({'status': True, 'name': cookie.get('name')}, status=200)
@@ -186,7 +198,7 @@ class WebSocketTHDcheck(View):
     def get(self, request):
 
         request_id = request.GET.get('id', None)
-        print(WS_CACHE_CONNECTION)
+
         if not request_id:
             return JsonResponse({'error': 'GET запрос составлен неверно'}, status=400)
         try:

@@ -9,10 +9,11 @@ from transliterate import translit, slugify
 
 SYSTEM_CODE = {
     '0': {'message': 'Подключение с компьютера!', 'action': 'change screen', 'scanner':'none'},
-    '10': {'message': 'Отсканируйте код сотрудника!', 'action': 'Show message, scanner response2server', 'scanner': 'on until scan'},
+    '10': {'message': 'Отсканируйте код сотрудника!', 'action': 'Show message, scanner response2server', 'scanner': 'button'},
     '11': {'message': '-', 'action': 'connect to ws by THD', 'scanner': '-'},
     '100': {'message': '-', 'action': 'disconnect to ws by THD', 'scanner': '-'},
-    '101': {'message': '-', 'action': 'ws resend message', 'scanner':'-'}
+    '101': {'message': '-', 'action': 'ws resend message', 'scanner': '-'},
+    '111': {'message': '-', 'action':'thd2client id response', 'scanner':'button'}
 }
 
 class CustomWriter(ImageWriter):

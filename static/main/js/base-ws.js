@@ -7,15 +7,26 @@ function setWSHandler (ws){
             case 11:
                 switch($('.prompt-message-text').text()){
                     case 'Откройте приложение для аутентификации!':
-                        ///ws.send()
                         $('.prompt-message-text').text('Отсканируйте свой бэйдж!')
+                        ws.send(JSON.stringify({"code":"10", "user-message":"Отсканируйте бэйдж сотрудника!"}))
                         break;
 
                 }
-            break;
-        case 101:
-            $('.prompt-message-text').text('Переподключите ТСД!')
-        break;
-    }
-})
+                break;
+            case 101:
+                $('.prompt-message-text').text('Переподключите ТСД!')
+                break;
+            case 111:
+                $.ajax({
+                     method:"POST",
+                     async: true,
+                     url: login,
+                     data:{'id':message.id},
+                     success: function (response){
+                        this.location.reload
+                     }
+                })
+                break;
+        }
+    })
 }

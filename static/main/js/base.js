@@ -104,13 +104,13 @@ function selectTHD(obj, id){
                 url:THDCheck,
                 data:{'id':id},
                 success: function (response){
-                    console.log(response.status)
+
                     switch (response.status){
                         case true:
                             $('.prompt-message-text').text('Отсканируйте свой бэйдж!')
                             $('.prompt-message').show()
                             waitForSocketConnection(socket, JSON.stringify({"code":"0"}))
-
+                            waitForSocketConnection(socket, JSON.stringify({"code":"10", "user-message":"Отсканируйте бэйдж сотрудника!"}))
                             break;
                         case false:
                             $('.prompt-message-text').text('Откройте приложение для аутентификации!')

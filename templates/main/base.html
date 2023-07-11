@@ -20,10 +20,17 @@
     <script>
     const THDList = "{% url 'THD_list' %}",
         THDSelect = "{% url 'THD_select' %}",
-        THDCheck = "{% url 'websocket_THD_check' %}"
+        THDCheck = "{% url 'websocket_THD_check' %}",
+        login = "{% url 'login' %}"
     $(document).ready(function(){
         {% if internalUser != "NA" %}
             authorized()
+            var wsStart = 'ws://',
+                loc = window.location;
+            if (loc.protocol == 'https:') {
+                 wsStart = 'wss://'
+            }
+            var socket = new WebSocket(wsStart+window.location.hostname+':8000/ws/THD-ws/'+'{{THD}}')
         {% else %}
             nonAuthorized()
         {% endif %}
