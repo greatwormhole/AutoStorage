@@ -29,19 +29,15 @@ class consumerInfinityThread(object):
 
         while not self.threading.stopped():
 
-                time.sleep(3)
+                time.sleep(1)
 
-                message = ['This is socket message']
-                
+                message = 'true'
 
                 # data = testsData.objects.all().order_by('-id')[0]
                 # message.append(data.status)
                 # message.append(data.result)
 
-                self.consumer.send(text_data=json.dumps({
-                    'event': "Send",
-                    'message': message,
-                }))
+                self.consumer.send(text_data=message)
 
 class ConnectionThread(threading.Thread):
 
@@ -78,10 +74,35 @@ class test(WebsocketConsumer):
 
         self.thread = consumerInfinityThread(self)
 
-    def disconnect(self):
+    def disconnect(self, close_code):
 
         self.thread.infinite_stop()
 
+        async_to_sync(self.channel_layer.group_discard)(
+            self.room_name,
+            self.channel_name
+        )
+
+
+class THDWS(WebsocketConsumer):
+
+    def connect(self):
+
+        self.id = self.scope['url_route']['kwargs']['room']
+
+        self.room_name = 'room_%s' % self.id
+
+        #connectionDict[self.robot_ip] = opcConnection(self.robot_ip).connect()
+
+        async_to_sync(self.channel_layer.group_add)(
+            self.room_name,
+            self.channel_name
+        )
+
+        self.accept()
+
+    def disconnect(self, close_code):
+        
         async_to_sync(self.channel_layer.group_discard)(
             self.room_name,
             self.channel_name

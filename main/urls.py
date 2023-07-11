@@ -1,11 +1,12 @@
 from django.contrib import admin
 from django.urls import path
-from .views import DeliveryView, HomeView, LoginView, THDList, NomenclatureView, MainView, THDSelect
+from .views import DeliveryView, HomeView, LoginView, THDList, NomenclatureView, MainView, THDSelect, get_ws
 
 from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
+    path('test', get_ws),
     path('', HomeView.as_view(), name="home"),
     path('barcode', DeliveryView.as_view(), name='barcode'),
     path('API/login', LoginView.as_view(), name='login'),

@@ -60,7 +60,7 @@ class DeliveryView(View):
     @check_access()
     def get(self, request):
     
-        article = translit('2222', language_code='ru', reversed=True)
+        article = translit('111111111', language_code='ru', reversed=True)
         print(article)
         nomenclature = 'Болт М5'
 
@@ -122,7 +122,14 @@ class NomenclatureView(View):
 class MainView(View):
     
     def get(self, request):
-        pass
+
+        get_ip = request.META.get('REMOTE_ADDR')
+        thd = THD.objects.get(ip=get_ip)
+        print(get_ip)
+        if not thd:
+            return JsonResponse(data = {'error': 'ТСД с таким ip нет в базе'}, status=404)
+        print(thd.is_comp)
+        return JsonResponse(data = {'is_comp': thd.is_comp, 'id':thd.THD_number}, status=200)
 
     def post(self, request):
         
@@ -164,3 +171,7 @@ class THDSelect(View):
         thd.save()
 
         return JsonResponse(data={}, status=200)
+    
+
+def get_ws(request):
+    return render(request, 'main/main.html') 

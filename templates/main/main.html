@@ -2,7 +2,7 @@
 
 {% block content %}
     <script>
-        const socket = new WebSocket('ws://127.0.0.1:8000/ws/test/1\w');
+        const socket = new WebSocket('ws://192.168.8.54:5555/ws/test/1');
 
         socket.onopen = function(e) {
           socket.send(JSON.stringify({
