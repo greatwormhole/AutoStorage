@@ -63,7 +63,7 @@ class Worker(models.Model):
 
 class DeliveryNote(models.Model):
     number = models.PositiveBigIntegerField(primary_key=True)
-    datetime = models.DateTimeField(default=datetime.now())
+    datetime = models.DateTimeField(auto_now_add=True)
     worker_id = models.ForeignKey(Worker, on_delete=models.RESTRICT)
     article_list = models.JSONField(default=dict,
                                     validators=[ArticleJSONValidator(limit_value=JSONSCHEMA)])
@@ -105,7 +105,7 @@ class Flaw(models.Model):
     id = models.PositiveBigIntegerField()
     nomenclature = models.ForeignKey(Nomenclature, on_delete=models.RESTRICT)
     amount = models.FloatField()
-    datetime = models.DateTimeField(primary_key=True, default=datetime.now())
+    datetime = models.DateTimeField(primary_key=True, auto_now_add=True)
     worker_add = models.ForeignKey(Worker, on_delete=models.RESTRICT, related_name='worker_addition')
     worker_decision = models.ForeignKey(Worker, on_delete=models.RESTRICT, related_name='worker_decision', blank=True)
     decision = models.BooleanField(blank=True)
@@ -124,7 +124,7 @@ class THD(models.Model):
     ip = models.CharField(max_length=250)
     is_using = models.BooleanField(default=False)
     is_comp = models.BooleanField(default=False)
-    worker_id = models.ForeignKey(Worker, on_delete=models.RESTRICT, blank=True, null=True)
+    worker = models.ForeignKey(Worker, on_delete=models.RESTRICT, blank=True, null=True)
 
     def __str__(self):
         return str(self.THD_number)

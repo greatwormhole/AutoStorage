@@ -28,36 +28,48 @@ class HomeView(View):
 
 class LoginView(View):
 
-    def get(self, request):
-        
-        get_id = request.GET.get('id', None)
+    def post(self, request):   
 
-        if get_id is None:
-            return JsonResponse({'status': False, 'error': 'GET запрос составлен неверно'}, status=400)
+        request_id = request.POST.get('id', None)
+        request_ip = request.POST.get('ip', None)
+
+        if request_id is None or request_ip is None:
+            return JsonResponse({'status': False, 'error': 'POST запрос составлен неверно'}, status=400)
         
-        worker = Worker.objects.get(id=get_id)
+        worker = Worker.objects.filter(id=request_id)
+        thd = THD.objects.filter(ip=request_ip)
 
         if not worker:
             return JsonResponse({'status': False, 'error': 'Данного работника нет в базе'}, status=404)
 
-        try:
-
-            reserved_THD = THD.ojects.get(worker_id=get_id).THD_number
-
-        except:
-
-            reserved_THD = '-1'
+        if not thd:
+            return JsonResponse({'status': False, 'error': 'Данного ТСД нет в базе'}, status=404)
+        
+        worker = worker[0]
+        thd = thd[0]
 
         cookie = {
-            'id': int(get_id),
+            'id': int(request_id),
             'name': str(worker.name),
             'storage_right': bool(worker.storage_right),
             'plan_right': bool(worker.plan_right),
             'quality_control_right': bool(worker.quality_control_right),
-            'THD': reserved_THD
+            'THD': int(thd.THD_number)
+        }
+        data = {
+            'status': True,
+            'name': str(worker.name),
+            'storage_right': bool(worker.storage_right),
+            'plan_right': bool(worker.plan_right),
+            'quality_control_right': bool(worker.quality_control_right),
         }
 
-        response = JsonResponse({'status': True, 'name': cookie.get('name')}, status=200)
+        thd.worker = worker
+        thd.is_using = True
+        thd.is_comp = False
+
+        thd.save()
+        response = JsonResponse(data, status=200)
         response.set_cookie(key='AccessKey', value=json.dumps(cookie))
         
         return response
@@ -103,12 +115,12 @@ class NomenclatureView(View):
         get_article = request.GET.get('article', None)
 
         if get_article is None:
-            return JsonResponse({'error': 'GET запрос составлен неверно'}, status=400)
+            return JsonResponse({'status': False, 'error': 'GET запрос составлен неверно'}, status=400)
         
         nomenclature = Nomenclature.objects.get(article=get_article)
 
         if not nomenclature:
-            return JsonResponse({'error': 'Данного артикула нет в базе'}, status=404)
+            return JsonResponse({'status': False, 'error': 'Данного артикула нет в базе'}, status=404)
         
         data = {
             'nomenclature': nomenclature.title,
@@ -134,34 +146,15 @@ class MainView(View):
         """
 
         get_ip = request.META.get('REMOTE_ADDR')
-        thd = THD.objects.get(ip=get_ip)
+        thd = THD.objects.filter(ip=get_ip)
 
         if not thd:
-            return JsonResponse(data ={'error': 'ТСД с таким ip нет в базе'}, status=404)
+            return JsonResponse({'status': False, 'error': 'ТСД с таким ip нет в базе'}, status=404)
 
-        return JsonResponse(data={'is_comp': thd.is_comp, 'id':thd.THD_number}, status=200)
+        thd = thd[0]
 
-    # def post(self, request):
-        
-    #     """
-    #     Блокировка ТСД с определнным id в базе по POST запросу
-    #     """
-
-    #     get_ip = request.META.get('REMOTE_ADDR')
-    #     thd = THD.objects.get(ip=get_ip)
-
-    #     if not thd:
-    #         return JsonResponse(data = {'error': 'ТСД с таким ip нет в базе'}, status=404)
-
-    #     if thd.is_using:
-    #         return JsonResponse({'error': 'Данное устройство уже занято'}, status=403)
-        
-    #     thd.is_using = True
-    #     thd.save()
-
-    #     return JsonResponse({'status': True})
+        return JsonResponse(data={'status': True, 'is_comp': thd.is_comp, 'id':thd.THD_number}, status=200)
     
-
 class THDSelect(View):
 
     """
@@ -181,13 +174,13 @@ class THDSelect(View):
         try:
             thd = THD.objects.get(THD_number=THD_num)
         except:
-            return JsonResponse(data={'error':'ТСД с таким ip нет в базе'}, status=404)
+            return JsonResponse({'status': False, 'error':'ТСД с таким ip нет в базе'}, status=404)
         
         thd.is_comp = is_comp
         thd.is_using = True
 
         thd.save()
-        return JsonResponse(data={}, status=200)
+        return JsonResponse({}, status=200)
     
 class WebSocketTHDcheck(View):
 
@@ -200,14 +193,15 @@ class WebSocketTHDcheck(View):
         request_id = request.GET.get('id', None)
 
         if not request_id:
-            return JsonResponse({'error': 'GET запрос составлен неверно'}, status=400)
+            return JsonResponse({'status': False, 'error': 'GET запрос составлен неверно'}, status=400)
+        
         try:
 
             ip = THD.objects.get(THD_number=request_id).ip
 
         except:
 
-            return JsonResponse({'error': 'GET запрос составлен неверно'}, status=400)
+            return JsonResponse({'status': False, 'error': 'GET запрос составлен неверно'}, status=400)
 
         if ip not in WS_CACHE_CONNECTION.keys():
 
@@ -230,18 +224,25 @@ class LogoutView(View):
 
     def post(self, request):
 
-        request_id = request.POST.get('id', None)
+        request_ip = request.POST.get('ip', None)
+        print(request.COOKIES)
 
-        if not request_id:
-            return JsonResponse({'error': 'GET запрос составлен неверно'}, status=400)
+        if not request_ip:
+            return JsonResponse({'status': False, 'error': 'GET запрос составлен неверно'}, status=400)
         
-        try:
-            thd = THD.objects.get(id=request_id)
-        except:
-            return JsonResponse(data={'error':'ТСД с таким ip нет в базе'}, status=404)
+        thd = THD.objects.filter(ip=request_ip)
+
+        if not thd:
+            return JsonResponse({'status': False, 'error': 'ТСД с таким ip нет в базе'}, status=404)
+        
+        thd = thd[0]
+
+        if not thd.is_using:
+            return JsonResponse({'status': False, 'error': 'Данное ТСД уже никем не используется'}, status=405)
         
         thd.is_comp = False
         thd.is_using = False
+        thd.worker = None
 
         thd.save()
         response = JsonResponse({'status': True}, status=200)
