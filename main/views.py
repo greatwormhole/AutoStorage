@@ -145,6 +145,8 @@ class MainView(View):
         необходима для отправки на ТСД информации отображения определенного экрана
         """
 
+        login_data = {}
+        logged_in = False
         get_ip = request.META.get('REMOTE_ADDR')
         thd = THD.objects.filter(ip=get_ip)
 
@@ -152,8 +154,19 @@ class MainView(View):
             return JsonResponse({'status': False, 'error': 'ТСД с таким ip нет в базе'}, status=404)
 
         thd = thd[0]
+        
+        if thd.is_using:
+            login_data = {
+                'status': True,
+                'id': thd.worker.id,
+                'name': thd.worker.name,
+                'storage_right': thd.worker.storage_right,
+                'plan_right': thd.worker.plan_right,
+                'quality_control_right': thd.worker.quality_control_right,
+            }
+            logged_in = True
 
-        return JsonResponse(data={'status': True, 'is_comp': thd.is_comp, 'id':thd.THD_number}, status=200)
+        return JsonResponse({'status': True, 'is_comp': thd.is_comp, 'id':thd.THD_number, 'login': login_data, 'is_logged_in': logged_in}, status=200)
     
 class THDSelect(View):
 
@@ -225,7 +238,6 @@ class LogoutView(View):
     def post(self, request):
 
         request_ip = request.POST.get('ip', None)
-        print(request.COOKIES)
 
         if not request_ip:
             return JsonResponse({'status': False, 'error': 'GET запрос составлен неверно'}, status=400)

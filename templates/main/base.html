@@ -30,7 +30,7 @@
             if (loc.protocol == 'https:') {
                  wsStart = 'wss://'
             }
-            var socket = new WebSocket(wsStart+window.location.hostname+':8000/ws/THD-ws/'+'{{THD}}')
+            var socket = new WebSocket(wsStart+window.location.hostname+':'+window.location.port+'/ws/THD-ws/'+'{{THD}}')
         {% else %}
             nonAuthorized()
         {% endif %}

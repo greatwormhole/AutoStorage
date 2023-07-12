@@ -92,12 +92,12 @@ function selectTHD(obj, id){
             if (loc.protocol == 'https:') {
                  wsStart = 'wss://'
             }
-            var socket = new WebSocket(wsStart+window.location.hostname+':8000/ws/THD-ws/'+id)
+            var socket = new WebSocket(wsStart+window.location.hostname+':'+window.location.port+'/ws/THD-ws/'+id)
             setWSHandler(socket)
             /// test///
            /// $(socket).on('open', function(){
              ///   socket.send(JSON.stringify({"code":"101"}))
-           /// })
+           /// })+
             /// test///
             $.ajax({
                 method:"GET",
