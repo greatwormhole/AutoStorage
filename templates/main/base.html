@@ -14,31 +14,42 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap" rel="stylesheet">
-    <script  src="{% static 'main/js/base.js' %}" rel="stylesheet" ></script>
-    <script  src="{% static 'main/js/base-ws.js' %}" rel="stylesheet" ></script>
     <link rel="stylesheet" href="{% static 'main/css/base.css' %}">
     <script>
-    const THDList = "{% url 'THD_list' %}",
+        const THDList = "{% url 'THD_list' %}",
         THDSelect = "{% url 'THD_select' %}",
         THDCheck = "{% url 'websocket_THD_check' %}",
         login_url = "{% url 'login' %}",
         logout_url = "{% url 'logout' %}",
-        home_url = "{% url 'home' %}"
-    $(document).ready(function(){
+        home_url = "{% url 'home' %}",
+        USING_THD = "{{THD}}"
         {% if internalUser != "NA" %}
-            authorized()
-            var wsStart = 'ws://',
-                loc = window.location;
-            if (loc.protocol == 'https:') {
-                 wsStart = 'wss://'
-            }
-            var socket = new WebSocket(wsStart+window.location.hostname+':'+window.location.port+'/ws/THD-ws/'+'{{THD}}')
-        {% else %}
-            nonAuthorized()
-        {% endif %}
-    })
+            
 
+        var wsStart = 'ws://',
+        loc = window.location;
+        if (loc.protocol == 'https:') {
+            wsStart = 'wss://'
+        }
+        var auth_socket = new WebSocket(wsStart+window.location.hostname+':'+window.location.port+'/ws/THD-ws/'+USING_THD)
+
+        {% endif %}
+        $(document).ready(function(){
+            {% if internalUser != "NA" %}
+            
+
+            authorized()
+            
+            {% else %}
+
+            nonAuthorized()
+
+            {% endif %}
+        })
+        
     </script>
+    <script  src="{% static 'main/js/base.js' %}" rel="stylesheet" ></script>
+    <script  src="{% static 'main/js/base-ws.js' %}" rel="stylesheet" ></script>
     {% block link %}
 
     {% endblock %}

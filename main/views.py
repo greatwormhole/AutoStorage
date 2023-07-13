@@ -182,7 +182,22 @@ class THDSelect(View):
     """
     View для резервирования ТСД с компьютера
     """
+    def get(self, request):
 
+        THD_ip = request.GET.get('ip')
+
+        try:
+            thd = THD.objects.get(ip=THD_ip)
+        except:
+            return JsonResponse({'status': False, 'error':'ТСД с таким ip нет в базе'}, status=404)
+        
+        thd.is_comp = False
+        thd.is_using = False
+
+        thd.save()
+
+        return JsonResponse({}, status=200)
+    
     def post(self, request):
         
         """

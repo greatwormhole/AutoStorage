@@ -1,4 +1,5 @@
 // Make the function wait until the connection is made...
+
 function waitForSocketConnection(socket, msg){
     setTimeout(
         function () {
@@ -22,13 +23,20 @@ function logout(ip){
         url: logout_url,
         data:{"ip": ip},
         success: function (response){
-            location.href = home_url
+            
+            if (auth_socket.readyState == 1){
+                auth_socket.send(JSON.stringify({"code":"1010", "user-message":"-"}));
+                location.href = home_url
+            } else{
+                location.href = home_url
+            }
+        
             }
         })
 }
 /// authorization logic///
 function authorized(){
-
+    
     $('#login-BU').css('display','none')
 
 }

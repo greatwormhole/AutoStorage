@@ -15,7 +15,8 @@ SYSTEM_CODE = {
     '101': {'message': '-', 'action': 'ws resend message', 'scanner': '-'},
     '111': {'message': '-', 'action':'thd2client id response', 'scanner':'button'},
     '1000': {'message': 'Авторизация прошла успешно!', 'action': 'show message'},
-    '1001': {'message': 'Ошибка авторизации, попробуйте снова!'}
+    '1001': {'message': 'Ошибка авторизации, попробуйте снова!'},
+    '1010':{'message': '-'}
 }
 
 class CustomWriter(ImageWriter):

@@ -14,6 +14,15 @@ function setWSHandler (ws){
                 break;
             case 101:
                 $('.prompt-message-text').text('Переподключите ТСД!')
+                var connection_data = message.data
+                $.ajax({
+                    method:"GET",
+                    async: true,
+                    url: THDSelect,
+                    data:{"ip": connection_data.ip},
+                    
+                    })
+
                 break;
             case 111:
                 var connection_data = message.data

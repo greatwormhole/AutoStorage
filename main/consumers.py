@@ -2,7 +2,7 @@ import time
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 import json
-from.WS_cache import WS_CACHE_CONNECTION
+from.WS_cache import WS_CACHE_CONNECTION, WS_CACHE_MESSAGE
 import threading
 from channels.layers import get_channel_layer
 
@@ -95,18 +95,23 @@ class THDWS(WebsocketConsumer):
             "message": text_data,
         })
 
+        print('Receive')
+        
+        print(f'ws_cache_mess: {WS_CACHE_MESSAGE}')
+        print('code: '+ str(text_data_json['code']))
+
         if text_data_json['code'] == 11:
 
             WS_CACHE_CONNECTION[text_data_json['data']['ip']] = True
-
+            print(f'ws_cache_conn: {WS_CACHE_CONNECTION}')
             return
 
         if text_data_json['code'] == 101:
 
             WS_CACHE_CONNECTION[text_data_json['data']['ip']] = False
-
+            print(f'ws_cache_conn: {WS_CACHE_CONNECTION}')
             return
-
+        
     def chat_message(self, event):
 
         self.send(text_data=json.dumps(
