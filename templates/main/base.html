@@ -21,7 +21,9 @@
     const THDList = "{% url 'THD_list' %}",
         THDSelect = "{% url 'THD_select' %}",
         THDCheck = "{% url 'websocket_THD_check' %}",
-        login = "{% url 'login' %}"
+        login_url = "{% url 'login' %}",
+        logout_url = "{% url 'logout' %}",
+        home_url = "{% url 'home' %}"
     $(document).ready(function(){
         {% if internalUser != "NA" %}
             authorized()
@@ -52,7 +54,7 @@
             {% if internalUser != "NA" %}
                 <div id = "user-info">
                     <span class="text" id = "username">{{internalUser}} </span>
-                    <div id="logout" class = "button"></div>
+                    <div id="logout" class = "button" onclick="logout('{{THD_ip}}')"></div>
                 </div>
             {% else %}
                 <div id="login" class = "button" onclick="viewListOfTHD()"></div>
@@ -74,7 +76,7 @@
                     <div id = "prompt-name-container">
                         <h4 id = "prompt-name" class="text"></h4>
                     </div>
-                    <div id = "prompt-close" class="button" onclick="promptHide(this)">
+                    <div id = "prompt-close" class="button" onclick="promptHide()">
 
                     </div>
                 </div>
