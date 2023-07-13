@@ -147,6 +147,7 @@ class MainView(View):
 
         login_data = {}
         logged_in = False
+
         get_ip = request.META.get('REMOTE_ADDR')
         thd = THD.objects.filter(ip=get_ip)
 
@@ -155,7 +156,7 @@ class MainView(View):
 
         thd = thd[0]
         
-        if thd.is_using:
+        if thd.worker is not None:
             login_data = {
                 'status': True,
                 'id': thd.worker.id,
