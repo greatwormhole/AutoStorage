@@ -13,7 +13,9 @@ SYSTEM_CODE = {
     '11': {'message': '-', 'action': 'connect to ws by THD', 'scanner': '-'},
     '100': {'message': '-', 'action': 'disconnect to ws by THD', 'scanner': '-'},
     '101': {'message': '-', 'action': 'ws resend message', 'scanner': '-'},
-    '111': {'message': '-', 'action':'thd2client id response', 'scanner':'button'}
+    '111': {'message': '-', 'action':'thd2client id response', 'scanner':'button'},
+    '1000': {'message': 'Авторизация прошла успешно!', 'action': 'show message'},
+    '1001': {'message': 'Ошибка авторизации, попробуйте снова!'}
 }
 
 class CustomWriter(ImageWriter):

@@ -26,7 +26,7 @@ def check_access(action: str | None = None):
                     'quality_control_right': False,
                 }
 
-                response = redirect('login')
+                response = redirect('home')
                 response.set_cookie(key='AccessKey', value=json.dumps(cookie))
 
                 return response

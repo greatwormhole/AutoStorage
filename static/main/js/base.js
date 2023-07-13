@@ -13,7 +13,19 @@ function waitForSocketConnection(socket, msg){
 
         }, 5);
 }
+///logout
 
+function logout(ip){
+    $.ajax({
+        method:"POST",
+        async: true,
+        url: logout_url,
+        data:{"ip": ip},
+        success: function (response){
+            location.href = home_url
+            }
+        })
+}
 /// authorization logic///
 function authorized(){
 
@@ -29,8 +41,8 @@ function nonAuthorized(){
 }
 
 ///prompt logic///
-function promptHide(obj){
-    $(obj).parent().parent().parent().hide()
+function promptHide(){
+    $('#prompt-block-UI').hide()
     $('#prompt-content').children().remove()
 }
 
