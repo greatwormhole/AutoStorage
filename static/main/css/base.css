@@ -10,9 +10,13 @@
     justify-content:space-between;
 }
 /* general css place*/
+html{
+    height:100%;
+}
 body{
-background-color:#fffef1;
-overflow:hidden;
+    background-color:#fffef1;
+    overflow:hidden;
+    height: 100%;
 }
 .block-ui{
 display:none;
@@ -42,7 +46,7 @@ left:0;
 #main{
 display:flex;
 width:100%;
-height:auto;
+height:100%;
 
 }
 

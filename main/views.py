@@ -4,7 +4,7 @@ from django.views import View
 from .decorators import check_access
 from django.core import serializers
 from .WS_cache import WS_CACHE_CONNECTION, WS_CACHE_MESSAGE
-from .models import Worker, THD, Nomenclature
+from .models import Worker, THD, Nomenclature, Crates
 import random
 from barcode import Code39
 from .utils import CustomWriter
@@ -157,12 +157,12 @@ class MainView(View):
         logged_in = False
 
         get_ip = request.META.get('REMOTE_ADDR')
-        thd = THD.objects.filter(ip=get_ip)
+        thds = THD.objects.filter(ip=get_ip)
 
-        if not thd:
+        if not thds:
             return JsonResponse({'status': False, 'error': 'ТСД с таким ip нет в базе'}, status=404)
 
-        thd = thd[0]
+        thd = thds.first()
         
         if thd.worker is not None:
             login_data = {
@@ -285,3 +285,20 @@ class LogoutView(View):
         response.delete_cookie('AccessKey')
 
         return response
+    
+class CrateListView(View):
+
+    def get(self, request):
+
+        request_crate_id = request.GET.get('id', None)
+
+        if request_crate_id is None:
+            return JsonResponse({'status': False, 'error': 'GET запрос составлен неверно'}, status=400)
+
+        crate = Crates.objects.filter(id=request_crate_id)
+
+        if not crate:
+            return JsonResponse({'status': False, 'error': 'Коробки с таким ID нет в базе'}, status=404)
+        
+        crate = crate.first()
+
