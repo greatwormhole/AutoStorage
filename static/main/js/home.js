@@ -7,7 +7,7 @@ function getCookie(name) {
 /// authorization button logic///
 $(document).ready(function(){
     var rights = JSON.parse(getCookie('AccessKey').replace(/\\054/g, ','))
-    if (JSON.parse(rights)["storage_right"] == false){
+    if (JSON.parse(rights)["storage_right"] == true){
         var html = "<div class = 'rights'>"
         html += "<h2 class = 'text'>Склад</h2>"
         html += "<button class = 'storage' id = 'consignment-note'>"
@@ -28,7 +28,7 @@ $(document).ready(function(){
         html += "</div>"
         $('#button-panel').append(html)
     }
-    if (JSON.parse(rights)["plan_right"] == false){
+    if (JSON.parse(rights)["plan_right"] == true){
         var html = "<div class = 'rights'>"
         html += "<h2 class = 'text'>Планирование</h2>"
         html += "<button class = 'plan' id = 'month-plan'>"
@@ -43,7 +43,7 @@ $(document).ready(function(){
         html += "</div>"
         $('#button-panel').append(html)
     }
-    if (JSON.parse(rights)["quality_control_right"] == false){
+    if (JSON.parse(rights)["quality_control_right"] == true){
         var html = "<div class = 'rights'>"
         html += "<h2 class = 'text'>Отдел качества</h2>"
         html += "<button class = 'quality'>"

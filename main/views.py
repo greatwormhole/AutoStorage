@@ -16,8 +16,7 @@ class HomeView(View):
     @check_access()
     def get(self, request):
 
-        #username = json.loads(request.COOKIES.get('AccessKey')).get('name')
-        username = 'ilya'
+        username = json.loads(request.COOKIES.get('AccessKey')).get('name')
         THD_num = json.loads(request.COOKIES.get('AccessKey')).get('THD')
 
         if THD_num is not None:
@@ -72,9 +71,11 @@ class LoginView(View):
             'quality_control_right': bool(worker.quality_control_right),
         }
 
+        if not thd.is_using:
+            thd.is_using = True
+            thd.is_comp = False
+
         thd.worker = worker
-        thd.is_using = True
-        thd.is_comp = False
 
         thd.save()
         response = JsonResponse(data, status=200)
