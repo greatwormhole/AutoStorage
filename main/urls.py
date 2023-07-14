@@ -10,7 +10,7 @@ from .views import (
     THDSelect,
     WebSocketTHDcheck,
     LogoutView,
-    CrateView
+
     )
 from django.conf import settings
 from django.conf.urls.static import static
@@ -25,7 +25,7 @@ urlpatterns = [
     path('API/THD-select', THDSelect.as_view(), name="THD_select"),
     path('API/THD-check', WebSocketTHDcheck.as_view(), name='websocket_THD_check'),
     path('API/logout', LogoutView.as_view(), name='logout'),
-    path('API/crates', CrateView.as_view(), name='crate')
+
 ]
 
 if settings.DEBUG:

@@ -16,7 +16,8 @@ class HomeView(View):
     @check_access()
     def get(self, request):
 
-        username = json.loads(request.COOKIES.get('AccessKey')).get('name')
+        #username = 'json.loads(request.COOKIES.get('AccessKey')).get('name')'
+        username = 'ilya'
         THD_num = json.loads(request.COOKIES.get('AccessKey')).get('THD')
 
         if THD_num is not None:
@@ -40,20 +41,20 @@ class LoginView(View):
         request_id = request.POST.get('id', None)
         request_ip = request.POST.get('ip', None)
 
-        if None in (request_id, request_ip):
+        if request_id is None or request_ip is None:
             return JsonResponse({'status': False, 'error': 'POST запрос составлен неверно'}, status=400)
         
-        workers = Worker.objects.filter(id=request_id)
-        thds = THD.objects.filter(ip=request_ip)
+        worker = Worker.objects.filter(id=request_id)
+        thd = THD.objects.filter(ip=request_ip)
 
-        if not workers:
+        if not worker:
             return JsonResponse({'status': False, 'error': 'Данного работника нет в базе'}, status=404)
 
-        if not thds:
+        if not thd:
             return JsonResponse({'status': False, 'error': 'Данного ТСД нет в базе'}, status=404)
         
-        worker = workers.first()
-        thd = thds.first()
+        worker = worker[0]
+        thd = thd[0]
 
         cookie = {
             'id': int(request_id),
@@ -116,10 +117,6 @@ class THDList(View):
     
 class NomenclatureView(View):
 
-    """
-    View для подгрузки номенклатуры из базы по полю
-    """
-
     @check_access()
     def get(self, request):
         
@@ -128,13 +125,11 @@ class NomenclatureView(View):
         if get_article is None:
             return JsonResponse({'status': False, 'error': 'GET запрос составлен неверно'}, status=400)
         
-        nomenclatures = Nomenclature.objects.filter(article=get_article)
+        nomenclature = Nomenclature.objects.get(article=get_article)
 
-        if not nomenclatures:
+        if not nomenclature:
             return JsonResponse({'status': False, 'error': 'Данного артикула нет в базе'}, status=404)
         
-        nomenclature = nomenclatures.first()
-
         data = {
             'nomenclature': nomenclature.title,
             'units': nomenclature.units,
@@ -187,21 +182,15 @@ class THDSelect(View):
     """
     View для резервирования ТСД с компьютера
     """
-
     def get(self, request):
 
         THD_ip = request.GET.get('ip')
 
-        if THD_ip is None:
-            return JsonResponse({'status': False, 'error': 'GET запрос составлен неверно'}, status=400)
-
-        thds = THD.objects.filter(ip=THD_ip)
-
-        if not thds:
+        try:
+            thd = THD.objects.get(ip=THD_ip)
+        except:
             return JsonResponse({'status': False, 'error':'ТСД с таким ip нет в базе'}, status=404)
         
-        thd = thds.first()
-
         thd.is_comp = False
         thd.is_using = False
 
@@ -216,18 +205,14 @@ class THDSelect(View):
         """
 
         THD_num = request.POST.get('THD_num')
+
         is_comp = request.POST.get('PC')
 
-        if None in (THD_num, is_comp):
-            return JsonResponse({'status': False, 'error': 'GET запрос составлен неверно'}, status=400)
-        
-        thds = THD.objects.filter(THD_number=THD_num)
-
-        if not thds:
+        try:
+            thd = THD.objects.get(THD_number=THD_num)
+        except:
             return JsonResponse({'status': False, 'error':'ТСД с таким ip нет в базе'}, status=404)
         
-        thd = thds.first()
-
         thd.is_comp = is_comp
         thd.is_using = True
 
@@ -248,9 +233,12 @@ class WebSocketTHDcheck(View):
             return JsonResponse({'status': False, 'error': 'GET запрос составлен неверно'}, status=400)
         
         try:
+
             ip = THD.objects.get(THD_number=request_id).ip
+
         except:
-            return JsonResponse({'status': False, 'error': 'Данный ip не подключен к комнате'}, status=404)
+
+            return JsonResponse({'status': False, 'error': 'GET запрос составлен неверно'}, status=400)
 
         if ip not in WS_CACHE_CONNECTION.keys():
 
@@ -298,7 +286,7 @@ class LogoutView(View):
 
         return response
     
-class CrateView(View):
+class CrateListView(View):
 
     def get(self, request):
 
@@ -313,6 +301,4 @@ class CrateView(View):
             return JsonResponse({'status': False, 'error': 'Коробки с таким ID нет в базе'}, status=404)
         
         crate = crate.first()
-
-        return JsonResponse({'status': True, 'position': None}, status=200)
 

@@ -14,20 +14,175 @@
 #view-space{
     max-width: 1440px;
     max-height: 966px;
-    width: 95%;
-    height: 100%;
+    width: 40%;
+    height: 85%;
     background-color: white;
     border-radius: 10px 10px 10px 10px;
     box-shadow: 0px 1px 10px 2px rgba(0, 0, 0, 0.16);
     display: flex;
-    
+    flex-direction: column;
     justify-content: center;
     margin-top: 30px;
 }
 #button-panel{
+    display: flex;
     min-height: 500px;
-    width: 80%;
-    margin-top: 30px;
+    max-height:95%;
+    width: 100%;
     border-radius: 10px 10px 10px 10px;
-    
+    flex-direction: column;
+    overflow-x:hidden;
+    overflow-y:auto;
+}
+#button-panel::-webkit-scrollbar {
+  width: 2px;
+}
+
+#button-panel::-webkit-scrollbar-thumb {
+  background-color: darkgrey;
+  outline: 1px solid slategrey;
+}
+#button-panel button{
+    width:80%;
+    height:40px;
+    margin:auto;
+    margin-top:0px;
+    margin-bottom:20px;
+    border:1px solid gray;
+    border-radius:5px 5px 5px 5px;
+    font-weight: bold;
+    color:white;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+
+}
+#button-panel button span{
+    margin:auto;
+}
+.storage{
+    width:90%;
+    background-color:#0d6efd;
+}
+.plan{
+    background-color:#20c997;
+}
+.quality{
+    background-color:#ffc107;
+}
+
+.rights{
+    display:flex;
+    flex-direction: column;
+    border:1px solid gray;
+    border-radius:10px 10px 10px 10px;
+    width:90%;
+    margin:auto;
+    margin-bottom:20px;
+    margin-top:0px;
+    box-shadow: 0px 1px 10px 2px rgba(0, 0, 0, 0.16);
+}
+
+.rights h2{
+    text-align:center;
+}
+
+#consignment-note::before{
+    content: "";
+    display:inline-block;
+    width:32px;
+    height:32px;
+    background:url('/media/icons/consignment-note.png');
+    background-size: contain;
+    margin-top:4px;
+}
+
+#broken-parts-in::before{
+    content: "";
+    display:inline-block;
+    width:32px;
+    height:32px;
+    background:url('/media/icons/flaw_send.png');
+    background-size: contain;
+    margin-top:4px;
+}
+#parts-in-factory::before{
+    content: "";
+    display:inline-block;
+    width:32px;
+    height:32px;
+    background:url('/media/icons/real_prod.png');
+    background-size: contain;
+    margin-top:4px;
+
+}
+
+#month-plan::before{
+    content: "";
+    display:inline-block;
+    width:32px;
+    height:32px;
+    background:url('/media/icons/month_plan.png');
+    background-size: contain;
+    margin-top:4px;
+}
+
+#visualise-storage::before{
+    content: "";
+    display:inline-block;
+    width:32px;
+    height:32px;
+    background:url('/media/icons/terminal.png');
+    background-size: contain;
+    margin-top:4px;
+}
+
+#shift-plan::before{
+    content: "";
+    display:inline-block;
+    width:32px;
+    height:32px;
+    background:url('/media/icons/shift_plan.png');
+    background-size: contain;
+    margin-top:4px;
+}
+
+#search::before{
+    content: "";
+    display:inline-block;
+    width:32px;
+    height:32px;
+    background:url('/media/icons/navigation.png');
+    background-size: contain;
+    margin-top:4px;
+}
+
+#prod-fact::before{
+    content: "";
+    display:inline-block;
+    width:32px;
+    height:32px;
+    background:url('/media/icons/navigation.png');
+    background-size: contain;
+    margin-top:4px;
+}
+
+#flaw-send::before{
+    content: "";
+    display:inline-block;
+    width:32px;
+    height:32px;
+    background:url('/media/icons/flaw_send.png');
+    background-size: contain;
+    margin-top:4px;
+}
+
+#flaw-decision::before{
+    content: "";
+    display:inline-block;
+    width:32px;
+    height:32px;
+    background:url('/media/icons/flaw_decision.png');
+    background-size: contain;
+    margin-top:4px;
 }
