@@ -286,7 +286,7 @@ class LogoutView(View):
 
         return response
     
-class CrateListView(View):
+class CrateView(View):
 
     def get(self, request):
 
@@ -302,3 +302,4 @@ class CrateListView(View):
         
         crate = crate.first()
 
+        return JsonResponse({'status': True, 'position': None}, status=200)
