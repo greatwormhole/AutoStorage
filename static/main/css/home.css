@@ -186,3 +186,13 @@
     background-size: contain;
     margin-top:4px;
 }
+
+#real-prod::before{
+    content: "";
+    display:inline-block;
+    width:32px;
+    height:32px;
+    background:url('/media/icons/ready_product.png');
+    background-size: contain;
+    margin-top:4px;
+}

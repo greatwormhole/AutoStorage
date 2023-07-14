@@ -16,7 +16,7 @@ class HomeView(View):
     @check_access()
     def get(self, request):
 
-        #username = 'json.loads(request.COOKIES.get('AccessKey')).get('name')'
+        #username = json.loads(request.COOKIES.get('AccessKey')).get('name')
         username = 'ilya'
         THD_num = json.loads(request.COOKIES.get('AccessKey')).get('THD')
 
