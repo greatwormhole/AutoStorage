@@ -33,19 +33,6 @@ class Specification(models.Model):
         verbose_name = "Спецификация"
         verbose_name_plural = "Спецификации"
 
-class Crates(models.Model):
-    id = models.PositiveBigIntegerField(primary_key=True)
-    nomenclature = models.ForeignKey(Nomenclature, on_delete=models.RESTRICT)
-    amount = models.FloatField()
-    size = models.CharField(max_length=60)
-
-    def __str__(self):
-        return self.nomenclature
-    
-    class Meta:
-        verbose_name = "Коробка"
-        verbose_name_plural = "Коробки"
-
 class Worker(models.Model):
     id = models.PositiveIntegerField(primary_key=True)
     name = models.CharField(max_length=150)
@@ -76,15 +63,14 @@ class DeliveryNote(models.Model):
         verbose_name_plural = "Накладные"
 
 class Storage(models.Model):
-    adress = models.CharField(max_length=250, primary_key=True)
-    crate_list = ArrayField(base_field=models.IntegerField(), default=list)
+    adress = models.PositiveIntegerField(primary_key=True)
     cell_size = models.CharField(max_length=60)
     size_left = models.FloatField()
     storage_name = models.CharField(max_length=60)
     mass = models.PositiveIntegerField(default=700)
 
     def __str__(self):
-        return self.adress
+        return f'{self.adress}'
     
     class Meta:
         verbose_name = "Склад"
@@ -100,6 +86,20 @@ class ProductionStorage(models.Model):
     class Meta:
         verbose_name = "Склад производства"
         verbose_name_plural = "Склады производства"
+
+class Crates(models.Model):
+    id = models.PositiveBigIntegerField(primary_key=True)
+    nomenclature = models.ForeignKey(Nomenclature, on_delete=models.RESTRICT)
+    amount = models.FloatField()
+    size = models.CharField(max_length=60)
+    cell = models.ForeignKey(Storage, on_delete=models.RESTRICT, blank=True, null=True, related_name='crates')
+
+    def __str__(self):
+        return f'Коробка {self.nomenclature.title} - {self.amount} {self.nomenclature.units}'
+    
+    class Meta:
+        verbose_name = "Коробка"
+        verbose_name_plural = "Коробки"
     
 class Flaw(models.Model):
     id = models.PositiveBigIntegerField()
@@ -127,7 +127,7 @@ class THD(models.Model):
     worker = models.ForeignKey(Worker, on_delete=models.RESTRICT, blank=True, null=True)
 
     def __str__(self):
-        return str(self.THD_number)
+        return f'ТСД №{self.THD_number}'
 
     class Meta:
         verbose_name = "Номер ТСД"

@@ -1,13 +1,16 @@
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
 from django.views import View
-from .decorators import check_access
 from django.core import serializers
+from django.db import IntegrityError
+
+from .decorators import check_access
 from .WS_cache import WS_CACHE_CONNECTION, WS_CACHE_MESSAGE
-from .models import Worker, THD, Nomenclature, Crates
+from .models import Worker, THD, Nomenclature, Crates, Storage
+from .utils import CustomWriter
+
 import random
 from barcode import Code39
-from .utils import CustomWriter
 from transliterate import translit
 import json
 
@@ -289,6 +292,10 @@ class LogoutView(View):
     
 class CrateView(View):
 
+    """
+    Получение и изменение данных одной коробки по id
+    """
+
     def get(self, request):
 
         request_crate_id = request.GET.get('id', None)
@@ -304,3 +311,70 @@ class CrateView(View):
         crate = crate.first()
 
         return JsonResponse({'status': True, 'position': None}, status=200)
+    
+    def post(self, request):
+
+        request_id = int(request.POST.get('id', None))
+        request_amount = float(request.POST.get('amount', None))
+
+        if None in (request_amount, request_id):
+            return JsonResponse({'status': False, 'error': 'POST запрос составлен неверно'}, status=400)
+        
+        crate = Crates.objects.filter(id=request_id)
+
+        if not crate:
+            return JsonResponse({'status': False, 'error': 'Коробки с таким ID нет в базе'}, status=404)
+        
+        crate = crate.first()
+
+        if request_amount < crate.amount:
+            crate.amount -= request_amount  
+        else:
+            crate.delete()
+
+        try:
+            crate.save()
+        except IntegrityError:
+            pass    
+
+        return JsonResponse({'status': True}, status=200)
+        
+class MoveCrateView(View):
+
+    """
+    Перемещение коробки из одной ячейки в другую
+    """
+
+    def post(self, request):
+
+        request_id = request.POST.get('id', None)
+        request_adress = request.POST.get('cell', None)
+
+        if None in (request_adress, request_id):
+            return JsonResponse({'status': False, 'error': 'POST запрос составлен неверно'}, status=400)
+        
+        crate = Crates.objects.filter(id=request_id)
+        cell = Storage.objects.filter(adress=request_adress)
+
+        if not crate:
+            return JsonResponse({'status': False, 'error': 'Коробки с таким ID нет в базе'}, status=404)
+        
+        if not cell:
+            return JsonResponse({'status': False, 'error': 'Ячейки с таким ID нет в базе'}, status=404)
+        
+        crate = crate.first()
+        cell = cell.first()
+
+        crate.cell = cell
+
+        crate.save()
+
+        return JsonResponse({'status': True}, status=200)
+        
+
+
+class CheckConnection(View):
+
+    def get(self, request):
+
+        return JsonResponse({'status': True}, status=200)
