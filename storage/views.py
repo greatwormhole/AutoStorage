@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import JsonResponse
+from django.http import HttpResponse
 from django.views import View
 from django.core import serializers
 from main.models import THD, Nomenclature
@@ -35,6 +35,6 @@ class NomenclatureView(View):
 
         data = Nomenclature.objects.all()
 
-        response = JsonResponse(data=serializers.serialize('json', data), safe=False)
+        response = HttpResponse(serializers.serialize('json', data), content_type='application/json')
 
         return response

@@ -7,7 +7,7 @@ from datetime import datetime
 
 class Nomenclature(models.Model):
     article = models.CharField(max_length=250, primary_key=True)
-    title = models.CharField(max_length=250)
+    title = models.CharField(max_length=250, unique=True)
     units = models.CharField(max_length=60)
     maximum = models.FloatField(null=True, blank=True)
     minimum = models.FloatField(null=True, blank=True)
@@ -49,7 +49,7 @@ class Worker(models.Model):
         verbose_name_plural = "Работники"
 
 class DeliveryNote(models.Model):
-    id = models.CharField(primary_key=True, max_length=150)
+    id = models.CharField(primary_key=True, max_length=150, default='')
     datetime = models.DateTimeField(auto_now_add=True)
     worker_id = models.ForeignKey(Worker, on_delete=models.RESTRICT)
     article_list = models.JSONField(default=dict,
@@ -57,7 +57,7 @@ class DeliveryNote(models.Model):
     provider = models.CharField(max_length=150, default='')
 
     def __str__(self):
-        return self.number
+        return self.id
     
     class Meta:
         verbose_name = "Накладная"
@@ -92,7 +92,7 @@ class Crates(models.Model):
     id = models.PositiveBigIntegerField(primary_key=True)
     nomenclature = models.ForeignKey(Nomenclature, on_delete=models.RESTRICT)
     amount = models.FloatField()
-    size = models.CharField(max_length=60)
+    size = models.CharField(max_length=80)
     cell = models.ForeignKey(Storage, on_delete=models.RESTRICT, blank=True, null=True, related_name='crates')
 
     def __str__(self):
