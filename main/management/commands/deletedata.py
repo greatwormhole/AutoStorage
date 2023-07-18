@@ -12,11 +12,7 @@ class Command(BaseCommand):
 
         self.stdout.write("Deleting old data...")
 
-        models = apps.get_models()
-
-        for m in models:
-            if issubclass(m, Worker) or issubclass(m, Storage) or issubclass(m, Nomenclature) or issubclass(m, Crates):
-                m.objects.all().delete()
-        
-
-
+        Crates.objects.all().delete()
+        Worker.objects.all().delete()
+        Nomenclature.objects.all().delete()
+        Storage.objects.all().delete()

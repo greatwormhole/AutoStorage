@@ -125,7 +125,7 @@ class THD(models.Model):
     ip = models.CharField(max_length=250)
     is_using = models.BooleanField(default=False)
     is_comp = models.BooleanField(default=False)
-    worker = models.ForeignKey(Worker, on_delete=models.RESTRICT, blank=True, null=True)
+    worker = models.ForeignKey(Worker, on_delete=models.SET_NULL, blank=True, null=True)
 
     def __str__(self):
         return f'ТСД №{self.THD_number}'

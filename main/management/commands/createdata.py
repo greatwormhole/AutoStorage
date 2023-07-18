@@ -5,10 +5,10 @@ from django.db import transaction
 
 from main.factories import *
 
-CRATE_NUM = 100
-WORKER_NUM = 20
-NOMENCLATURE_NUM = 1000
-CELLS_PER_STORAGE = 20
+CRATE_NUM = 500
+WORKER_NUM = 150
+NOMENCLATURE_NUM = 5000
+CELLS_PER_STORAGE = 50
 STORAGE_NUM = 5
 
 STORAGES = [f'Склад {i}' for i in range(1, STORAGE_NUM + 1)]

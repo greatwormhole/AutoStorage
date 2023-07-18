@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import path
 from .views import (
-    DeliveryView,
+    BarcodeView,
     HomeView,
     LoginView,
     THDList,
@@ -18,7 +18,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('', HomeView.as_view(), name="home"),
-    path('barcode', DeliveryView.as_view(), name='barcode'),
+    path('API/barcode', BarcodeView.as_view(), name='barcode'),
     path('API/login', LoginView.as_view(), name='login'),
     path('API/THD-list', THDList.as_view(), name='THD_list'),
     path('API/THD-lock', MainView.as_view(), name='locking'),

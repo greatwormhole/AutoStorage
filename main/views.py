@@ -93,13 +93,12 @@ class LoginView(View):
         
         return response
 
-class DeliveryView(View):
+class BarcodeView(View):
 
     """
-    Генерация накладной
+    Генерация штрих-кода для коробки
     """
 
-    @check_access()
     def get(self, request):
     
         article = translit('22222223', language_code='ru', reversed=True)

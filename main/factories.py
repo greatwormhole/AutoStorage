@@ -5,6 +5,7 @@ from .models import *
 
 class WorkerFactory(DjangoModelFactory):
 
+    id = factory.Sequence(lambda num: num)
     name = factory.Faker('name')
     storage_right = factory.Faker('boolean', chance_of_getting_true=50)
     plan_right = factory.Faker('boolean', chance_of_getting_true=50)
@@ -27,7 +28,7 @@ class NomenclatureFactory(DjangoModelFactory):
 
 class StorageFactory(DjangoModelFactory):
     
-    adress = factory.Faker('numerify', text='%#####')
+    adress = factory.Sequence(lambda x: x)
     cell_size = factory.Faker('numerify', text='%!!!!!x%!!!!!x%!!!!!')
     size_left = factory.Faker('numerify', text='%##!!!')
     mass = factory.Faker('numerify', text='%##!!!')
@@ -37,6 +38,7 @@ class StorageFactory(DjangoModelFactory):
 
 class CrateFactory(DjangoModelFactory):
 
+    id = factory.Sequence(lambda num: num)
     amount = factory.Faker('numerify', text='%##!')
     size = factory.Faker('numerify', text='%!!!x%!!!x%!!!')
 
