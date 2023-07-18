@@ -20,7 +20,7 @@ function getCookie(name) {
 /// authorization button logic///
 $(document).ready(function(){
     var rights = JSON.parse(getCookie('AccessKey').replace(/\\054/g, ','))
-    if (JSON.parse(rights)["storage_right"] == true){
+    if (JSON.parse(rights)["storage_right"] == false){
         var html = "<div class = 'rights'>"
         html += "<h2 class = 'text'>Склад</h2>"
         html += "<button class = 'storage' id = 'consignment-note'>"
