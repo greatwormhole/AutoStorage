@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import JsonResponse, HttpResponse
 from django.views import View
 from django.core import serializers
 from main.models import THD, Nomenclature
@@ -12,7 +12,7 @@ class main(View):
 
         username = json.loads(request.COOKIES.get('AccessKey')).get('name')
         THD_num = json.loads(request.COOKIES.get('AccessKey')).get('THD')
-        # username = 'test'
+        username = 'test'
         if THD_num is not None:
 
             THD_ip = THD.objects.get(THD_number=THD_num).ip

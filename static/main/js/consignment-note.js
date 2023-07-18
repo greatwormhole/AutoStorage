@@ -1,14 +1,17 @@
+
+//start
 function promptShow(){
     if ($('#prompt-block-UI').css('display') != 'none'){
     return
     }
+
     $('#prompt').css({'flex-direction':'column',
                       'border':'1px solid gray',
                       'background-color':'white',
                       'border-radius':'5px 5px 5px 5px'})
     var html = '<div class = "prompt-row " id = "consignment-note-prompt-row">'
     html += '<span class = "margined">Идентификатор:</span>'
-    html += '<input type="text" class = "margined" id="input-consignment-note-num">'
+    html += '<input type="text" class = "margined" id="input-consignment-note-num" maxlength="150">'
     html += '<div id = "save-consignment-note-num" class = "margined"></div>'
     html += '</div>'
 
@@ -32,22 +35,110 @@ function promptShow(){
         $('#prompt-block-UI').hide()
         $('.prompt-message').hide()
         $('#number').text(consignmentNoteId)
+        window.onbeforeunload = function() {
+                return "Накладную придется заполнять заново!";
+            };
     })
 }
+// получение информации GET
+function ajaxGet(path){
+    var GlobalResponse = {}
+    $.ajax({
+        method:"GET",
+        async: false,
+        url: path,
+        success: function(response){
 
+            GlobalResponse = response
+        },
+        error: function(response){
+            location.reload
+        }
+    })
+    return GlobalResponse
+}
+//Доюавление ячейки с товаром
 function addRow(){
-    var html='<tr>'
+    var previous = $('.main-table-row')[$('.main-table-row').length-1],
+        id = parseInt($(previous).attr('id')) + 1
+    if (typeof $(previous).attr('id') === 'undefined'){
+        id = 0
+    }
+
+    var html='<tr class="main-table-row" id="'+id+'">'
     html += '<td>'
+    html += '<span id="'+id+'_articule_span"></span>'
     html += '</td>'
     html += '<td>'
+    html += '<select class="js-example-basic-single" id = "'+id+'_select_nomenclature">'
+    html += '<option>Добавьте номенклатуру!</option>'
+    for (let i=0; i<nomenclature.length;i++){
+        html += '<option>'+nomenclature[i].fields.title+'</option>'
+
+    }
+    html += '</select>'
     html += '</td>'
     html += '<td>'
+    html += '<input type="number"  class= "input-table" id="'+id+'_count">'
+    html += '<span id="'+id+'_unit"></span>'
     html += '</td>'
     html += '<td>'
+    html += '<input type="number" class= "input-table" style="width:18%; border:1px solid gray" id="'+id+'_x">'
+    html += '<span> (мм) - </span>'
+    html += '<input type="number" class= "input-table" style="width:18%; border:1px solid gray" id="'+id+'_y">'
+    html += '<span> (мм) - </span>'
+    html += '<input type="number" class= "input-table" style="width:18%; border:1px solid gray" id="'+id+'_z">'
+    html += '<span> (мм)</span>'
     html += '</td>'
     html += '<td>'
+    html += '<button class="print-mark-button">'
+    html += '</button>'
+    html += '<button class="delete-row-button" id = "'+id+'_delete" onclick="deleteTableRow(this.id)">'
+    html += '</button>'
     html += '</td>'
+
     html+='</tr>'
     $('#table-body').append(html)
     $('#main-table').scrollTop($('#table-body').height());
+    $('.js-example-basic-single').attr("lang", "ru").select2({
+        language: "ru"
+    });
+    $('.select2').css({'width':'100%', 'max-width':'100%'})
+    $('.select2-selection--single').css({'border':'0px solid', 'background':'none'})
+
+    $('#'+id+'_select_nomenclature').on('change', function(e){
+        var id = parseInt(e.target.id.split('_')[0]),
+            nom = e.target.value,
+            product = {}
+        if (nom == 'Добавьте номенклатуру!'){
+            $('#'+id+'_articule_span').text('')
+            $('#'+id+'_unit').text('')
+            return
+        }
+        for (let i = 0; i<nomenclature.length; i++){
+            if (nomenclature[i].fields.title == nom){
+               product = nomenclature[i]
+            }
+        }
+        $('#'+id+'_articule_span').text(product.pk)
+        $('#'+id+'_count').val(null)
+        $('#'+id+'_x').val(null)
+        $('#'+id+'_y').val(null)
+        $('#'+id+'_z').val(null)
+        $('#'+id+'_unit').text(product.fields.units)
+        })
+    $('.input-table').on('keydown', function(e){
+        if (e.keyCode == 69 || e.keyCode == 189){
+            return false
+        } else {return true}
+    })
+    }
+
+//delete row
+
+function deleteTableRow(id){
+    let isDelete = confirm("Удалить строку номенклатуры?");
+    if (isDelete){
+        $('#'+id.split("_")[0]).remove()
+    }
 }
