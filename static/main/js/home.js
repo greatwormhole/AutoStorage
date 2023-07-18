@@ -1,3 +1,16 @@
+///redirect
+var pathList = {
+    'consignment-note': consignmentNote
+}
+function redirect(idList){
+
+    for (i=0; i<idList.length; i++){
+        $('#'+idList[i]).on('click', function(){
+            location.href = pathList[this.id]
+        })
+    }
+}
+/// visualization using rights
 function getCookie(name) {
   let matches = document.cookie.match(new RegExp(
     "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
@@ -7,7 +20,7 @@ function getCookie(name) {
 /// authorization button logic///
 $(document).ready(function(){
     var rights = JSON.parse(getCookie('AccessKey').replace(/\\054/g, ','))
-    if (JSON.parse(rights)["storage_right"] == true){
+    if (JSON.parse(rights)["storage_right"] == false){
         var html = "<div class = 'rights'>"
         html += "<h2 class = 'text'>Склад</h2>"
         html += "<button class = 'storage' id = 'consignment-note'>"
@@ -27,8 +40,10 @@ $(document).ready(function(){
         html += "</button>"
         html += "</div>"
         $('#button-panel').append(html)
+
+        redirect(['consignment-note'])
     }
-    if (JSON.parse(rights)["plan_right"] == true){
+    if (JSON.parse(rights)["plan_right"] == false){
         var html = "<div class = 'rights'>"
         html += "<h2 class = 'text'>Планирование</h2>"
         html += "<button class = 'plan' id = 'month-plan'>"
@@ -43,7 +58,7 @@ $(document).ready(function(){
         html += "</div>"
         $('#button-panel').append(html)
     }
-    if (JSON.parse(rights)["quality_control_right"] == true){
+    if (JSON.parse(rights)["quality_control_right"] == false){
         var html = "<div class = 'rights'>"
         html += "<h2 class = 'text'>Отдел качества</h2>"
         html += "<button class = 'quality'>"
