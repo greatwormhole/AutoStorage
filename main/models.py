@@ -9,8 +9,8 @@ class Nomenclature(models.Model):
     article = models.CharField(max_length=250, primary_key=True)
     title = models.CharField(max_length=250)
     units = models.CharField(max_length=60)
-    maximum = models.FloatField(null=True)
-    minimum = models.FloatField(null=True)
+    maximum = models.FloatField(null=True, blank=True)
+    minimum = models.FloatField(null=True, blank=True)
     mass = models.FloatField(blank=True, null=True)
 
     def __str__(self):
@@ -49,11 +49,12 @@ class Worker(models.Model):
         verbose_name_plural = "Работники"
 
 class DeliveryNote(models.Model):
-    number = models.PositiveBigIntegerField(primary_key=True)
+    id = models.CharField(primary_key=True, max_length=150)
     datetime = models.DateTimeField(auto_now_add=True)
     worker_id = models.ForeignKey(Worker, on_delete=models.RESTRICT)
     article_list = models.JSONField(default=dict,
                                     validators=[ArticleJSONValidator(limit_value=JSONSCHEMA)])
+    provider = models.CharField(max_length=150, default='')
 
     def __str__(self):
         return self.number

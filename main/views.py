@@ -24,7 +24,7 @@ class HomeView(View):
 
         username = json.loads(request.COOKIES.get('AccessKey')).get('name')
         THD_num = json.loads(request.COOKIES.get('AccessKey')).get('THD')
-        username = "test"
+        # username = "test"
         if THD_num is not None:
 
             THD_ip = THD.objects.get(THD_number=THD_num).ip
@@ -129,35 +129,6 @@ class THDList(View):
         response_json = serializers.serialize('json', data)
 
         return HttpResponse(response_json, content_type='application/json')
-    
-class NomenclatureView(View):
-
-    """
-    Получение номенклатуры по артикулу
-    """
-
-    @check_access()
-    def get(self, request):
-        
-        get_article = request.GET.get('article', None)
-
-        if get_article is None:
-            return JsonResponse({'status': False, 'error': 'GET запрос составлен неверно'}, status=400)
-        
-        nomenclature = Nomenclature.objects.get(article=get_article)
-
-        if not nomenclature:
-            return JsonResponse({'status': False, 'error': 'Данного артикула нет в базе'}, status=404)
-        
-        data = {
-            'nomenclature': nomenclature.title,
-            'units': nomenclature.units,
-            'mass': nomenclature.mass
-        }
-
-        response = JsonResponse(data=data)
-
-        return response
     
 class MainView(View):
     

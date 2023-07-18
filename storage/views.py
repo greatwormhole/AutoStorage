@@ -1,6 +1,8 @@
 from django.shortcuts import render
+from django.http import JsonResponse
 from django.views import View
-from main.models import THD
+from django.core import serializers
+from main.models import THD, Nomenclature
 import json
 
 
@@ -10,7 +12,7 @@ class main(View):
 
         username = json.loads(request.COOKIES.get('AccessKey')).get('name')
         THD_num = json.loads(request.COOKIES.get('AccessKey')).get('THD')
-        username = 'test'
+        # username = 'test'
         if THD_num is not None:
 
             THD_ip = THD.objects.get(THD_number=THD_num).ip
@@ -22,4 +24,17 @@ class main(View):
             context = {"internalUser": username, 'THD': THD_num}
 
         return render(request, 'storage/consignment-note.html', context=context)
-# Create your views here.
+
+class NomenclatureView(View):
+
+    """
+    Получение номенклатуры по артикулу
+    """
+
+    def get(self, request):
+
+        data = Nomenclature.objects.all()
+
+        response = JsonResponse(data=serializers.serialize('json', data), safe=False)
+
+        return response
