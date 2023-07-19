@@ -72,7 +72,7 @@ DATABASES = {
         'NAME': 'Apro',
         'USER': 'postgres',
         'PASSWORD': 'ybrbnjc123',
-        'HOST': '26.67.48.151',
+        'HOST': 'localhost',
         'PORT': '5432',
     }
 }

@@ -54,7 +54,7 @@
         var consignmentNoteId = '',
             nomenclature = {}
         const getNomenclature = "{% url 'get_all_nomenclature' %}",
-              saveConsignmentNoteUrl = ""
+              saveConsignmentNoteUrl = "{% url 'save_consignment_note' %}"
         $(document).ready(function(){
             promptShow()
             $('#date').text(new Date().toLocaleDateString() + ' '+ new Date().toLocaleTimeString())

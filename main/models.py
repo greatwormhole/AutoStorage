@@ -51,9 +51,8 @@ class Worker(models.Model):
 class DeliveryNote(models.Model):
     id = models.CharField(primary_key=True, max_length=150, default='')
     datetime = models.DateTimeField(auto_now_add=True)
-    worker_id = models.ForeignKey(Worker, on_delete=models.RESTRICT)
-    article_list = models.JSONField(default=dict,
-                                    validators=[ArticleJSONValidator(limit_value=JSONSCHEMA)])
+    worker = models.ForeignKey(Worker, on_delete=models.RESTRICT)
+    article_list = models.TextField(null=True, blank=True)
     provider = models.CharField(max_length=150, default='')
 
     def __str__(self):

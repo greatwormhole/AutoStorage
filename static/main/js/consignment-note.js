@@ -154,7 +154,7 @@ function saveConsignmentNote(){
                 nomenclature = $('#'+i+'_select_nomenclature').val(),
                 count = $('#'+i+'_count').val(),
                 unit = $('#'+i+'_unit').text(),
-                dimensions = $('#'+i+'_x').val()+'-'+$('#'+i+'_y').val()+'-'+$('#'+i+'_z').val()
+                dimensions = $('#'+i+'_x').val()+'x'+$('#'+i+'_y').val()+'x'+$('#'+i+'_z').val()
             var dataRow = {'articule':articule, 'nomenclature':nomenclature, 'count':count, 'unit':unit, 'dimensions':dimensions}
             console.log(dataRow)
             if(articule == '' || nomenclature == 'Добавьте номенклатуру!' || count == '' || unit == '' || $('#'+i+'_x').val() == '' || $('#'+i+'_y').val()== '' || $('#'+i+'_z').val() == ''){
@@ -174,7 +174,7 @@ function saveConsignmentNote(){
                 method:"POST",
                 async: true,
                 url: saveConsignmentNoteUrl,
-                data:{'data':data},
+                data: JSON.stringify({'data': data}),
                 success: function (response){
                     window.onbeforeunload = null;
                     location.href = home
