@@ -53,7 +53,8 @@
     <script>
         var consignmentNoteId = '',
             nomenclature = {}
-        const getNomenclature = "{% url 'get_all_nomenclature' %}"
+        const getNomenclature = "{% url 'get_all_nomenclature' %}",
+              saveConsignmentNoteUrl = ""
         $(document).ready(function(){
             promptShow()
             $('#date').text(new Date().toLocaleDateString() + ' '+ new Date().toLocaleTimeString())
@@ -69,7 +70,10 @@
 
     <div class="content">
         <div id = "view-space">
-            <h3 class="sign">Электронная накладная.</h3>
+            <div class="note-header">
+                <h3 class="sign main-sign">Электронная накладная.</h3>
+                <button class="save-button" onclick="saveConsignmentNote()"></button>
+            </div>
             <h5 class="sign">Общие сведения.</h5>
             <div class="scroll-table" style="height:70px; margin-bottom:0px;">
                 <table>
@@ -78,9 +82,7 @@
                             <th>
                                 Составитель:
                             </th>
-                            <th style="background:white">
-                                {{internalUser}}
-                            </th>
+                            <th style="background:white" id="worker_id">{{internalUser}}</th>
                             <th>
                                 Дата:
                             </th>
@@ -96,7 +98,7 @@
                                Поставщик:
                             </th>
                             <th id = 'provider' style="background:white">
-                                <input maxlength="150">
+                                <input maxlength="150" id="provider-input">
                             </th>
                         </tr>
                     </thead>

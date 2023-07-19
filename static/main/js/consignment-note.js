@@ -79,15 +79,15 @@ function addRow(){
     html += '</select>'
     html += '</td>'
     html += '<td>'
-    html += '<input type="number"  class= "input-table" id="'+id+'_count">'
+    html += '<input type="number"  min="1" class= "input-table" id="'+id+'_count">'
     html += '<span id="'+id+'_unit"></span>'
     html += '</td>'
     html += '<td>'
-    html += '<input type="number" class= "input-table" style="width:18%; border:1px solid gray" id="'+id+'_x">'
+    html += '<input type="number" min="1" class= "input-table" style="width:18%; border:1px solid gray" id="'+id+'_x">'
     html += '<span> (мм) - </span>'
-    html += '<input type="number" class= "input-table" style="width:18%; border:1px solid gray" id="'+id+'_y">'
+    html += '<input type="number" min="1" class= "input-table" style="width:18%; border:1px solid gray" id="'+id+'_y">'
     html += '<span> (мм) - </span>'
-    html += '<input type="number" class= "input-table" style="width:18%; border:1px solid gray" id="'+id+'_z">'
+    html += '<input type="number" min="1" class= "input-table" style="width:18%; border:1px solid gray" id="'+id+'_z">'
     html += '<span> (мм)</span>'
     html += '</td>'
     html += '<td>'
@@ -140,5 +140,48 @@ function deleteTableRow(id){
     let isDelete = confirm("Удалить строку номенклатуры?");
     if (isDelete){
         $('#'+id.split("_")[0]).remove()
+    }
+}
+
+// save note
+function saveConsignmentNote(){
+    var dataCreates = [],
+        data = {}
+    let isSave = confirm("Уверены что хотите сохранить накладную?");
+    if (isSave){
+        for (let i = 0; i<=parseInt($($('.main-table-row')[$('.main-table-row').length-1]).attr('id')); i++){
+            var articule = $('#'+i+'_articule_span').text(),
+                nomenclature = $('#'+i+'_select_nomenclature').val(),
+                count = $('#'+i+'_count').val(),
+                unit = $('#'+i+'_unit').text(),
+                dimensions = $('#'+i+'_x').val()+'-'+$('#'+i+'_y').val()+'-'+$('#'+i+'_z').val()
+            var dataRow = {'articule':articule, 'nomenclature':nomenclature, 'count':count, 'unit':unit, 'dimensions':dimensions}
+            console.log(dataRow)
+            if(articule == '' || nomenclature == 'Добавьте номенклатуру!' || count == '' || unit == '' || $('#'+i+'_x').val() == '' || $('#'+i+'_y').val()== '' || $('#'+i+'_z').val() == ''){
+                return alert('Накладная заполнена не полностью!')
+            }
+            dataCreates.push(dataRow)
+
+        }
+        data = {"worker_id": $('#worker_id').text(),
+                "datetime": $('#date').text(),
+                "number": $('#number').text(),
+                "provider":$('#provider-input').val(),
+                "dataCreates":dataCreates
+                }
+        console.log(data)
+        $.ajax({
+                method:"POST",
+                async: true,
+                url: saveConsignmentNoteUrl,
+                data:{'data':data},
+                success: function (response){
+                    window.onbeforeunload = null;
+                    location.href = home
+                },
+                error: function (request){
+
+                }
+            })
     }
 }
