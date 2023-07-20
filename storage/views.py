@@ -1,9 +1,9 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import JsonResponse, HttpResponse
 from django.views import View
 from django.core import serializers
 
-from main.models import THD, Nomenclature, DeliveryNote, Worker
+from main.models import THD, Nomenclature, DeliveryNote, Worker, Crates
 
 import json
 from datetime import datetime as dt
@@ -90,3 +90,20 @@ class defectiveProductCreate(View):
 
             context = {"internalUser": username, 'THD': THD_num}
         return render(request, 'storage/defective-product-add.html', context=context)
+    
+class SaveCrateView(View):
+
+    def post(self, request):
+
+        data = request.POST
+
+        nomenclature = Nomenclature.objects.get(data.get('articule'))
+
+        crate = Crates.objects.create(
+            amount = data.get('count'),
+            size = data.get('dimensions'),
+            nomenclature = nomenclature,
+        )
+        crate.save()
+
+        return redirect('barcode', id=crate.text_id, title=crate.nomenclature.title)

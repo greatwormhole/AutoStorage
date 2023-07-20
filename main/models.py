@@ -1,9 +1,12 @@
 from .validators import ArticleJSONValidator, JSONSCHEMA
 
 from django.db import models
-from django.contrib.postgres.fields import ArrayField
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 from datetime import datetime
+
+TEXT_ID_RANK = 8
 
 class Nomenclature(models.Model):
     article = models.CharField(max_length=250, primary_key=True)
@@ -89,10 +92,19 @@ class ProductionStorage(models.Model):
 
 class Crates(models.Model):
     id = models.PositiveBigIntegerField(primary_key=True)
+    text_id = models.CharField(max_length=15, blank=True, null=True)
     nomenclature = models.ForeignKey(Nomenclature, on_delete=models.RESTRICT)
     amount = models.FloatField()
     size = models.CharField(max_length=80)
     cell = models.ForeignKey(Storage, on_delete=models.RESTRICT, blank=True, null=True, related_name='crates')
+
+    @property
+    def rank(self):
+        id = self.id
+        counter = 1
+        while id != 0:
+            id //= 10
+        return counter
 
     def __str__(self):
         return f'Коробка {self.nomenclature.title} - {self.amount} {self.nomenclature.units}'
@@ -132,3 +144,8 @@ class THD(models.Model):
     class Meta:
         verbose_name = "Номер ТСД"
         verbose_name_plural = "Номер ТСД"
+
+@receiver(post_save, sender=Crates)
+def fill_text_id(sender, instance, created, **kwargs):
+    zero_amount = TEXT_ID_RANK - instance.rank
+    instance.text_id = zero_amount * '0' + str(instance.id)

@@ -99,22 +99,17 @@ class BarcodeView(View):
     Генерация штрих-кода для коробки
     """
 
-    def get(self, request):
+    def get(self, request, id, title):
     
-        article = translit('00000000', language_code='ru', reversed=True)
+        article = translit(id, language_code='ru', reversed=True)
         print(article)
-        nomenclature = 'A'*200
-        print(nomenclature)
+        print(title)
 
-        ean = Code39(article, writer=CustomWriter(nomenclature), add_checksum=False)
+        ean = Code39(article, writer=CustomWriter(title), add_checksum=False)
         name = ean.save(f'media/{article}', options={"module_width":0.1, "module_height":8, "font_size": 14, "text_distance": 1, "quiet_zone": 3})
         resize_image(f'{article}.png', 60, 40)
 
-        context = {
-            'filename': name
-        }
-
-        return render(request, 'main/barcode.html', context=context)
+        return HttpResponse(status=200)
 
 class THDList(View):
 
