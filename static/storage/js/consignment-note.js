@@ -160,7 +160,6 @@ function saveConsignmentNote(){
             if(articule == '' || nomenclature == 'Добавьте номенклатуру!' || count == '' || unit == '' || $('#'+i+'_x').val() == '' || $('#'+i+'_y').val()== '' || $('#'+i+'_z').val() == ''){
                 return alert('Накладная заполнена не полностью!')
             }
-            dataCreates.push(dataRow)
 
         }
         data = {"worker_id": $('#worker_id').text(),
@@ -169,7 +168,6 @@ function saveConsignmentNote(){
                 "provider":$('#provider-input').val(),
                 "dataCreates":dataCreates
                 }
-        console.log(data)
         $.ajax({
                 method:"POST",
                 async: true,
@@ -190,19 +188,44 @@ function saveConsignmentNote(){
 function printSticker(id){
     var rowId = parseInt(id.split('_')[0])
     $('#prompt-content').children().remove()
+    $('#prompt-close').unbind('click')
     $('#prompt').css({'flex-direction':'column',
                       'border':'1px solid gray',
                       'background-color':'white',
                       'border-radius':'5px 5px 5px 5px'})
     var html = '<div class = "prompt-row " id = "consignment-note-prompt-row">'
-    html += '<button>Регистарция новой коробки.</button>'
-    html += '<button>Использование существующих.</button>'
+    html += '<button id = "register-new-create" onclick = "createNote('+rowId+')">Регистарция новой коробки.</button>'
+    html += '<button id = "choose-create" >Использование существующих.</button>'
     html += '</div>'
 
     $('#prompt-content').append(html)
     $('#prompt-name').text('Выберите механизм внесения!')
     $('#prompt-block-UI').show()
     $('#prompt-close').click(function(){
+
         $('#prompt-block-UI').hide()
+
     })
+}
+
+function createNote(id){
+    var articule = $('#'+id+'_articule_span').text(),
+        nomenclature = $('#'+id+'_select_nomenclature').val(),
+        count = $('#'+id+'_count').val(),
+        unit = $('#'+id+'_unit').text(),
+        dimensions = $('#'+id+'_x').val()+'x'+$('#'+id+'_y').val()+'x'+$('#'+id+'_z').val()
+    var data = {'articule':articule, 'nomenclature':nomenclature, 'count':count, 'unit':unit, 'dimensions':dimensions}
+    $.ajax({
+                method:"POST",
+                async: true,
+                url: createNoteUrl,
+                data: JSON.stringify({'data': data}),
+                success: function (response){
+                    $('#prompt-block-UI').hide()
+                    $('#'+id+'_print').prop( "disabled", true );
+                },
+                error: function (request){
+                    alert('Произошла ошибка, попробуйте еще раз!')
+                }
+            })
 }

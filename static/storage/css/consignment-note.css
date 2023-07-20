@@ -90,3 +90,24 @@
     display:inherit;
     margin:0 auto;
 }
+#register-new-create{
+    margin-top:10px;
+    margin-bottom:10px;
+    border:0px solid;
+    background:#8eee53c7;
+    box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.16);
+}
+
+#choose-create{
+    margin-top:10px;
+    margin-bottom:10px;
+    border:0px solid;
+    background:#8eee53c7;
+    box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.16);
+}
+#register-new-create:hover{
+    box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0);
+}
+#choose-create:hover{
+    box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0);
+}
