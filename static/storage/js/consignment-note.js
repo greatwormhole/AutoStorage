@@ -91,7 +91,7 @@ function addRow(){
     html += '<span> (мм)</span>'
     html += '</td>'
     html += '<td>'
-    html += '<button class="print-mark-button">'
+    html += '<button class="print-mark-button" id = "'+id+'_print" onclick="printSticker(this.id)">'
     html += '</button>'
     html += '<button class="delete-row-button" id = "'+id+'_delete" onclick="deleteTableRow(this.id)">'
     html += '</button>'
@@ -184,4 +184,25 @@ function saveConsignmentNote(){
                 }
             })
     }
+}
+
+// print sticker
+function printSticker(id){
+    var rowId = parseInt(id.split('_')[0])
+    $('#prompt-content').children().remove()
+    $('#prompt').css({'flex-direction':'column',
+                      'border':'1px solid gray',
+                      'background-color':'white',
+                      'border-radius':'5px 5px 5px 5px'})
+    var html = '<div class = "prompt-row " id = "consignment-note-prompt-row">'
+    html += '<button>Регистарция новой коробки.</button>'
+    html += '<button>Использование существующих.</button>'
+    html += '</div>'
+
+    $('#prompt-content').append(html)
+    $('#prompt-name').text('Выберите механизм внесения!')
+    $('#prompt-block-UI').show()
+    $('#prompt-close').click(function(){
+        $('#prompt-block-UI').hide()
+    })
 }

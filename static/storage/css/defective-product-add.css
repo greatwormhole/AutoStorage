@@ -1,0 +1,92 @@
+.content{
+    width:100%;
+    display:flex;
+
+    justify-content:center;
+}
+
+#view-space{
+    max-width: 1440px;
+    max-height: 966px;
+    width: 95%;
+    height: 85%;
+    background-color: white;
+    border-radius: 10px 10px 10px 10px;
+    box-shadow: 0px 1px 10px 2px rgba(0, 0, 0, 0.16);
+    display: flex;
+    flex-direction: column;
+    margin-top: 30px;
+}
+
+#save-defective-product-add-num{
+    width:32px;
+    height:32px;
+    cursor:pointer;
+    background:url('/media/icons/save.png');
+    background-size:cover;
+
+}
+.margined{
+    margin-top:5px;
+    margin-bottom:5px;
+}
+
+#consignment-defective-product-add-row{
+    border:1px solid gray;
+    justify-content:space-around;
+    border-radius:3px 3px 3px 3px;
+    box-shadow: 0px 1px 1px 1px rgba(0, 0, 0, 0.16);
+    overflow-y:hidden;
+    overflow-x:auto;
+}
+.table{
+    box-sizing:border-box;
+    width:calc(100% - 40);
+    height:100%;
+    margin:20px;
+}
+.sign{
+    width:100%;
+    margin-top:5px;
+    text-align:center;
+}
+.add-consignment-note-row{
+    width:100%;
+    height:40px;
+    box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.16);
+    border-radius:0px 0px 5px 5px;
+    border:1px solid #9a9a9a;
+    border-top:0px solid black;
+    cursor:pointer;
+}
+.add-consignment-note-row:hover{
+    box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0);
+}
+.print-mark-button{
+    width:25px;
+    border:0px solid;
+    margin-right:10px;
+    height:25px;
+    background: url('/media/icons/printer.png');
+    background-size:cover;
+}
+.delete-row-button{
+    width:25px;
+    border:0px solid;
+    height:25px;
+    background: url('/media/icons/delete.png');
+    background-size:cover;
+}
+.save-button{
+    background: url('/media/icons/save.png');
+    background-size:cover;
+    width:32px;
+    height:32px;
+    margin:auto;
+    margin-left:5px;
+    border:0px solid;
+}
+.note-header{
+    display:inherit;
+    margin:0 auto;
+}

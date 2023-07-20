@@ -75,7 +75,7 @@ class SaveConsignmentNote(View):
         return HttpResponse(status=200)
 
 
-class defectiveProductCreate():
+class defectiveProductCreate(View):
 
     def get(self, request):
         username = json.loads(request.COOKIES.get('AccessKey')).get('name')
