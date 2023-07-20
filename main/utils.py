@@ -4,6 +4,8 @@ from barcode.writer import (
     mm2px,
     pt2mm,
     )
+from barcode import Code39
+from transliterate import translit
 from PIL import Image, ImageDraw, ImageFont
 import textwrap
 from Apro.settings import MEDIA_ROOT
@@ -73,7 +75,7 @@ class CustomWriter(ImageWriter):
         font = ImageFont.truetype(self.font_path, font_size)
         lines = textwrap.wrap(self.upper_text, width=MAX_WIDTH)
         
-        ypos -= len(lines) * 1.7
+        ypos -= len(lines) * 2
 
         for line in lines:
             width, height = font.getsize(line)
@@ -82,7 +84,7 @@ class CustomWriter(ImageWriter):
                 mm2px(ypos, self.dpi) - 6 * height,
             )
             self._draw.text(pos, line, font=font, fill=self.foreground)
-            ypos += 1.5
+            ypos += 0.7
 
 def resize_image(relative_path, width, height):
     height_px = int(height/MM_PER_PX)
@@ -91,3 +93,15 @@ def resize_image(relative_path, width, height):
     image = Image.open(path)
     image = image.resize((width_px, height_px), Image.ANTIALIAS)
     image.save(path)
+
+def generate_barcode(id, title):
+
+    article = translit(id, language_code='ru', reversed=True)
+    print(article)
+    print(title)
+
+    ean = Code39(article, writer=CustomWriter(title), add_checksum=False)
+    name = ean.save(f'media/barcode.png',
+                    options={"module_width": 0.1, "module_height": 8, "font_size": 14, "text_distance": 1,
+                             "quiet_zone": 3})
+    # resize_image(f'{article}.png', 60, 40)

@@ -9,8 +9,6 @@ from .WS_cache import WS_CACHE_CONNECTION
 from .models import Worker, THD, Nomenclature, Crates, Storage
 from .utils import CustomWriter, resize_image
 
-from barcode import Code39
-from transliterate import translit
 import json
 
 class HomeView(View):

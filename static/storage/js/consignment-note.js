@@ -215,6 +215,9 @@ function createNote(id){
         unit = $('#'+id+'_unit').text(),
         dimensions = $('#'+id+'_x').val()+'x'+$('#'+id+'_y').val()+'x'+$('#'+id+'_z').val()
     var data = {'articule':articule, 'nomenclature':nomenclature, 'count':count, 'unit':unit, 'dimensions':dimensions}
+    if(articule == '' || nomenclature == 'Добавьте номенклатуру!' || count == '' || unit == '' || $('#'+id+'_x').val() == '' || $('#'+id+'_y').val()== '' || $('#'+id+'_z').val() == ''){
+                return alert('Накладная заполнена не полностью!')
+            }
     $.ajax({
                 method:"POST",
                 async: true,

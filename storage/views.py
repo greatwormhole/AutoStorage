@@ -4,6 +4,7 @@ from django.views import View
 from django.core import serializers
 
 from main.models import THD, Nomenclature, DeliveryNote, Worker, Crates
+from main.utils import generate_barcode
 
 import json
 from datetime import datetime as dt
@@ -95,9 +96,12 @@ class SaveCrateView(View):
 
     def post(self, request):
 
-        data = request.POST
+        print(request.body)
+        data = json.loads(request.body).get('data')
+        print(data)
 
-        nomenclature = Nomenclature.objects.get(data.get('articule'))
+        nomenclature = Nomenclature.objects.get(article=data.get('articule'))
+        print(nomenclature)
 
         crate = Crates.objects.create(
             amount = data.get('count'),
@@ -106,4 +110,6 @@ class SaveCrateView(View):
         )
         crate.save()
 
-        return redirect('barcode', id=crate.text_id, title=crate.nomenclature.title)
+        generate_barcode(crate.text_id, crate.nomenclature.title)
+
+        return HttpResponse(status=200)
