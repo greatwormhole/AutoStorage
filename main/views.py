@@ -7,7 +7,7 @@ from django.db import IntegrityError
 from .decorators import check_access
 from .WS_cache import WS_CACHE_CONNECTION
 from .models import Worker, THD, Nomenclature, Crates, Storage
-from .utils import CustomWriter
+from .utils import CustomWriter, resize_image
 
 from barcode import Code39
 from transliterate import translit
@@ -101,12 +101,14 @@ class BarcodeView(View):
 
     def get(self, request):
     
-        article = translit('22222223', language_code='ru', reversed=True)
+        article = translit('00000000', language_code='ru', reversed=True)
         print(article)
-        nomenclature = 'Болт М5'
+        nomenclature = 'A'*200
+        print(nomenclature)
 
         ean = Code39(article, writer=CustomWriter(nomenclature), add_checksum=False)
-        name = ean.save(f'media/{article}')
+        name = ean.save(f'media/{article}', options={"module_width":0.1, "module_height":8, "font_size": 14, "text_distance": 1, "quiet_zone": 3})
+        resize_image(f'{article}.png', 60, 40)
 
         context = {
             'filename': name
