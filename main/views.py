@@ -1,13 +1,12 @@
 from django.http import JsonResponse, HttpResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.views import View
 from django.core import serializers
 from django.db import IntegrityError
 
 from .decorators import check_access
 from .WS_cache import WS_CACHE_CONNECTION
-from .models import Worker, THD, Nomenclature, Crates, Storage
-from .utils import CustomWriter, resize_image
+from .models import Worker, THD, Crates, Storage
 
 import json
 
@@ -90,24 +89,6 @@ class LoginView(View):
         response.set_cookie(key='AccessKey', value=json.dumps(cookie))
         
         return response
-
-class BarcodeView(View):
-
-    """
-    Генерация штрих-кода для коробки
-    """
-
-    def get(self, request, id, title):
-    
-        article = translit(id, language_code='ru', reversed=True)
-        print(article)
-        print(title)
-
-        ean = Code39(article, writer=CustomWriter(title), add_checksum=False)
-        name = ean.save(f'media/{article}', options={"module_width":0.1, "module_height":8, "font_size": 14, "text_distance": 1, "quiet_zone": 3})
-        resize_image(f'{article}.png', 60, 40)
-
-        return HttpResponse(status=200)
 
 class THDList(View):
 

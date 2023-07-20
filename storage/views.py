@@ -15,7 +15,7 @@ class main(View):
 
         username = json.loads(request.COOKIES.get('AccessKey')).get('name')
         THD_num = json.loads(request.COOKIES.get('AccessKey')).get('THD')
-        #username = "test"
+        # username = "test"
         if THD_num is not None:
 
             THD_ip = THD.objects.get(THD_number=THD_num).ip
@@ -96,12 +96,9 @@ class SaveCrateView(View):
 
     def post(self, request):
 
-        print(request.body)
         data = json.loads(request.body).get('data')
-        print(data)
 
         nomenclature = Nomenclature.objects.get(article=data.get('articule'))
-        print(nomenclature)
 
         crate = Crates.objects.create(
             amount = data.get('count'),

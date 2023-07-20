@@ -63,6 +63,7 @@ class CustomWriter(ImageWriter):
         ypos += 3.8
 
         for line in lines:
+            print(font.getsize(line))
             width, height = font.getsize(line)
             pos = (
                 mm2px(xpos, self.dpi) - width // 2,
@@ -75,7 +76,7 @@ class CustomWriter(ImageWriter):
         font = ImageFont.truetype(self.font_path, font_size)
         lines = textwrap.wrap(self.upper_text, width=MAX_WIDTH)
         
-        ypos -= len(lines) * 2
+        ypos -= len(lines) * 1.5
 
         for line in lines:
             width, height = font.getsize(line)
@@ -84,7 +85,7 @@ class CustomWriter(ImageWriter):
                 mm2px(ypos, self.dpi) - 6 * height,
             )
             self._draw.text(pos, line, font=font, fill=self.foreground)
-            ypos += 0.7
+            ypos += 1.5
 
 def resize_image(relative_path, width, height):
     height_px = int(height/MM_PER_PX)
@@ -97,8 +98,6 @@ def resize_image(relative_path, width, height):
 def generate_barcode(id, title):
 
     article = translit(id, language_code='ru', reversed=True)
-    print(article)
-    print(title)
 
     ean = Code39(article, writer=CustomWriter(title), add_checksum=False)
     name = ean.save(f'media/barcode.png',
