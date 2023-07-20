@@ -14,7 +14,7 @@ class main(View):
 
         username = json.loads(request.COOKIES.get('AccessKey')).get('name')
         THD_num = json.loads(request.COOKIES.get('AccessKey')).get('THD')
-        username = "test"
+        #username = "test"
         if THD_num is not None:
 
             THD_ip = THD.objects.get(THD_number=THD_num).ip
@@ -38,7 +38,7 @@ class NomenclatureView(View):
         data = Nomenclature.objects.all()
 
         response = HttpResponse(serializers.serialize('json', data), content_type='application/json')
-        response.set_cookie('AccessKey', json.dumps({'id': 1}))
+        #response.set_cookie('AccessKey', json.dumps({'id': 1}))
 
         return response
     
@@ -73,3 +73,20 @@ class SaveConsignmentNote(View):
         delivery_note.save()
 
         return HttpResponse(status=200)
+
+
+class defectiveProductCreate(View):
+
+    def get(self, request):
+        username = json.loads(request.COOKIES.get('AccessKey')).get('name')
+        THD_num = json.loads(request.COOKIES.get('AccessKey')).get('THD')
+        if THD_num is not None:
+
+            THD_ip = THD.objects.get(THD_number=THD_num).ip
+
+            context = {"internalUser": username, 'THD': THD_num, 'THD_ip': THD_ip}
+
+        else:
+
+            context = {"internalUser": username, 'THD': THD_num}
+        return render(request, 'storage/defective-product-add.html', context=context)

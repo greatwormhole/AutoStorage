@@ -1,0 +1,76 @@
+{% extends 'main/base.html' %}
+{% block link %}
+{% load static %}
+
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+        var nomenclature = {}
+        const getNomenclature = "{% url 'get_all_nomenclature' %}",
+              home = "{% url 'home' %}"
+        $(document).ready(function(){
+            $('#date').text(new Date().toLocaleDateString() + ' '+ new Date().toLocaleTimeString())
+            nomenclature = ajaxGet(getNomenclature)
+            window.onbeforeunload = function() {
+                return "Акт придется заполнять заново!";
+            };
+        })
+    </script>
+    <script  src="{% static 'storage/js/defective-product-add.js' %}" rel="stylesheet" ></script>
+    <link rel="stylesheet" href="{% static 'storage/css/defective-product-add.css' %}">
+{% endblock %}
+{% block content %}
+ <div class="content">
+        <div id = "view-space">
+            <div class="note-header">
+                <h3 class="sign main-sign">Акт выбраковки.</h3>
+                <button class="save-button" onclick=""></button>
+            </div>
+            <h5 class="sign">Общие сведения.</h5>
+            <div class="scroll-table" style="height:70px; margin-bottom:0px;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>
+                                Составитель:
+                            </th>
+                            <th style="background:white" id="worker_id">{{internalUser}}</th>
+                            <th>
+                                Дата:
+                            </th>
+                            <th id = 'date' style="background:white">
+                            </th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+             <h5 class="sign">Тело акта.</h5>
+            <div class="scroll-table" id="main-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>
+                                Артикуль
+                            </th>
+                            <th>
+                                Наименование
+                            </th>
+                            <th>
+                                Количество
+                            </th>
+                            <th>
+                               Действия
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body">
+
+                    </tbody>
+                </table>
+                <button class="add-consignment-note-row" onclick="addRow()">
+                    <i class="fa fa-plus"></i>
+                </button>
+            </div>
+        </div>
+ </div>
+{% endblock %}

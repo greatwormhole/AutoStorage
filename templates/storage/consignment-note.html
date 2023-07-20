@@ -54,7 +54,8 @@
         var consignmentNoteId = '',
             nomenclature = {}
         const getNomenclature = "{% url 'get_all_nomenclature' %}",
-              saveConsignmentNoteUrl = "{% url 'save_consignment_note' %}"
+              saveConsignmentNoteUrl = "{% url 'save_consignment_note' %}",
+              home = "{% url 'home' %}"
         $(document).ready(function(){
             promptShow()
             $('#date').text(new Date().toLocaleDateString() + ' '+ new Date().toLocaleTimeString())
@@ -62,8 +63,8 @@
 
         })
     </script>
-    <script  src="{% static 'main/js/consignment-note.js' %}" rel="stylesheet" ></script>
-    <link rel="stylesheet" href="{% static 'main/css/consignment-note.css' %}">
+    <script  src="{% static 'storage/js/consignment-note.js' %}" rel="stylesheet" ></script>
+    <link rel="stylesheet" href="{% static 'storage/css/consignment-note.css' %}">
 
 {% endblock %}
 {% block content %}

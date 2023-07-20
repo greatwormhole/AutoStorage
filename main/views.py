@@ -24,7 +24,7 @@ class HomeView(View):
 
         username = json.loads(request.COOKIES.get('AccessKey')).get('name')
         THD_num = json.loads(request.COOKIES.get('AccessKey')).get('THD')
-        username = "test"
+        #username = "test"
         if THD_num is not None:
 
             THD_ip = THD.objects.get(THD_number=THD_num).ip

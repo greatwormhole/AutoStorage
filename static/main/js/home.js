@@ -1,6 +1,7 @@
 ///redirect
 var pathList = {
-    'consignment-note': consignmentNote
+    'consignment-note': consignmentNote,
+    'broken-parts-in': brokenPartsIn
 }
 function redirect(idList){
 
@@ -20,7 +21,7 @@ function getCookie(name) {
 /// authorization button logic///
 $(document).ready(function(){
     var rights = JSON.parse(getCookie('AccessKey').replace(/\\054/g, ','))
-    if (JSON.parse(rights)["storage_right"] == false){
+    if (JSON.parse(rights)["storage_right"] == true){
         var html = "<div class = 'rights'>"
         html += "<h2 class = 'text'>Склад</h2>"
         html += "<button class = 'storage' id = 'consignment-note'>"
@@ -41,7 +42,7 @@ $(document).ready(function(){
         html += "</div>"
         $('#button-panel').append(html)
 
-        redirect(['consignment-note'])
+        redirect(['consignment-note','broken-parts-in'])
     }
     if (JSON.parse(rights)["plan_right"] == true){
         var html = "<div class = 'rights'>"
