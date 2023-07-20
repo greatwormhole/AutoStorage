@@ -91,7 +91,6 @@ class ProductionStorage(models.Model):
         verbose_name_plural = "Склады производства"
 
 class Crates(models.Model):
-    id = models.PositiveBigIntegerField(primary_key=True)
     text_id = models.CharField(max_length=15, blank=True, null=True)
     nomenclature = models.ForeignKey(Nomenclature, on_delete=models.RESTRICT)
     amount = models.FloatField()
