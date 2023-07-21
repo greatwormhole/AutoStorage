@@ -1,11 +1,11 @@
-from .validators import ArticleJSONValidator, JSONSCHEMA
-
 from django.db import models
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 
 from datetime import datetime
+from functools import reduce
 
+from .validators import ArticleJSONValidator, JSONSCHEMA
+
+DEFAULT_CRATE_MASS = 50.0
 TEXT_ID_RANK = 8
 
 class Nomenclature(models.Model):
@@ -68,12 +68,18 @@ class DeliveryNote(models.Model):
 class Storage(models.Model):
     adress = models.PositiveIntegerField(primary_key=True)
     cell_size = models.CharField(max_length=60)
-    size_left = models.FloatField()
     storage_name = models.CharField(max_length=60)
     mass = models.PositiveIntegerField(default=700)
 
     def __str__(self):
         return f'{self.adress}'
+    
+    @property
+    def size_left(self):
+        size = reduce(lambda i, j: float(i) * float(j), self.cell_size.split('x'))
+        for el in self.crates.all():
+            size -= el.volume
+        return size
     
     class Meta:
         verbose_name = "Склад"
@@ -97,6 +103,11 @@ class Crates(models.Model):
     size = models.CharField(max_length=80)
     cell = models.ForeignKey(Storage, on_delete=models.RESTRICT, blank=True, null=True, related_name='crates')
 
+    def save(self, *args, **kwargs):
+        zero_amount = TEXT_ID_RANK - self.rank
+        self.text_id = zero_amount * '0' + str(self.id)
+        super().save(*args, **kwargs)
+
     @property
     def rank(self):
         id = self.id
@@ -104,6 +115,13 @@ class Crates(models.Model):
         while id != 0:
             id //= 10
         return counter
+    
+    @property
+    def volume(self):
+        return reduce(lambda i, j: float(i) * float(j), self.size.split('x'))
+
+    def get_same_nomenclature(self):
+        return self.__class__.objects.filter(nomenclature=self.nomenclature)
 
     def __str__(self):
         return f'Коробка {self.nomenclature.title} - {self.amount} {self.nomenclature.units}'
@@ -143,8 +161,3 @@ class THD(models.Model):
     class Meta:
         verbose_name = "Номер ТСД"
         verbose_name_plural = "Номер ТСД"
-
-@receiver(post_save, sender=Crates)
-def fill_text_id(sender, instance, created, **kwargs):
-    zero_amount = TEXT_ID_RANK - instance.rank
-    instance.text_id = zero_amount * '0' + str(instance.id)

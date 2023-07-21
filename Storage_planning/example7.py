@@ -1,6 +1,6 @@
 from py3dbp import Packer, Bin, Item, Painter
 import time
-from random import randint
+from random import randint, choice
 start = time.time()
 
 '''
@@ -14,7 +14,7 @@ If you have multiple boxes, you can change distribute_items to achieve different
 # init packing function
 packer = Packer()
 #  init bin 
-box = Bin('example7-Bin1', (1000, 1000, 1000), 100,0,0)
+box = Bin('Cell', (300, 300, 300), 100,0,0)
 # box2 = Bin('example7-Bin2', (3, 3, 5), 100,0,0)
 #  add item
 # Item('item partno', (W,H,D), Weight, Packing Priority level, load bear, Upside down or not , 'item color')
@@ -25,16 +25,18 @@ data = [{
     'partno': f'Box-{i}',
     'name': f'Crate{i}',
     'typeof': 'cube',
-    'WHD': (randint(100, 400),randint(100, 400),randint(100, 400)),
+    'WHD': (50, randint(100, 400), randint(100, 400)),
     'weight': 1,
     'level': 1,
     'loadbear': 1,
     'updown': True,
     'color': 'red'
-    } for i in range(1, 31)]
+    } for i in range(1, 30)]
 
-for i in range(len(data)):
-    packer.addItem(Item(**data[i]))
+for el in data:
+    item = Item(**el)
+    print(item.string())
+    packer.addItem(item)
 
 # calculate packing 
 packer.pack(
@@ -80,8 +82,8 @@ for idx,b in enumerate(packer.bins) :
     painter = Painter(b)
     fig = painter.plotBoxAndItems(
         title=b.partno,
-        alpha=0.8,
-        write_num=False,
+        alpha=0.2,
+        write_num=True,
         fontsize=10
     )
 

@@ -30,7 +30,6 @@ class StorageFactory(DjangoModelFactory):
     
     adress = factory.Sequence(lambda x: x)
     cell_size = factory.Faker('numerify', text='%!!!!!x%!!!!!x%!!!!!')
-    size_left = factory.Faker('numerify', text='%##!!!')
     mass = factory.Faker('numerify', text='%##!!!')
 
     class Meta:
