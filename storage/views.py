@@ -110,3 +110,20 @@ class SaveCrateView(View):
         generate_barcode(crate.text_id, crate.nomenclature.title)
 
         return HttpResponse(status=200)
+    
+class NomenclatureCratesView(View):
+
+    def get(self, request):
+
+        request_article = request.GET.get('articule', None)
+
+        nomenclature = Nomenclature.objects.get(article=request_article)
+        # print(Nomenclature.objects.get(title=))
+
+        crates_per_nomenclature = Crates.objects.filter(nomenclature=nomenclature)
+
+        return HttpResponse(
+            serializers.serialize('json', crates_per_nomenclature),
+            content_type='application/json',
+            status=200
+        )
