@@ -298,7 +298,7 @@ function promptCrateListShow(response, id){
         }
         html += '</td>'
         html += '<td>'
-        html += '<button class="choose-btn" onclick="chooseCrate('+id+')">Выбрать</button>'
+        html += '<button class="choose-btn" onclick="chooseCrate('+id+', '+response[i].fields.text_id+')">Выбрать</button>'
         html += '</td>'
         html += '</tr>'
     }
@@ -315,19 +315,24 @@ function promptCrateListShow(response, id){
 }
 
 
-function chooseCrate(id){
-    $('#'+id+'_print').prop( "disabled", false );
-    console.log(id)
+function chooseCrate(id, boxId){
+    var articule = $('#'+id+'_articule_span').text(),
+        nomenclature = $('#'+id+'_select_nomenclature').val(),
+        count = $('#'+id+'_count').val(),
+        unit = $('#'+id+'_unit').text(),
+        dimensions = $('#'+id+'_x').val()+'x'+$('#'+id+'_y').val()+'x'+$('#'+id+'_z').val()
+    var data = {'id':boxId, 'count':count, 'dimensions':dimensions}
     $.ajax({
-                method:"POST",
-                async: true,
-                url: chooseCreate,
-
-                success: function (response){
-                    $('#prompt-block-UI').hide()
-                },
-                error: function (response){
-                    alert('Произошла ошибка!')
-                }
-            })
+        method:"POST",
+        async: true,
+        url: chooseCreate,
+        data: JSON.stringify({'data':data}),
+        success: function (response){
+            $('#prompt-block-UI').hide()
+            $('#'+id+'_print').prop( "disabled", true );
+            },
+        error: function (response){
+             alert('Произошла ошибка!')
+            }
+        })
 }
