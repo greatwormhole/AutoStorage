@@ -6,7 +6,7 @@ from functools import reduce
 from .validators import ArticleJSONValidator, JSONSCHEMA
 
 DEFAULT_CRATE_MASS = 50.0
-TEXT_ID_RANK = 8
+TEXT_ID_RANK = 6
 
 class Nomenclature(models.Model):
     article = models.CharField(max_length=250, primary_key=True)
@@ -112,7 +112,7 @@ class Crates(models.Model):
     def rank(self):
         id = self.id
         print(self.id)
-        counter = 1
+        counter = 0
         while id != 0:
             id //= 10
         return counter
