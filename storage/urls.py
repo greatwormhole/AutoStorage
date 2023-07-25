@@ -11,6 +11,7 @@ urlpatterns = [
     path('API/save-crate', SaveCrateView.as_view(), name='save_crate'),
     path('API/get-nomenclature-crates', NomenclatureCratesView.as_view(), name='get_nomenclature_crates'),
     path('API/crate-positioning', CratePositioningView.as_view(), name='crate_positioning'),
+    path('API/choose-crate', SaveTempCrateView.as_view(), name='choose_crate')
 ]
 
 if settings.DEBUG:
