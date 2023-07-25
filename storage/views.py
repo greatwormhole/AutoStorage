@@ -94,7 +94,15 @@ class defectiveProductCreate(View):
         return render(request, 'storage/defective-product-add.html', context=context)
     
 class SaveCrateView(View):
+    def get(self,request):
 
+        article = request.GET.get('data')
+
+        box_list = Crates.objects.filter(nomenclature=Nomenclature.objects.get(article=article))
+
+        response = HttpResponse(serializers.serialize('json', box_list), content_type='application/json')
+
+        return response
     def post(self, request):
 
         data = json.loads(request.body).get('data')

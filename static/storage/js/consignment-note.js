@@ -196,7 +196,7 @@ function printSticker(id){
                       'border-radius':'5px 5px 5px 5px'})
     var html = '<div class = "prompt-row " id = "consignment-note-prompt-row">'
     html += '<button id = "register-new-create" onclick = "createNote('+rowId+', this)">Регистарция новой коробки.</button>'
-    html += '<button id = "choose-create" >Использование существующих.</button>'
+    html += '<button id = "choose-create" onclick = "selectNote('+rowId+', this)">Использование существующих.</button>'
     html += '</div>'
 
     $('#prompt-content').append(html)
@@ -234,6 +234,100 @@ function createNote(id,button){
                 error: function (request){
                     $('#prompt-block-UI').hide()
                     alert('Произошла ошибка, попробуйте еще раз!')
+                }
+            })
+}
+
+function selectNote(id, button){
+    button.disabled=true
+    var articule = $('#'+id+'_articule_span').text(),
+        nomenclature = $('#'+id+'_select_nomenclature').val(),
+        count = $('#'+id+'_count').val(),
+        unit = $('#'+id+'_unit').text(),
+        dimensions = $('#'+id+'_x').val()+'x'+$('#'+id+'_y').val()+'x'+$('#'+id+'_z').val()
+    if(articule == '' || nomenclature == 'Добавьте номенклатуру!' || count == '' || unit == '' || $('#'+id+'_x').val() == '' || $('#'+id+'_y').val()== '' || $('#'+id+'_z').val() == ''){
+                $('#prompt-block-UI').hide()
+                return alert('Накладная заполнена не полностью!')
+            }
+
+    $.ajax({
+                method:"GET",
+                async: true,
+                url: createNoteUrl,
+                data: {"data": articule},
+                success: function (response){
+                    promptCrateListShow(response,id ,button)
+                },
+                error: function (response){
+                    alert('Нет подходящих коробок!')
+                }
+            })
+
+}
+
+function promptCrateListShow(response, id){
+    $('#prompt-content').children().remove()
+    $('#prompt').css({'flex-direction':'column',
+                      'border':'1px solid gray',
+                      'background-color':'white',
+                      'border-radius':'5px 5px 5px 5px'})
+    var html = '<div class="scroll-table" style="margin-top:8px">'
+    html += '<table>'
+    html += '<thead>'
+    html += '<tr>'
+    html += '<th>ID коробки'
+    html += '</th>'
+    html += '<th>Ячейка склада'
+    html += '</th>'
+    html += '<th>Действие'
+    html += '</th>'
+    html += '</tr>'
+    html += '</thead>'
+    html += '<tbody>'
+    console.log(response)
+    for (let i=0; i<response.length;i++){
+        html += '<tr style = "border-bottom:1px solid #9a9a9a;">'
+        html += '<td>'
+        html += '<span>'+response[i].fields.text_id+'</span>'
+        html += '</td>'
+        html += '<td>'
+        if (response[i].fields.cell == null){
+            html += '<span>Не поступило</span>'
+        } else {
+            html += '<span>'+response[i].fields.cell+'</span>'
+        }
+        html += '</td>'
+        html += '<td>'
+        html += '<button class="choose-btn" onclick="chooseCrate('+id+')">Выбрать</button>'
+        html += '</td>'
+        html += '</tr>'
+    }
+    html += '</tbody>'
+    html += '</table>'
+    html += '</div>'
+
+    $('#prompt-content').append(html)
+    $('#prompt-name').text('Список коробок:')
+    $('#prompt-close').click(function(){
+        $('#prompt-block-UI').hide()
+    })
+
+}
+
+
+function chooseCrate(id){
+    $('#'+id+'_print').prop( "disabled", false );
+    console.log(id)
+    $.ajax({
+                method:"POST",
+                async: true,
+                url: chooseCreate,
+
+                success: function (response){
+                    $('#prompt-block-UI').hide()
+                },
+                error: function (response){
+                    alert('Произошла ошибка!')
                 }
             })
 }

@@ -56,7 +56,9 @@
         const getNomenclature = "{% url 'get_all_nomenclature' %}",
               saveConsignmentNoteUrl = "{% url 'save_consignment_note' %}",
               home = "{% url 'home' %}",
-              createNoteUrl = "{% url 'save_crate' %}"
+              createNoteUrl = "{% url 'save_crate' %}",
+              chooseCreate = "{% url 'choose_crate' %}"
+
         $(document).ready(function(){
             promptShow()
             $('#date').text(new Date().toLocaleDateString() + ' '+ new Date().toLocaleTimeString())
