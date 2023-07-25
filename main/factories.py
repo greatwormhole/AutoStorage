@@ -37,7 +37,6 @@ class StorageFactory(DjangoModelFactory):
 
 class CrateFactory(DjangoModelFactory):
 
-    id = factory.Sequence(lambda num: num)
     amount = factory.Faker('numerify', text='%##!')
     size = factory.Faker('numerify', text='%!!!x%!!!x%!!!')
 

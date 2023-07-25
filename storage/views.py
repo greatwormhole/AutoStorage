@@ -4,7 +4,7 @@ from django.views import View
 from django.core import serializers
 
 from main.models import THD, Nomenclature, DeliveryNote, Worker, Crates, Storage
-from main.utils import generate_barcode
+from main.utils import generate_nomenclature_barcode
 from .calculate_planning import handle_calculations
 
 import json
@@ -108,7 +108,26 @@ class SaveCrateView(View):
         )
         crate.save()
 
-        generate_barcode(crate.text_id, crate.nomenclature.title)
+        generate_nomenclature_barcode(crate.text_id, crate.nomenclature.title)
+
+        return HttpResponse(status=200)
+    
+class SaveTempCrateView(View):
+    
+    def post(self, request):
+
+        data = json.loads(request.body).get('data')
+
+        crate = Crates.objects.get(text_id=data.get('id'))
+
+        temp_crate = Crates.objects.create(
+            amount = data.get('count'),
+            size = data.get('dimensions'),
+            nomenclature = crate.nomenclature,
+        )
+        temp_crate.save()
+
+        generate_nomenclature_barcode(temp_crate.text_id, crate.text_id)
 
         return HttpResponse(status=200)
     

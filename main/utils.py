@@ -103,7 +103,7 @@ def resize_image(relative_path, width, height):
     image = image.resize((width_px, height_px), Image.ANTIALIAS)
     image.save(path)
 
-def generate_barcode(id, title):
+def generate_nomenclature_barcode(id, title):
 
     article = translit(id, language_code='ru', reversed=True)
 
@@ -143,6 +143,29 @@ def generate_barcode(id, title):
     # hDC.EndPage()
     # hDC.EndDoc()
     # hDC.DeleteDC()
+    
+def generate_worker_barcode(id, name):
+    
+    ean = Code39(str(id), writer=CustomWriter(name), add_checksum=False)
+    ean.save('media/worker-id',
+             options={"module_width": 0.1, "module_height": 8, "font_size": 14, "text_distance": 1,
+                             "quiet_zone": 3})
+    resize_image('worker-id.png', 90, 60)
+    
+    img_path = os.path.join(os.getcwd(), r'media\worker-id.png') 
+    pdf_path = os.path.join(os.getcwd(), r'media\worker-id.pdf')
+    image = Image.open(img_path)
+    pdf_bytes = img2pdf.convert(image.filename)
+    file = open(pdf_path, "wb")
+    file.write(pdf_bytes)
+    image.close()
+    file.close()
+
+    printer_name = win32print.GetDefaultPrinter()
+    GSPRINT_PATH = os.path.join(os.getcwd(), r'Ghostgum\gsview\gsprint.exe') 
+    GHOSTSCRIPT_PATH = os.path.join(os.getcwd(), r'gs\gs10.01.2\bin\gswin64.exe') 
+
+    win32api.ShellExecute(0, 'open', GSPRINT_PATH, '-ghostscript "'+GHOSTSCRIPT_PATH+'" -printer "'+printer_name+f'" "{pdf_path}"', '.', 0)
 
 
 def print_pdf(input_pdf, mode=2, printer=1):

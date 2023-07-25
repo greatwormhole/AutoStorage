@@ -329,8 +329,6 @@ class MoveCrateView(View):
         crate.save()
 
         return JsonResponse({'status': True}, status=200)
-        
-
 
 class CheckConnection(View):
 

@@ -1,9 +1,12 @@
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 from datetime import datetime
 from functools import reduce
 
 from .validators import ArticleJSONValidator, JSONSCHEMA
+from .utils import generate_worker_barcode
 
 DEFAULT_CRATE_MASS = 50.0
 TEXT_ID_RANK = 7
@@ -107,6 +110,7 @@ class Crates(models.Model):
         super().save(*args, **kwargs)
         zero_amount = TEXT_ID_RANK - self.rank
         self.text_id = zero_amount * '0' + str(self.id)
+        super().save(*args, **kwargs)
 
     @property
     def rank(self):
@@ -162,3 +166,33 @@ class THD(models.Model):
     class Meta:
         verbose_name = "Номер ТСД"
         verbose_name_plural = "Номер ТСД"
+        
+class TempCrate(models.Model):
+    crate = models.ForeignKey(Crates, on_delete=models.RESTRICT)
+    text_id = models.CharField(max_length=15, blank=True, null=True)
+    amount = models.FloatField()
+    size = models.CharField(max_length=80)
+    
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        zero_amount = TEXT_ID_RANK - self.rank
+        self.text_id = zero_amount * '0' + str(self.id)
+        super().save(*args, **kwargs)
+
+    @property
+    def rank(self):
+        id = self.id
+        counter = 0
+        while id != 0:
+            id //= 10
+            counter += 1
+        return counter
+    
+    class Meta:
+        verbose_name = 'Временная коробка'
+        verbose_name_plural = 'Временные коробки'
+        
+@receiver(post_save, sender=Worker)
+def create_barcode(sender, instance, created, **kwargs):
+    if created:
+        generate_worker_barcode(instance.id, instance.name)
