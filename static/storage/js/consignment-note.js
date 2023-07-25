@@ -157,11 +157,11 @@ function saveConsignmentNote(){
                 unit = $('#'+i+'_unit').text(),
                 dimensions = $('#'+i+'_x').val()+'x'+$('#'+i+'_y').val()+'x'+$('#'+i+'_z').val()
             var dataRow = {'articule':articule, 'nomenclature':nomenclature, 'count':count, 'unit':unit, 'dimensions':dimensions}
-            console.log(dataRow)
+
             if(articule == '' || nomenclature == 'Добавьте номенклатуру!' || count == '' || unit == '' || $('#'+i+'_x').val() == '' || $('#'+i+'_y').val()== '' || $('#'+i+'_z').val() == ''){
                 return alert('Накладная заполнена не полностью!')
             }
-
+            dataCreates.push(dataRow)
         }
         data = {"worker_id": $('#worker_id').text(),
                 "datetime": $('#date').text(),
@@ -256,6 +256,9 @@ function selectNote(id, button){
                 url: createNoteUrl,
                 data: {"data": articule},
                 success: function (response){
+                    if (response.length == 0){
+                        return alert('Нет подходящих коробок!')
+                    }
                     promptCrateListShow(response,id ,button)
                 },
                 error: function (response){
