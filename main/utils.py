@@ -12,8 +12,11 @@ from Apro.settings import MEDIA_ROOT
 import os
 from PIL import Image, ImageWin
 import os, sys
+import win32print
+import win32ui, win32api
 import img2pdf
-import aspose.pdf as pdf
+from pywintypes import error
+
 SYSTEM_CODE = {
     '0': {'message': 'Подключение с компьютера!', 'action': 'change screen', 'scanner':'none'},
     '10': {'message': 'Отсканируйте код сотрудника!', 'action': 'Show message, scanner response2server', 'scanner': 'button'},
@@ -119,14 +122,54 @@ def generate_barcode(id, title):
     image.close()
     file.close()
 
-    # Initialize PdfViewer class object
-    viewer = pdf.facades.PdfViewer()
+    printer_name = win32print.GetDefaultPrinter()
+    GSPRINT_PATH = os.path.join(os.getcwd(), r'Ghostgum\gsview\gsprint.exe') 
+    GHOSTSCRIPT_PATH = os.path.join(os.getcwd(), r'gs\gs10.01.2\bin\gswin64.exe') 
 
-    # Bind PDF document
-    viewer.bind_pdf(r"C:\Users\Илья Юлдашев\PycharmProjects\AproSklad\media\barcode.pdf")
-
-    viewer.print_document()
-
-    print("PDF Printed Successfully")
+    win32api.ShellExecute(0, 'open', GSPRINT_PATH, '-ghostscript "'+GHOSTSCRIPT_PATH+'" -printer "'+printer_name+f'" "{pdf_path}"', '.', 0)
 
 
+    # hDC = win32ui.CreateDC()
+    # hDC.CreatePrinterDC(printer_name)
+    # printer_size = hDC.GetDeviceCaps(WIDTH), hDC.GetDeviceCaps(HEIGHT)
+
+
+    # hDC.StartDoc(file_name)
+    # hDC.StartPage()
+
+    # dib = ImageWin.Dib(bmp)
+    # dib.draw(hDC.GetHandleOutput(), (0, 0, printer_size[0], printer_size[1]))
+
+    # hDC.EndPage()
+    # hDC.EndDoc()
+    # hDC.DeleteDC()
+
+
+def print_pdf(input_pdf, mode=2, printer=1):
+    name = win32print.GetDefaultPrinter()
+
+    # оставляем без изменений
+    ## тут нужные права на использование принтеров
+    printdefaults = {"DesiredAccess": win32print.PRINTER_ALL_ACCESS}
+    ## начинаем работу с принтером ("открываем" его)
+    handle = win32print.OpenPrinter(name, printdefaults)
+    ## Если изменить level на другое число, то не сработает
+    level = 2
+    ## Получаем значения принтера
+    attributes = win32print.GetPrinter(handle, level)
+    ## Настройка двухсторонней печати
+    attributes['pDevMode'].Duplex = mode   #flip over  3 - это короткий 2 - это длинный край
+
+    ## Передаем нужные значения в принтер
+    win32print.SetPrinter(handle, level, attributes, 0)
+    win32print.GetPrinter(handle, level)['pDevMode'].Duplex
+    ## Предупреждаем принтер о старте печати
+    win32print.StartDocPrinter(handle, 1, [input_pdf, None, "raw"])
+    ## 2 в начале для открытия pdf и его сворачивания, для открытия без сворачивания поменяйте на 1
+    win32api.ShellExecute(2,'print', input_pdf,'.','/manualstoprint',0)
+    ## "Закрываем" принтер
+    win32print.ClosePrinter(handle)
+
+    ## Меняем стандартный принтер на часто используемый  
+    win32print.SetDefaultPrinterW("Brother DCP-L2540DN series Printer")
+    win32print.SetDefaultPrinter("Brother DCP-L2540DN series Printer")
