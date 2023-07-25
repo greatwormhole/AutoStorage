@@ -111,7 +111,7 @@ def generate_barcode(id, title):
     name = ean.save(f'media/barcode',
                     options={"module_width": 0.1, "module_height": 8, "font_size": 14, "text_distance": 1,
                              "quiet_zone": 3})
-    resize_image(f'barcode.png', 60, 40)
+    resize_image(f'barcode.png', 90, 60)
 
     img_path = os.path.join(os.getcwd(), r'media\barcode.png') 
     pdf_path = os.path.join(os.getcwd(), r'media\barcode.pdf')
@@ -123,22 +123,10 @@ def generate_barcode(id, title):
     file.close()
 
     printer_name = win32print.GetDefaultPrinter()
+    GSPRINT_PATH = os.path.join(os.getcwd(), r'Ghostgum\gsview\gsprint.exe') 
+    GHOSTSCRIPT_PATH = os.path.join(os.getcwd(), r'gs\gs10.01.2\bin\gswin64.exe') 
 
-    printdefaults = {"DesiredAccess": win32print.PRINTER_ALL_ACCESS}
-
-    handle = win32print.OpenPrinter(printer_name, printdefaults)
-    level = 2
-    attributes = win32print.GetPrinter(handle, level)
-    attributes['pDevMode'].Duplex = 1
-
-    win32print.SetPrinter(handle, level, attributes, 0)
-    win32print.GetPrinter(handle, level)['pDevMode'].Duplex
-    win32print.StartDocPrinter(handle, 1, [pdf_path, None, "raw"])
-    try:
-        win32api.ShellExecute(2,'print', pdf_path,'.','/manualstoprint',0)
-    except error as e:
-        return e[2]
-    win32print.ClosePrinter(handle)
+    win32api.ShellExecute(0, 'open', GSPRINT_PATH, '-ghostscript "'+GHOSTSCRIPT_PATH+'" -printer "'+printer_name+f'" "{pdf_path}"', '.', 0)
 
 
     # hDC = win32ui.CreateDC()
