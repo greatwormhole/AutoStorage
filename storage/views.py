@@ -63,6 +63,10 @@ class SaveConsignmentNote(View):
         worker = worker[0]
 
         consignment_note_body = f"""{post_data.get('dataCreates')}"""
+
+        if consignment_note_body == '[]':
+            return JsonResponse({'status': False, 'error': 'Пустая накладная!'}, status=404)
+
         worker = Worker.objects.get(id=request_id)
         delivery_note = DeliveryNote.objects.create(
             worker = worker,
