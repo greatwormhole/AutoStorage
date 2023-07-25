@@ -182,8 +182,8 @@ class CratePositioningView(View):
 
             all_cells = sorted(
                 [
-                cell for cell in Storage.objects.all()
-                if cell.size_left > new_crate.volume
+                    cell for cell in Storage.objects.all()
+                    if cell.size_left > new_crate.volume
                 ],
                 key=lambda cell: cell.size_left,
                 reverse=True,

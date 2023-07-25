@@ -1,6 +1,6 @@
 from decimal import Decimal
 
-from Storage_planning.py3dbp import Packer, Bin, Item, Painter
+from storage_planning.py3dbp import Packer, Bin, Item, Painter
 from main.models import DEFAULT_CRATE_MASS
 
 def cast_sizes(width: Decimal, height: Decimal, depth: Decimal, pos_arr: list):
@@ -45,28 +45,33 @@ def calculate(crate_list: list, cell_size: list, cell_weight: float, surface_rat
                 temp = packer_item.width
                 packer_item.width = packer_item.height
                 packer_item.height = temp
+                break
             case 2: 
                 packer_item.rotation_type = 0
                 temp = packer_item.width
                 packer_item.width = packer_item.height
                 packer_item.height = packer_item.depth
                 packer_item.depth = temp
+                break
             case 3: 
                 packer_item.rotation_type = 0
                 temp = packer_item.width
                 packer_item.width = packer_item.depth
                 packer_item.depth = temp
+                break
             case 4: 
                 packer_item.rotation_type = 0
                 temp = packer_item.width
                 packer_item.width = packer_item.depth
                 packer_item.depth = packer_item.height
                 packer_item.height = temp
+                break
             case 5: 
                 packer_item.rotation_type = 0
                 temp = packer_item.height
                 packer_item.height = packer_item.depth
                 packer_item.depth = temp
+                break
             case _: continue
 
     packer.pack(

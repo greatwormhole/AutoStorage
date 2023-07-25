@@ -13,7 +13,10 @@ import os
 from PIL import Image, ImageWin
 import os, sys
 import win32print
-import win32ui
+import win32ui, win32api
+import img2pdf
+from pywintypes import error
+
 SYSTEM_CODE = {
     '0': {'message': 'Подключение с компьютера!', 'action': 'change screen', 'scanner':'none'},
     '10': {'message': 'Отсканируйте код сотрудника!', 'action': 'Show message, scanner response2server', 'scanner': 'button'},
@@ -80,7 +83,8 @@ class CustomWriter(ImageWriter):
         font = ImageFont.truetype(self.font_path, font_size)
         lines = textwrap.wrap(self.upper_text, width=MAX_WIDTH)
         
-        ypos -= len(lines) * 1.5
+        ypos -= 2.5
+        ypos -= len(lines) * 1
 
         for line in lines:
             width, height = font.getsize(line)
@@ -108,23 +112,76 @@ def generate_barcode(id, title):
                     options={"module_width": 0.1, "module_height": 8, "font_size": 14, "text_distance": 1,
                              "quiet_zone": 3})
     resize_image(f'barcode.png', 60, 40)
+
+    img_path = os.path.join(os.getcwd(), r'media\barcode.png') 
+    pdf_path = os.path.join(os.getcwd(), r'media\barcode.pdf')
+    image = Image.open(img_path)
+    pdf_bytes = img2pdf.convert(image.filename)
+    file = open(pdf_path, "wb")
+    file.write(pdf_bytes)
+    image.close()
+    file.close()
+
     printer_name = win32print.GetDefaultPrinter()
-    file_name = os.path.join(MEDIA_ROOT, "barcode.png")
 
-    hDC = win32ui.CreateDC()
-    hDC.CreatePrinterDC(printer_name)
-    printer_size = hDC.GetDeviceCaps(WIDTH), hDC.GetDeviceCaps(HEIGHT)
+    printdefaults = {"DesiredAccess": win32print.PRINTER_ALL_ACCESS}
 
-    bmp = Image.open(file_name)
-    if bmp.size[0] < bmp.size[1]:
-        bmp = bmp.rotate(90)
+    handle = win32print.OpenPrinter(printer_name, printdefaults)
+    level = 2
+    attributes = win32print.GetPrinter(handle, level)
+    attributes['pDevMode'].Duplex = 1
 
-    hDC.StartDoc(file_name)
-    hDC.StartPage()
+    win32print.SetPrinter(handle, level, attributes, 0)
+    win32print.GetPrinter(handle, level)['pDevMode'].Duplex
+    win32print.StartDocPrinter(handle, 1, [pdf_path, None, "raw"])
+    try:
+        win32api.ShellExecute(2,'print', pdf_path,'.','/manualstoprint',0)
+    except error as e:
+        return e[2]
+    win32print.ClosePrinter(handle)
 
-    dib = ImageWin.Dib(bmp)
-    dib.draw(hDC.GetHandleOutput(), (0, 0, printer_size[0], printer_size[1]))
 
-    hDC.EndPage()
-    hDC.EndDoc()
-    hDC.DeleteDC()
+    # hDC = win32ui.CreateDC()
+    # hDC.CreatePrinterDC(printer_name)
+    # printer_size = hDC.GetDeviceCaps(WIDTH), hDC.GetDeviceCaps(HEIGHT)
+
+
+    # hDC.StartDoc(file_name)
+    # hDC.StartPage()
+
+    # dib = ImageWin.Dib(bmp)
+    # dib.draw(hDC.GetHandleOutput(), (0, 0, printer_size[0], printer_size[1]))
+
+    # hDC.EndPage()
+    # hDC.EndDoc()
+    # hDC.DeleteDC()
+
+
+def print_pdf(input_pdf, mode=2, printer=1):
+    name = win32print.GetDefaultPrinter()
+
+    # оставляем без изменений
+    ## тут нужные права на использование принтеров
+    printdefaults = {"DesiredAccess": win32print.PRINTER_ALL_ACCESS}
+    ## начинаем работу с принтером ("открываем" его)
+    handle = win32print.OpenPrinter(name, printdefaults)
+    ## Если изменить level на другое число, то не сработает
+    level = 2
+    ## Получаем значения принтера
+    attributes = win32print.GetPrinter(handle, level)
+    ## Настройка двухсторонней печати
+    attributes['pDevMode'].Duplex = mode   #flip over  3 - это короткий 2 - это длинный край
+
+    ## Передаем нужные значения в принтер
+    win32print.SetPrinter(handle, level, attributes, 0)
+    win32print.GetPrinter(handle, level)['pDevMode'].Duplex
+    ## Предупреждаем принтер о старте печати
+    win32print.StartDocPrinter(handle, 1, [input_pdf, None, "raw"])
+    ## 2 в начале для открытия pdf и его сворачивания, для открытия без сворачивания поменяйте на 1
+    win32api.ShellExecute(2,'print', input_pdf,'.','/manualstoprint',0)
+    ## "Закрываем" принтер
+    win32print.ClosePrinter(handle)
+
+    ## Меняем стандартный принтер на часто используемый  
+    win32print.SetDefaultPrinterW("Brother DCP-L2540DN series Printer")
+    win32print.SetDefaultPrinter("Brother DCP-L2540DN series Printer")

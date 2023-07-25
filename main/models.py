@@ -111,6 +111,7 @@ class Crates(models.Model):
     @property
     def rank(self):
         id = self.id
+        print(self.id)
         counter = 1
         while id != 0:
             id //= 10
