@@ -30,8 +30,8 @@ SYSTEM_CODE = {
 }
 
 MM_PER_PX = .2645833333
-SYMBOL_WIDTH = 2.5
-MAX_WIDTH = 32
+SYMBOL_WIDTH = 4.939
+MAX_WIDTH = 35
 WIDTH=90
 HEIGHT=60
 class CustomWriter(ImageWriter):
@@ -46,7 +46,7 @@ class CustomWriter(ImageWriter):
 
     def _init(self, code):
         width, height = self.calculate_size(len(code[0]), len(code))
-        size = (int(self.x_img_scale * mm2px(width, self.dpi)), int(self.y_img_scale * mm2px(height, self.dpi)))
+        size = (int(self.x_img_scale * mm2px(width, self.dpi)), int(self.y_img_scale * mm2px(height, self.dpi))+20)
         print(size)
         self._image = Image.new(self.mode, size, self.background)
         self._draw = ImageDraw.Draw(self._image)
@@ -62,7 +62,7 @@ class CustomWriter(ImageWriter):
         self._draw.rectangle(size, outline=color, fill=color)
 
     def _paint_text(self, xpos, ypos):
-
+        MAX_WIDTH = round(WIDTH / (MM_PER_PX * 8) - 13)
         font_size = 25
         font = ImageFont.truetype(self.font_path, font_size)
         lines = textwrap.wrap(self.text, width=MAX_WIDTH)
@@ -87,7 +87,6 @@ class CustomWriter(ImageWriter):
         ypos -= len(lines) * 1
 
         for line in lines:
-            
             width, height = font.getsize(line)
             pos = (
                 mm2px(xpos, self.dpi) - width // 2,
@@ -124,10 +123,10 @@ def generate_barcode(id, title):
     file.close()
 
     printer_name = win32print.GetDefaultPrinter()
-    GSPRINT_PATH = os.path.join(os.getcwd(), r'Ghostgum\gsview\gsprint.exe')
+    GSPRINT_PATH = os.path.join(os.getcwd(), r'Ghostgum\gsview\gsprint.exe') 
     GHOSTSCRIPT_PATH = os.path.join(os.getcwd(), r'gs\gs10.01.2\bin\gswin64.exe') 
 
-    # win32api.ShellExecute(0, 'open', GSPRINT_PATH, '-ghostscript "'+GHOSTSCRIPT_PATH+'" -printer "'+printer_name+f'" "{pdf_path}"', '.', 0)
+    win32api.ShellExecute(0, 'open', GSPRINT_PATH, '-ghostscript "'+GHOSTSCRIPT_PATH+'" -printer "'+printer_name+f'" "{pdf_path}"', '.', 0)
 
 
     # hDC = win32ui.CreateDC()
