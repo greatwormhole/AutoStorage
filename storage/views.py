@@ -3,7 +3,7 @@ from django.http import JsonResponse, HttpResponse
 from django.views import View
 from django.core import serializers
 
-from main.models import THD, Nomenclature, DeliveryNote, Worker, Crates, Storage
+from main.models import THD, Nomenclature, DeliveryNote, Worker, Crates, Storage, TempCrate
 from main.utils import generate_nomenclature_barcode
 from .calculate_planning import handle_calculations
 
@@ -125,13 +125,13 @@ class SaveTempCrateView(View):
     def post(self, request):
 
         data = json.loads(request.body).get('data')
-
+        print(data)
         crate = Crates.objects.get(id=int(data.get('id')))
 
-        temp_crate = Crates.objects.create(
+        temp_crate = TempCrate.objects.create(
+            crate = crate,
             amount = data.get('count'),
             size = data.get('dimensions'),
-            nomenclature = crate.nomenclature,
         )
         temp_crate.save()
 

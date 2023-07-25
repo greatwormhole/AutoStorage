@@ -298,7 +298,7 @@ function promptCrateListShow(response, id){
         }
         html += '</td>'
         html += '<td>'
-        html += '<button class="choose-btn" onclick="chooseCrate('+id+', '+response[i].fields.text_id+')">Выбрать</button>'
+        html += '<button class="choose-btn" onclick="chooseCrate('+id+', '+response[i].pk+')">Выбрать</button>'
         html += '</td>'
         html += '</tr>'
     }
