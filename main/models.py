@@ -106,12 +106,6 @@ class Crates(models.Model):
     size = models.CharField(max_length=80)
     cell = models.ForeignKey(Storage, on_delete=models.RESTRICT, blank=True, null=True, related_name='crates')
 
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        zero_amount = TEXT_ID_RANK - self.rank
-        self.text_id = zero_amount * '0' + str(self.id)
-        super().save(*args, **kwargs)
-
     @property
     def rank(self):
         id = self.id
@@ -175,12 +169,6 @@ class TempCrate(models.Model):
     
     def __str__(self):
         return f' Временная коробка к {self.crate.__str__()}'
-    
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        zero_amount = TEXT_ID_RANK - self.rank
-        self.text_id = zero_amount * '0' + str(self.id)
-        super().save(*args, **kwargs)
 
     @property
     def rank(self):
@@ -199,3 +187,17 @@ class TempCrate(models.Model):
 def create_barcode(sender, instance, created, **kwargs):
     if created:
         generate_worker_barcode(instance.id, instance.name)
+        
+@receiver(post_save, sender=Crates)
+def set_crates_text_id(sender, instance, created, **kwargs):
+    if created:
+        zero_amount = TEXT_ID_RANK - instance.rank
+        instance.text_id = zero_amount * '0' + str(instance.id)
+        instance.save()
+    
+@receiver(post_save, sender=TempCrate)
+def set_temp_crates_text_id(sender, instance, created, **kwargs):
+    if created:
+        zero_amount = TEXT_ID_RANK - instance.rank
+        instance.text_id = zero_amount * '0' + str(instance.id)
+        instance.save()
