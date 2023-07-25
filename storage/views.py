@@ -126,7 +126,7 @@ class SaveTempCrateView(View):
 
         data = json.loads(request.body).get('data')
 
-        crate = Crates.objects.get(text_id=data.get('id'))
+        crate = Crates.objects.get(id=int(data.get('id')))
 
         temp_crate = Crates.objects.create(
             amount = data.get('count'),

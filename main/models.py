@@ -173,6 +173,9 @@ class TempCrate(models.Model):
     amount = models.FloatField()
     size = models.CharField(max_length=80)
     
+    def __str__(self):
+        return f' Временная коробка к {self.crate.__str__()}'
+    
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         zero_amount = TEXT_ID_RANK - self.rank
