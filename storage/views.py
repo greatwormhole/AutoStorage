@@ -66,7 +66,7 @@ class SaveConsignmentNote(View):
         worker = Worker.objects.get(id=request_id)
         delivery_note = DeliveryNote.objects.create(
             worker = worker,
-            id = post_data.get('number'),
+            number = post_data.get('number'),
             datetime = dt.strptime(post_data.get('datetime'), '%d.%m.%Y %H:%M:%S'),
             provider = post_data.get('provider'),
             article_list = consignment_note_body
