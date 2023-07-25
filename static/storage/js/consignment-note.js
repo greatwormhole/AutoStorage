@@ -194,7 +194,7 @@ function printSticker(id){
                       'background-color':'white',
                       'border-radius':'5px 5px 5px 5px'})
     var html = '<div class = "prompt-row " id = "consignment-note-prompt-row">'
-    html += '<button id = "register-new-create" onclick = "createNote('+rowId+')">Регистарция новой коробки.</button>'
+    html += '<button id = "register-new-create" onclick = "createNote('+rowId+', this)">Регистарция новой коробки.</button>'
     html += '<button id = "choose-create" >Использование существующих.</button>'
     html += '</div>'
 
@@ -208,7 +208,8 @@ function printSticker(id){
     })
 }
 
-function createNote(id){
+function createNote(id,button){
+    button.disabled=true
     var articule = $('#'+id+'_articule_span').text(),
         nomenclature = $('#'+id+'_select_nomenclature').val(),
         count = $('#'+id+'_count').val(),
@@ -216,8 +217,10 @@ function createNote(id){
         dimensions = $('#'+id+'_x').val()+'x'+$('#'+id+'_y').val()+'x'+$('#'+id+'_z').val()
     var data = {'articule':articule, 'nomenclature':nomenclature, 'count':count, 'unit':unit, 'dimensions':dimensions}
     if(articule == '' || nomenclature == 'Добавьте номенклатуру!' || count == '' || unit == '' || $('#'+id+'_x').val() == '' || $('#'+id+'_y').val()== '' || $('#'+id+'_z').val() == ''){
+                $('#prompt-block-UI').hide()
                 return alert('Накладная заполнена не полностью!')
             }
+
     $.ajax({
                 method:"POST",
                 async: true,

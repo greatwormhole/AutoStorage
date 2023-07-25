@@ -1,6 +1,6 @@
 from decimal import Decimal
 
-from storage_planning.py3dbp import Packer, Bin, Item, Painter
+from Storage_planning.py3dbp import Packer, Bin, Item, Painter
 from main.models import DEFAULT_CRATE_MASS
 
 def cast_sizes(width: Decimal, height: Decimal, depth: Decimal, pos_arr: list):

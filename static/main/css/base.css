@@ -230,6 +230,9 @@ input{
 }
 
 /* Таблицы */
+td{
+    overflow:hidden;
+}
 .scroll-table{
     width:calc(100% - 40px);
     height:100%;

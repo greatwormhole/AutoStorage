@@ -104,9 +104,9 @@ class Crates(models.Model):
     cell = models.ForeignKey(Storage, on_delete=models.RESTRICT, blank=True, null=True, related_name='crates')
 
     def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
         zero_amount = TEXT_ID_RANK - self.rank
         self.text_id = zero_amount * '0' + str(self.id)
-        super().save(*args, **kwargs)
 
     @property
     def rank(self):

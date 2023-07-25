@@ -10,7 +10,10 @@ from PIL import Image, ImageDraw, ImageFont
 import textwrap
 from Apro.settings import MEDIA_ROOT
 import os
-
+from PIL import Image, ImageWin
+import os, sys
+import win32print
+import win32ui
 SYSTEM_CODE = {
     '0': {'message': 'Подключение с компьютера!', 'action': 'change screen', 'scanner':'none'},
     '10': {'message': 'Отсканируйте код сотрудника!', 'action': 'Show message, scanner response2server', 'scanner': 'button'},
@@ -26,7 +29,8 @@ SYSTEM_CODE = {
 MM_PER_PX = .2645833333
 SYMBOL_WIDTH = 4.939
 MAX_WIDTH = 35
-
+WIDTH=90
+HEIGHT=60
 class CustomWriter(ImageWriter):
 
     def __init__(self, upper_text: str, *args, **kwargs):
@@ -100,7 +104,27 @@ def generate_barcode(id, title):
     article = translit(id, language_code='ru', reversed=True)
 
     ean = Code39(article, writer=CustomWriter(title), add_checksum=False)
-    name = ean.save(f'media/barcode.png',
+    name = ean.save(f'media/barcode',
                     options={"module_width": 0.1, "module_height": 8, "font_size": 14, "text_distance": 1,
                              "quiet_zone": 3})
-    # resize_image(f'{article}.png', 60, 40)
+    resize_image(f'barcode.png', 60, 40)
+    printer_name = win32print.GetDefaultPrinter()
+    file_name = os.path.join(MEDIA_ROOT, "barcode.png")
+
+    hDC = win32ui.CreateDC()
+    hDC.CreatePrinterDC(printer_name)
+    printer_size = hDC.GetDeviceCaps(WIDTH), hDC.GetDeviceCaps(HEIGHT)
+
+    bmp = Image.open(file_name)
+    if bmp.size[0] < bmp.size[1]:
+        bmp = bmp.rotate(90)
+
+    hDC.StartDoc(file_name)
+    hDC.StartPage()
+
+    dib = ImageWin.Dib(bmp)
+    dib.draw(hDC.GetHandleOutput(), (0, 0, printer_size[0], printer_size[1]))
+
+    hDC.EndPage()
+    hDC.EndDoc()
+    hDC.DeleteDC()
