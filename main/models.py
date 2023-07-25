@@ -10,7 +10,7 @@ TEXT_ID_RANK = 7
 
 class Nomenclature(models.Model):
     article = models.CharField(max_length=250, primary_key=True)
-    title = models.CharField(max_length=250, unique=True)
+    title = models.CharField(max_length=100, unique=True)
     units = models.CharField(max_length=60)
     maximum = models.FloatField(null=True, blank=True)
     minimum = models.FloatField(null=True, blank=True)
