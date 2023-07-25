@@ -120,6 +120,7 @@ function addRow(){
                product = nomenclature[i]
             }
         }
+        $('#'+id+'_print').prop( "disabled", false );
         $('#'+id+'_articule_span').text(product.pk)
         $('#'+id+'_count').val(null)
         $('#'+id+'_x').val(null)
@@ -231,6 +232,7 @@ function createNote(id,button){
                     $('#'+id+'_print').prop( "disabled", true );
                 },
                 error: function (request){
+                    $('#prompt-block-UI').hide()
                     alert('Произошла ошибка, попробуйте еще раз!')
                 }
             })
