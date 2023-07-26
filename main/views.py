@@ -3,10 +3,11 @@ from django.shortcuts import render
 from django.views import View
 from django.core import serializers
 from django.db import IntegrityError
+from django.core.exceptions import ObjectDoesNotExist
 
 from .decorators import check_access
 from .WS_cache import WS_CACHE_CONNECTION
-from .models import Worker, THD, Crates, Storage
+from .models import Worker, THD, Crates, Storage, ProductionStorage
 
 import json
 
@@ -285,13 +286,21 @@ class CrateView(View):
 
         if request_amount < crate.amount:
             crate.amount -= request_amount
+            crate.save()
+            
         else:
+            request_amount = crate.amount
             crate.delete()
 
         try:
-            crate.save()
-        except IntegrityError:
-            pass
+            prod_storage = ProductionStorage.objects.get(article=crate.nomenclature.article)
+            prod_storage.amount += request_amount
+            prod_storage.save()
+        except ObjectDoesNotExist:
+            ProductionStorage.objects.create(
+                article=crate.nomenclature.article,
+                amount = request_amount,
+            )
 
         return JsonResponse({'status': True}, status=200)
         
