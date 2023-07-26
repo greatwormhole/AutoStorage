@@ -71,6 +71,12 @@ class DeliveryNote(models.Model):
 class Storage(models.Model):
     adress = models.PositiveIntegerField(primary_key=True)
     cell_size = models.CharField(max_length=60)
+    x_cell_size = models.PositiveIntegerField(default=0)
+    y_cell_size = models.PositiveIntegerField(default=0)
+    z_cell_size = models.PositiveIntegerField(default=0)
+    x_cell_coord = models.PositiveIntegerField(default=0)
+    y_cell_coord = models.PositiveIntegerField(default=0)
+    z_cell_coord = models.PositiveIntegerField(default=0)
     storage_name = models.CharField(max_length=60)
     mass = models.PositiveIntegerField(default=700)
 
