@@ -300,6 +300,7 @@ class CrateView(View):
             ProductionStorage.objects.create(
                 title=crate.nomenclature.title,
                 amount = request_amount,
+                units = crate.nomenclature.units
             )
 
         return JsonResponse({'status': True}, status=200)
