@@ -191,8 +191,8 @@ class CratePositioningView(View):
 
     def post(self, request):
 
-        crate_geomentry = None
-        request_crate_id = request.POST.get('id', None)
+        crate_geometry = None
+        request_crate_id = json.loads(request.body).get('id', None)
 
         if request_crate_id is None:
             return JsonResponse({'status': False, 'error': 'POST запрос составлен неверно'}, status=400)
@@ -213,55 +213,53 @@ class CratePositioningView(View):
         # Список доступных ячеек в убывающем порядке
         cells = sorted(
             [
-                available_cell for cell_dct in same_nom_cells
+                available_cell for cell_dct in filter(lambda celldct: celldct['cell_id'] is not None, same_nom_cells)
                 if (available_cell := Storage.objects.get(adress=cell_dct['cell_id'])) # Задаем локальную переменную внутри list comrehension
                 if available_cell.size_left > new_crate.volume # Добавляем ячейку в список только если объем коробки меньше свободного объема ячейки
             ],
             key=lambda cell: cell.size_left,
-            reverse=True
+            reverse=True # Изменить этот параметр, если нужно заполнять сначала самые загруженные
         )
 
         # Цикл while чтобы найти место в ячейках с одинаковой номенклатурой пока есть подходящие ячейки
         while cells != []:
             print(cells)
             cell = cells.pop()
-            crate_geomentry = handle_calculations(
+            crate_geometry = handle_calculations(
                 cell=cell,
                 crates=list(cell.crates.all()) + [new_crate]
                 )
 
             # Выйти из цикла если место было найдено
-            if crate_geomentry is not None:
-                break
+            if crate_geometry is not None:
+                return JsonResponse(
+                    data=crate_geometry,
+                    status=200,
+            )
 
         # Если мы не нашли подходящую ячейку
         # попытаемся найти ячейку в общей базе данных
-        else:
+        all_cells = sorted(
+            [
+                cell for cell in Storage.objects.all()
+                if cell.size_left > new_crate.volume
+            ],
+            key=lambda cell: cell.size_left,
+            reverse=True # Изменить этот параметр, если нужно заполнять сначала самые загруженные
+        )
+        print(all_cells)
 
-            all_cells = sorted(
-                [
-                    cell for cell in Storage.objects.all()
-                    if cell.size_left > new_crate.volume
-                ],
-                key=lambda cell: cell.size_left,
-                reverse=True,
+        # Пока не нашли нужную ячейку
+        while crate_geometry is None:
+            if all_cells == []:
+                return JsonResponse({'status': False, 'error': 'Нет подходящих ячеек для размещения коробки'})
+            cell = all_cells.pop()
+            crate_geometry = handle_calculations(
+                cell=cell,
+                crates=list(cell.crates.all()) + [new_crate]
             )
-            
-            # Пока не нашли нужную ячейку
-            while crate_geomentry is None:
-
-                cell = all_cells.pop()
-                print(cell)
-                crate_geomentry = handle_calculations(
-                    cell=cell,
-                    crates=list(cell.crates.all()) + [new_crate]
-                )
-
+        
         return JsonResponse(
-            data={'status': True, 'data': crate_geomentry},
+            data=crate_geometry,
             status=200,
-        ) if crate_geomentry\
-        else JsonResponse(
-            data={'status': False, 'error': 'Подходящее место не было найдено'},
-            status=404
         )

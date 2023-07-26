@@ -3,13 +3,11 @@ from decimal import Decimal
 from storage_planning.py3dbp import Packer, Bin, Item, Painter
 from main.models import DEFAULT_CRATE_MASS
 
-def cast_sizes(width: Decimal, height: Decimal, depth: Decimal, pos_arr: list):
-    return [
-        pos_arr[0] + width / 2,
-        pos_arr[1] + height / 2,
-        pos_arr[2] + depth / 2,
-    ]
-
+class NotPackedError(Exception):
+    
+    def __init__(self, message):
+        super().__init__(message)
+        
 def calculate(crate_list: list, cell_size: list, cell_weight: float, surface_ratio: float = 0.9):
 
     # print(crate_list)
@@ -78,25 +76,29 @@ def calculate(crate_list: list, cell_size: list, cell_weight: float, surface_rat
         distribute_items=False,
         support_surface_ratio=surface_ratio,
     )
-
+    
     packer.putOrder()
-
-    return [
+    
+    res = [
         {
             'name': item.name,
-            'position': cast_sizes(
-                width=item.width,
-                height=item.height,
-                depth=item.depth,
-                pos_arr=[*map(Decimal, item.position)]),
-            'size': [
-                Decimal(item.width),
-                Decimal(item.height),
-                Decimal(item.depth),
-            ],
+            'position': {
+                'x': float(item.position[0] + item.width / 2),
+                'y': float(item.position[1] + item.height / 2), 
+                'z': float(item.position[2] + item.depth / 2),
+            },
+            'width': float(item.width),
+            'height': float(item.height),
+            'depth': float(item.depth),
         }
         for item in packer.bins[0].items
-    ] if packer.unfit_items is not None else None
+    ]
+    print(len(res), len(crate_list), sep='*******')
+    
+    if len(res) == len(crate_list):
+        return res
+    else:
+        raise NotPackedError('Не удалось разместить коробки')
 
     print("***************************************************")
     for idx,b in enumerate(packer.bins) :
@@ -150,6 +152,7 @@ def calculate(crate_list: list, cell_size: list, cell_weight: float, surface_rat
     print('unpack item volumn : ',volume_f)
 
     fig.show()
+    fig.savefig()
 
 def handle_calculations(cell, crates):
 
@@ -166,12 +169,17 @@ def handle_calculations(cell, crates):
 
     try:
         return {
-            'geometry': calculate(
+            'status': True,
+            'listBoxes': calculate(
                 crate_list=sorting_crate_list,
                 cell_size=cell_size,
                 cell_weight=cell.mass
             ),
-            'cell_id': cell.adress
+            'bin': {
+                'width': cell_size[0],
+                'height': cell_size[1],
+                'depth': cell_size[2],
+            },
         }
-    except ZeroDivisionError:
+    except (ZeroDivisionError, NotPackedError):
         return None
