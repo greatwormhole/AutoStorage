@@ -1,7 +1,7 @@
 from django.apps import apps
 from django.core.management.base import BaseCommand
 from django.db import transaction
-from main.models import Storage, Worker, Nomenclature, Crates, DeliveryNote
+from main.models import Storage, Worker, Nomenclature, Crates, DeliveryNote, ProductionStorage
 
 class Command(BaseCommand):
 
@@ -17,3 +17,4 @@ class Command(BaseCommand):
         Nomenclature.objects.all().delete()
         Storage.objects.all().delete()
         DeliveryNote.objects.all().delete()
+        ProductionStorage.objects.all().delete()

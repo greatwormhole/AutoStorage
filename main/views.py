@@ -293,12 +293,12 @@ class CrateView(View):
             crate.delete()
 
         try:
-            prod_storage = ProductionStorage.objects.get(article=crate.nomenclature.article)
+            prod_storage = ProductionStorage.objects.get(title=crate.nomenclature.title)
             prod_storage.amount += request_amount
             prod_storage.save()
         except ObjectDoesNotExist:
             ProductionStorage.objects.create(
-                article=crate.nomenclature.article,
+                title=crate.nomenclature.title,
                 amount = request_amount,
             )
 

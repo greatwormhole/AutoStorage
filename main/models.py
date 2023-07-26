@@ -14,7 +14,7 @@ TEXT_ID_RANK = 7
 class Nomenclature(models.Model):
     article = models.CharField(max_length=250, primary_key=True)
     title = models.CharField(max_length=100, unique=True)
-    units = models.CharField(max_length=60)
+    units = models.CharField(max_length=20)
     maximum = models.FloatField(null=True, blank=True)
     minimum = models.FloatField(null=True, blank=True)
     mass = models.FloatField(blank=True, null=True)
@@ -89,8 +89,9 @@ class Storage(models.Model):
         verbose_name_plural = "Склады"
 
 class ProductionStorage(models.Model):
-    article = models.CharField(max_length=250, primary_key=True)
+    title = models.CharField(max_length=250, primary_key=True, default='')
     amount = models.FloatField()
+    units = models.CharField(max_length=20, default='')
 
     def __str__(self):
         return self.article
