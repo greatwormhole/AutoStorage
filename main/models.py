@@ -94,7 +94,7 @@ class ProductionStorage(models.Model):
     units = models.CharField(max_length=20, default='')
 
     def __str__(self):
-        return self.article
+        return self.title
     
     class Meta:
         verbose_name = "Склад производства"
