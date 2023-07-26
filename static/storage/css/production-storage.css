@@ -26,3 +26,17 @@
     margin-top:5px;
     text-align:center;
 }
+.search-button{
+    background: url('/media/icons/navigation.png');
+    background-size: cover;
+    width: 29.6px;
+    height: 27px;
+    margin: auto;
+    margin-left: 5px;
+    border: 0px solid;
+    padding: 0;
+    box-sizing: border-box;
+}
+.select2-container{
+    z-index:10000
+}

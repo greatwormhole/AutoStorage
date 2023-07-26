@@ -56,6 +56,44 @@ class storagePlanView(View):
         response = HttpResponse(serializers.serialize('json', data), content_type='application/json')
 
         return response
+
+class storageNavigation(View):
+    @check_access()
+    def get(self, request):
+
+        username = json.loads(request.COOKIES.get('AccessKey')).get('name')
+        THD_num = json.loads(request.COOKIES.get('AccessKey')).get('THD')
+        # username = "test"
+        if THD_num is not None:
+
+            THD_ip = THD.objects.get(THD_number=THD_num).ip
+
+            context = {"internalUser": username, 'THD': THD_num, 'THD_ip': THD_ip}
+
+        else:
+
+            context = {"internalUser": username, 'THD': THD_num}
+
+        return render(request, 'storage/storage-navigation.html', context=context)
+
+class storageVisualization(View):
+    @check_access()
+    def get(self, request):
+
+        username = json.loads(request.COOKIES.get('AccessKey')).get('name')
+        THD_num = json.loads(request.COOKIES.get('AccessKey')).get('THD')
+        # username = "test"
+        if THD_num is not None:
+
+            THD_ip = THD.objects.get(THD_number=THD_num).ip
+
+            context = {"internalUser": username, 'THD': THD_num, 'THD_ip': THD_ip}
+
+        else:
+
+            context = {"internalUser": username, 'THD': THD_num}
+
+        return render(request, 'storage/visualization.html', context=context)
 class NomenclatureView(View):
 
     """

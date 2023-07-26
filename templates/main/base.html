@@ -26,8 +26,9 @@
         USING_THD = "{{THD}}",
         consignmentNote = '{% url "consignment-note" %}',
         brokenPartsIn = '{% url "defective_product_add" %}',
-        productionStorage = '{% url "production_storage" %}'
-
+        productionStorage = '{% url "production_storage" %}',
+        storageNavigation = '{% url "storage_navigation" %}',
+        storageVisualizationUrl = '{% url "storage_visualization" %}'
         {% if internalUser != "NA" %}
 
         var wsStart = 'ws://',

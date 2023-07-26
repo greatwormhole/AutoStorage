@@ -12,7 +12,9 @@ urlpatterns = [
     path('API/get-nomenclature-crates', NomenclatureCratesView.as_view(), name='get_nomenclature_crates'),
     path('API/crate-positioning', CratePositioningView.as_view(), name='crate_positioning'),
     path('API/choose-crate', SaveTempCrateView.as_view(), name='choose_crate'),
-    path('production-storage', storagePlanView.as_view(),name="production_storage")
+    path('production-storage', storagePlanView.as_view(),name="production_storage"),
+    path('storage-navigation', storageNavigation.as_view(),name="storage_navigation"),
+    path('storage-visualization', storageVisualization.as_view(),name="storage_visualization")
 ]
 
 if settings.DEBUG:
