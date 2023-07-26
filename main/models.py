@@ -62,7 +62,7 @@ class DeliveryNote(models.Model):
     provider = models.CharField(max_length=150, default='')
 
     def __str__(self):
-        return self.id
+        return self.number
     
     class Meta:
         verbose_name = "Накладная"
@@ -89,7 +89,7 @@ class Storage(models.Model):
         verbose_name_plural = "Склады"
 
 class ProductionStorage(models.Model):
-    article = models.CharField(max_length=60, primary_key=True)
+    article = models.CharField(max_length=250, primary_key=True)
     amount = models.FloatField()
 
     def __str__(self):
