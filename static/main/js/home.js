@@ -1,7 +1,8 @@
 ///redirect
 var pathList = {
     'consignment-note': consignmentNote,
-    'broken-parts-in': brokenPartsIn
+    'broken-parts-in': brokenPartsIn,
+    'parts-in-factory': productionStorage
 }
 function redirect(idList){
 
@@ -42,7 +43,7 @@ $(document).ready(function(){
         html += "</div>"
         $('#button-panel').append(html)
 
-        redirect(['consignment-note','broken-parts-in'])
+        redirect(['consignment-note','broken-parts-in','parts-in-factory'])
     }
     if (JSON.parse(rights)["plan_right"] == true){
         var html = "<div class = 'rights'>"

@@ -2,8 +2,8 @@ from django.shortcuts import render, redirect
 from django.http import JsonResponse, HttpResponse
 from django.views import View
 from django.core import serializers
-
-from main.models import THD, Nomenclature, DeliveryNote, Worker, Crates, Storage, TempCrate
+from main.decorators import check_access
+from main.models import THD, Nomenclature, DeliveryNote, Worker, Crates, Storage, TempCrate, ProductionStorage
 from main.utils import generate_nomenclature_barcode
 from .calculate_planning import handle_calculations
 
@@ -11,7 +11,7 @@ import json
 from datetime import datetime as dt
 
 class main(View):
-
+    @check_access()
     def get(self, request):
 
         username = json.loads(request.COOKIES.get('AccessKey')).get('name')
@@ -29,6 +29,33 @@ class main(View):
 
         return render(request, 'storage/consignment-note.html', context=context)
 
+
+class storagePlanView(View):
+    @check_access()
+    def get (self, request):
+
+        username = json.loads(request.COOKIES.get('AccessKey')).get('name')
+        THD_num = json.loads(request.COOKIES.get('AccessKey')).get('THD')
+        # username = "test"
+        if THD_num is not None:
+
+            THD_ip = THD.objects.get(THD_number=THD_num).ip
+
+            context = {"internalUser": username, 'THD': THD_num, 'THD_ip': THD_ip}
+
+        else:
+
+            context = {"internalUser": username, 'THD': THD_num}
+
+        return render(request, 'storage/production-storage.html', context=context)
+
+    def post(self, request):
+
+        data = ProductionStorage.objects.all()
+
+        response = HttpResponse(serializers.serialize('json', data), content_type='application/json')
+
+        return response
 class NomenclatureView(View):
 
     """

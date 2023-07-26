@@ -1,0 +1,38 @@
+{% extends 'main/base.html' %}
+{% block link %}
+{% load static %}
+    <script  src="{% static 'storage/js/production-storage.js' %}" rel="stylesheet" ></script>
+    <link rel="stylesheet" href="{% static 'storage/css/production-storage.css' %}">
+    <script>
+        const updateInfoUrl = '{% url 'production_storage' %}'
+        $(document).ready(function(){
+            updateInfo()
+        })
+    </script>
+{% endblock %}
+{% block content %}
+ <div class="content">
+        <div id = "view-space">
+            <div class="note-header">
+                <h3 class="sign main-sign">Список МЦ на производстве.</h3>
+            </div>
+            <div class="scroll-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>
+                                Номенклатура
+                            </th>
+                            <th>
+                                Количество
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+ </div>
+{% endblock %}
