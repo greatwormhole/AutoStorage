@@ -230,6 +230,7 @@ class CratePositioningView(View):
     def post(self, request):
 
         crate_geometry = None
+        print(request.body)
         request_crate_id = json.loads(request.body).get('id', None)
 
         if request_crate_id is None:

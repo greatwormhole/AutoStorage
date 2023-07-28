@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models.signals import post_save
+from django.db.models import signals, Q
 from django.dispatch import receiver
 
 from datetime import datetime
@@ -70,7 +70,6 @@ class DeliveryNote(models.Model):
 
 class Storage(models.Model):
     adress = models.PositiveIntegerField(primary_key=True)
-    cell_size = models.CharField(max_length=60)
     x_cell_size = models.PositiveIntegerField(default=0)
     y_cell_size = models.PositiveIntegerField(default=0)
     z_cell_size = models.PositiveIntegerField(default=0)
@@ -85,7 +84,7 @@ class Storage(models.Model):
     
     @property
     def size_left(self):
-        size = reduce(lambda i, j: float(i) * float(j), self.cell_size.split('x'))
+        size = self.x_cell_size * self.y_cell_size * self.z_cell_size
         for el in self.crates.all():
             size -= el.volume
         return size
@@ -190,19 +189,19 @@ class TempCrate(models.Model):
         verbose_name = 'Временная коробка'
         verbose_name_plural = 'Временные коробки'
         
-@receiver(post_save, sender=Worker)
+@receiver(signals.post_save, sender=Worker)
 def create_barcode(sender, instance, created, **kwargs):
     if created:
         generate_worker_barcode(instance.id, instance.name)
         
-@receiver(post_save, sender=Crates)
+@receiver(signals.post_save, sender=Crates)
 def set_crates_text_id(sender, instance, created, **kwargs):
     if created:
         zero_amount = TEXT_ID_RANK - instance.rank
         instance.text_id = zero_amount * '0' + str(instance.id)
         instance.save()
     
-@receiver(post_save, sender=TempCrate)
+@receiver(signals.post_save, sender=TempCrate)
 def set_temp_crates_text_id(sender, instance, created, **kwargs):
     if created:
         zero_amount = TEXT_ID_RANK - instance.rank

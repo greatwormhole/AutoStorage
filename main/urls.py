@@ -9,7 +9,7 @@ from .views import (
     LogoutView,
     CrateView,
     CheckConnection,
-    MoveCrateView
+    MoveCrateView,
     )
 from django.conf import settings
 from django.conf.urls.static import static
@@ -25,7 +25,6 @@ urlpatterns = [
     path('API/crate/<int:pk>/', CrateView.as_view(), name='crate'),
     path('API/move-crate/<int:pk>/', MoveCrateView.as_view(), name='move_crate'),
     path('API/check-connection', CheckConnection.as_view(), name='check_connection'),
-
 ]
 
 if settings.DEBUG:

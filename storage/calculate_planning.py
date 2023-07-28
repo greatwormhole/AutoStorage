@@ -2,6 +2,7 @@ from decimal import Decimal
 
 from storage_planning.py3dbp import Packer, Bin, Item, Painter
 from main.models import DEFAULT_CRATE_MASS
+from .utils import img_to_bytestr
 
 class NotPackedError(Exception):
     
@@ -90,6 +91,7 @@ def calculate(crate_list: list, cell_size: list, cell_weight: float, surface_rat
             'width': float(item.width),
             'height': float(item.height),
             'depth': float(item.depth),
+            'img': img_to_bytestr()
         }
         for item in packer.bins[0].items
     ]
@@ -165,20 +167,24 @@ def handle_calculations(cell, crates):
         }
         for crate in crates
     ]
-    cell_size = [*map(float, cell.cell_size.split('x'))]
+    # cell_size = [*map(float, cell.cell_size.split('x'))]
 
     try:
         return {
             'status': True,
             'listBoxes': calculate(
                 crate_list=sorting_crate_list,
-                cell_size=cell_size,
+                cell_size=(
+                    cell.x_cell_size,
+                    cell.y_cell_size,
+                    cell.z_cell_size,    
+                ),
                 cell_weight=cell.mass
             ),
             'bin': {
-                'width': cell_size[0],
-                'height': cell_size[1],
-                'depth': cell_size[2],
+                'width': cell.x_cell_size,
+                'height': cell.y_cell_size,
+                'depth': cell.z_cell_size,
             },
         }
     except (ZeroDivisionError, NotPackedError):

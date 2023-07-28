@@ -29,7 +29,12 @@ class NomenclatureFactory(DjangoModelFactory):
 class StorageFactory(DjangoModelFactory):
     
     adress = factory.Sequence(lambda x: x)
-    cell_size = factory.Faker('numerify', text='%!!!!!x%!!!!!x%!!!!!')
+    x_cell_size = factory.Faker('numerify', text='%###')
+    y_cell_size = factory.Faker('numerify', text='%###')
+    z_cell_size = factory.Faker('numerify', text='%###')
+    x_cell_coord = factory.Faker('numerify', text='%###')
+    y_cell_coord = factory.Faker('numerify', text='%###')
+    z_cell_coord = factory.Faker('numerify', text='%###')
     mass = factory.Faker('numerify', text='%##!!!')
 
     class Meta:
