@@ -83,17 +83,32 @@ class storageVisualization(View):
         username = json.loads(request.COOKIES.get('AccessKey')).get('name')
         THD_num = json.loads(request.COOKIES.get('AccessKey')).get('THD')
         # username = "test"
+        storage_list = list(set(list(Storage.objects.values_list('storage_name',flat=True))))
         if THD_num is not None:
 
             THD_ip = THD.objects.get(THD_number=THD_num).ip
 
-            context = {"internalUser": username, 'THD': THD_num, 'THD_ip': THD_ip}
+            context = {"internalUser": username, 'THD': THD_num, 'THD_ip': THD_ip, 'storage_list':storage_list}
 
         else:
 
             context = {"internalUser": username, 'THD': THD_num}
 
         return render(request, 'storage/visualization.html', context=context)
+
+
+class storageInfo(View):
+
+    def get (self, request):
+        id = request.GET.get('data')
+
+        data = Storage.objects.filter(storage_name=id)
+
+        response = HttpResponse(serializers.serialize('json', data), content_type='application/json')
+        # response.set_cookie('AccessKey', json.dumps({'id': 1}))
+
+        return response
+
 class NomenclatureView(View):
 
     """
