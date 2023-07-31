@@ -3,11 +3,26 @@
 {% load static %}
   <script  src="{% static 'storage/js/visualization.js' %}" rel="stylesheet" ></script>
   <link rel="stylesheet" href="{% static 'storage/css/visualization.css' %}">
-
+  <script>
+        const storageList = '{{storage_list}}',
+            getCellsUrl = "{% url 'cells' %}"
+      $(document).ready(function(){
+        buildStorages(storageList)
+      })
+  </script>
 {% endblock %}
 {% block content %}
  <div class="content">
         <div id = "view-space">
+            <div class="visualize-header">
+            </div>
+            <div class="storage-view">
+                {% for storage in storage_list %}
+                    <div class = "storage_template" id="{{storage}}">
+
+                    </div>
+                {% endfor %}
+            </div>
         </div>
  </div>
 {% endblock %}
