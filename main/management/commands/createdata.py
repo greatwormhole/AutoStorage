@@ -27,11 +27,11 @@ class Command(BaseCommand):
         #     storage_name = random.choice(STORAGES)
         # ) for storage in range(STORAGE_NUM) for _ in range(CELLS_PER_STORAGE)]
         # workers = [WorkerFactory() for _ in range(WORKER_NUM)]
-        nomenclatures = [NomenclatureFactory(
-            units = random.choice(UNITS)
-        ) for _ in range(NOMENCLATURE_NUM)]
+        # nomenclatures = [NomenclatureFactory(
+        #     units = random.choice(UNITS)
+        # ) for _ in range(NOMENCLATURE_NUM)]
 
-        crates = [CrateFactory(
-            nomenclature = random.choice(nomenclatures),
-            cell = random.choice(storage_cells)
-        ) for _ in range(CRATE_NUM)]
+        # crates = [CrateFactory(
+        #     nomenclature = random.choice(nomenclatures),
+        #     cell = random.choice(storage_cells)
+        # ) for _ in range(CRATE_NUM)]

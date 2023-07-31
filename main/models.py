@@ -29,7 +29,7 @@ class Nomenclature(models.Model):
                 check=(
                     Q(units__exact='кг') | Q(units__exact='шт')
                 ),
-                name='Значение единиц измерения необходимо указывать в килограммах или штуках в формате "кг" или "шт"'
+                name='Значение единиц измерения необходимо указывать в килограммах или штуках в формате кг или шт'
             ),
             models.CheckConstraint(
                 check=((
@@ -45,9 +45,8 @@ class Nomenclature(models.Model):
 
 class Specification(models.Model):
     id = models.PositiveBigIntegerField(primary_key=True)
-    article_list = models.JSONField(default=dict,
-                                    validators=[ArticleJSONValidator(limit_value=JSONSCHEMA)])
-    production_time = models.TimeField()
+    nomenclatures = models.ManyToManyField(Nomenclature, verbose_name='Содержимое спецификации')
+    production_time = models.TimeField(verbose_name='Время производства')
 
     def __str__(self):
         return f'{self.id}'
