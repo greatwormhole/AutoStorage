@@ -1,8 +1,5 @@
-from decimal import Decimal
-
 from storage_planning.py3dbp import Packer, Bin, Item, Painter
-from main.models import DEFAULT_CRATE_MASS
-from .utils import img_to_bytestr
+from .utils import fast_convert
 
 class NotPackedError(Exception):
     
@@ -40,36 +37,36 @@ def calculate(crate_list: list, cell_size: list, cell_weight: float, surface_rat
         packer_item = packer.items[idx]
         match packer_item.rotation_type:
             case 1: 
-                packer_item.rotation_type = 0
-                temp = packer_item.width
-                packer_item.width = packer_item.height
-                packer_item.height = temp
+                packer.items[idx].rotation_type = 0
+                temp = packer.items[idx].width
+                packer.items[idx].width = packer.items[idx].height
+                packer.items[idx].height = temp
                 break
             case 2: 
-                packer_item.rotation_type = 0
-                temp = packer_item.width
-                packer_item.width = packer_item.height
-                packer_item.height = packer_item.depth
-                packer_item.depth = temp
+                packer.items[idx].rotation_type = 0
+                temp = packer.items[idx].width
+                packer.items[idx].width = packer.items[idx].height
+                packer.items[idx].height = packer.items[idx].depth
+                packer.items[idx].depth = temp
                 break
             case 3: 
-                packer_item.rotation_type = 0
-                temp = packer_item.width
-                packer_item.width = packer_item.depth
-                packer_item.depth = temp
+                packer.items[idx].rotation_type = 0
+                temp = packer.items[idx].width
+                packer.items[idx].width = packer.items[idx].depth
+                packer.items[idx].depth = temp
                 break
             case 4: 
-                packer_item.rotation_type = 0
-                temp = packer_item.width
-                packer_item.width = packer_item.depth
-                packer_item.depth = packer_item.height
-                packer_item.height = temp
+                packer.items[idx].rotation_type = 0
+                temp = packer.items[idx].width
+                packer.items[idx].width = packer.items[idx].depth
+                packer.items[idx].depth = packer.items[idx].height
+                packer.items[idx].height = temp
                 break
             case 5: 
-                packer_item.rotation_type = 0
-                temp = packer_item.height
-                packer_item.height = packer_item.depth
-                packer_item.depth = temp
+                packer.items[idx].rotation_type = 0
+                temp = packer.items[idx].height
+                packer.items[idx].height = packer.items[idx].depth
+                packer.items[idx].depth = temp
                 break
             case _: continue
 
@@ -80,22 +77,63 @@ def calculate(crate_list: list, cell_size: list, cell_weight: float, surface_rat
     
     packer.putOrder()
     
-    res = [
-        {
-            'name': item.name,
-            'position': {
-                'x': float(item.position[0] + item.width / 2),
-                'y': float(item.position[1] + item.height / 2), 
-                'z': float(item.position[2] + item.depth / 2),
-            },
-            'width': float(item.width),
-            'height': float(item.height),
-            'depth': float(item.depth),
-            'img': img_to_bytestr()
-        }
-        for item in packer.bins[0].items
-    ]
-    print(len(res), len(crate_list), sep='*******')
+    res = []
+    
+    # print(*map(lambda i: i.name, packer.bins[0].items))
+    
+    for item in packer.bins[0].items:
+        
+        # print(item.name, item.position, item.rotation_type, cell_size, '\n')
+        
+        match item.rotation_type:
+            case 1: 
+                item.rotation_type = 0
+                temp = item.width
+                item.width = item.height
+                item.height = temp
+            case 2: 
+                item.rotation_type = 0
+                temp = item.width
+                item.width = item.height
+                item.height = item.depth
+                item.depth = temp
+            case 3: 
+                item.rotation_type = 0
+                temp = item.width
+                item.width = item.depth
+                item.depth = temp
+            case 4: 
+                item.rotation_type = 0
+                temp = item.width
+                item.width = item.depth
+                item.depth = item.height
+                item.height = temp
+            case 5: 
+                item.rotation_type = 0
+                temp = item.height
+                item.height = item.depth
+                item.depth = temp
+            case _:
+                pass
+            
+        # print(item.name, item.position, item.rotation_type, cell_size)
+        # print('\n\n\n\n')
+        
+        res.append(
+            {
+                'position': {
+                    'x': float(item.position[0] + item.width / 2),
+                    'y': float(item.position[1] + item.height / 2), 
+                    'z': float(item.position[2] + item.depth / 2),
+                    'rot': item.rotation_type
+                },
+                'width': float(item.width),
+                'height': float(item.height),
+                'depth': float(item.depth),
+                'img': fast_convert(item.name, bg_color='#ad8762')
+            }
+        )
+    # print(len(res), len(crate_list), sep='*******')
     
     if len(res) == len(crate_list):
         return res
@@ -162,8 +200,7 @@ def handle_calculations(cell, crates):
         {
             'text_id': crate.text_id,
             'size': [*map(float, crate.size.split('x'))],
-            'weight': crate.amount if crate.nomenclature.units == 'кг' else DEFAULT_CRATE_MASS
-
+            'weight': crate.amount if crate.nomenclature.units == 'кг' else crate.amount * crate.nomenclature.mass
         }
         for crate in crates
     ]
@@ -182,6 +219,7 @@ def handle_calculations(cell, crates):
                 cell_weight=cell.mass
             ),
             'bin': {
+                'id': cell.adress,
                 'width': cell.x_cell_size,
                 'height': cell.y_cell_size,
                 'depth': cell.z_cell_size,

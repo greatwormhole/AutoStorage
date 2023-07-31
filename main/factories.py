@@ -32,9 +32,9 @@ class StorageFactory(DjangoModelFactory):
     x_cell_size = factory.Faker('numerify', text='%###')
     y_cell_size = factory.Faker('numerify', text='%###')
     z_cell_size = factory.Faker('numerify', text='%###')
-    x_cell_coord = factory.Faker('numerify', text='%###')
-    y_cell_coord = factory.Faker('numerify', text='%###')
-    z_cell_coord = factory.Faker('numerify', text='%###')
+    x_cell_coord = factory.Faker('numerify', text='%#')
+    y_cell_coord = factory.Faker('numerify', text='%#')
+    z_cell_coord = factory.Faker('numerify', text='%#')
     mass = factory.Faker('numerify', text='%##!!!')
 
     class Meta:

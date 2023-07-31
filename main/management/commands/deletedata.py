@@ -12,9 +12,11 @@ class Command(BaseCommand):
 
         self.stdout.write("Deleting old data...")
 
-        #Crates.objects.all().delete()
+        # Crates.objects.filter(
+        # ).delete()
+        # Crates.objects.all().delete()
         #Worker.objects.all().delete()
         #Nomenclature.objects.all().delete()
-        #Storage.objects.all().delete()
+        # Storage.objects.all().delete()
         #DeliveryNote.objects.all().delete()
-        ProductionStorage.objects.all().delete()
+        # ProductionStorage.objects.all().delete()

@@ -262,7 +262,6 @@ class CratePositioningView(View):
 
         # Цикл while чтобы найти место в ячейках с одинаковой номенклатурой пока есть подходящие ячейки
         while cells != []:
-            print(cells)
             cell = cells.pop()
             crate_geometry = handle_calculations(
                 cell=cell,
@@ -286,7 +285,6 @@ class CratePositioningView(View):
             key=lambda cell: cell.size_left,
             reverse=True # Изменить этот параметр, если нужно заполнять сначала самые загруженные
         )
-        print(all_cells)
 
         # Пока не нашли нужную ячейку
         while crate_geometry is None:

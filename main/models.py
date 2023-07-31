@@ -5,19 +5,18 @@ from django.dispatch import receiver
 from datetime import datetime
 from functools import reduce
 
-from .validators import ArticleJSONValidator, JSONSCHEMA
+from .validators import *
 from .utils import generate_worker_barcode
 
-DEFAULT_CRATE_MASS = 50.0
 TEXT_ID_RANK = 7
 
 class Nomenclature(models.Model):
-    article = models.CharField(max_length=250, primary_key=True)
-    title = models.CharField(max_length=100, unique=True)
-    units = models.CharField(max_length=20)
-    maximum = models.FloatField(null=True, blank=True)
-    minimum = models.FloatField(null=True, blank=True)
-    mass = models.FloatField(blank=True, null=True)
+    article = models.CharField(max_length=250, primary_key=True, verbose_name='Артикул')
+    title = models.CharField(max_length=100, unique=True,verbose_name='Наименование')
+    units = models.CharField(max_length=20, verbose_name='Единицы измерения')
+    maximum = models.FloatField(null=True, blank=True, verbose_name='Максимум продукции')
+    minimum = models.FloatField(null=True, blank=True, verbose_name='Минимум продукцииё')
+    mass = models.FloatField(blank=True, null=True, verbose_name='Масса одного изделия')
 
     def __str__(self):
         return self.title
@@ -25,6 +24,24 @@ class Nomenclature(models.Model):
     class Meta:
         verbose_name = "Номенклатура"
         verbose_name_plural = "Номенклатура"
+        constraints = [
+                        models.CheckConstraint(
+                check=(
+                    Q(units__exact='кг') | Q(units__exact='шт')
+                ),
+                name='Значение единиц измерения необходимо указывать в килограммах или штуках в формате "кг" или "шт"'
+            ),
+            models.CheckConstraint(
+                check=((
+                    Q(units__exact='шт') &
+                    Q(mass__isnull=False)
+                ) | (
+                    Q(units__exact='кг')
+                ) 
+                ),
+                name='Если изделие измеряется поштучно необходимо указать массу одного изделия'
+            )
+        ]
 
 class Specification(models.Model):
     id = models.PositiveBigIntegerField(primary_key=True)
@@ -33,7 +50,7 @@ class Specification(models.Model):
     production_time = models.TimeField()
 
     def __str__(self):
-        return self.id
+        return f'{self.id}'
     
     class Meta:
         verbose_name = "Спецификация"
@@ -76,7 +93,7 @@ class Storage(models.Model):
     x_cell_coord = models.PositiveIntegerField(default=0)
     y_cell_coord = models.PositiveIntegerField(default=0)
     z_cell_coord = models.PositiveIntegerField(default=0)
-    storage_name = models.CharField(max_length=60)
+    storage_name = models.CharField(max_length=60, validators=[validate_no_spaces])
     mass = models.PositiveIntegerField(default=700)
 
     def __str__(self):
