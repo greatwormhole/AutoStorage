@@ -8,6 +8,7 @@ from functools import reduce
 from .validators import *
 from .utils import generate_worker_barcode
 from Apro.settings import DEBUG
+from storage.WS_cache import WS_CACHED_CRATES_CHANGES as crates_cache
 
 TEXT_ID_RANK = 7
 
@@ -210,20 +211,49 @@ class TempCrate(models.Model):
         
 if not DEBUG:        
     @receiver(signals.post_save, sender=Worker)
-    def create_barcode(sender, instance, created, **kwargs):
+    def create_barcode(instance, created, **kwargs):
         if created:
             generate_worker_barcode(instance.id, instance.name)
         
 @receiver(signals.post_save, sender=Crates)
-def set_crates_text_id(sender, instance, created, **kwargs):
+def set_crates_text_id(instance, created, **kwargs):
     if created:
         zero_amount = TEXT_ID_RANK - instance.rank
         instance.text_id = zero_amount * '0' + str(instance.id)
         instance.save()
     
 @receiver(signals.post_save, sender=TempCrate)
-def set_temp_crates_text_id(sender, instance, created, **kwargs):
+def set_temp_crates_text_id(instance, created, **kwargs):
     if created:
         zero_amount = TEXT_ID_RANK - instance.rank
         instance.text_id = zero_amount * '0' + str(instance.id)
         instance.save()
+
+@receiver(signals.pre_save, sender=Crates)
+def pre_change(sender, instance: Crates, **kwargs):
+    original_cell = None
+    
+    if instance.id:
+        original_cell = sender.objects.get(id=instance.id).cell
+        
+    instance.__original_cell = original_cell
+
+@receiver(signals.pre_save, sender=Crates)
+def on_change(instance: Crates, **kwargs):
+    if instance.__original_cell != instance.cell:
+        crates_cache.append(
+            {
+                'crate_id': instance.id,
+                'amount': instance.amount,
+                'crate_size': [*map(float, instance.size.split('x'))],
+                'articule': instance.nomenclature.article,
+                'cell_adress': instance.cell.adress,
+                'storage_name': instance.cell.storage_name,
+                'width': instance.cell.x_cell_size,
+                'height': instance.cell.y_cell_size,
+                'depth': instance.cell.z_cell_size,
+                'x_coord': instance.cell.x_cell_coord,
+                'y_coord': instance.cell.y_cell_coord,
+                'z_coord': instance.cell.z_cell_coord,
+            }
+        )

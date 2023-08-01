@@ -25,6 +25,3 @@ def create_img(message: str, bg_color: str = 'white', text_color: str = 'black',
 @_img_to_bytestr
 def fast_convert(message: str, *args, **kwargs):
     return create_img(message, *args, **kwargs)
-
-create_img('Crate#0000101', safe=True)
-create_img('Crate#0000102', safe=True)
