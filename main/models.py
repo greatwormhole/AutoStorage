@@ -94,6 +94,8 @@ class Storage(models.Model):
     z_cell_coord = models.PositiveIntegerField(default=0)
     storage_name = models.CharField(max_length=60, validators=[validate_no_spaces])
     mass = models.PositiveIntegerField(default=700)
+    visualization_x = models.IntegerField(default=20)
+    visualization_y = models.IntegerField(default=20)
 
     def __str__(self):
         return f'{self.adress}'
