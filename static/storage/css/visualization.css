@@ -20,10 +20,15 @@
     flex-direction: row;
     flex-wrap:wrap;
     padding:20px;
+    padding-top:0px;
 }
 .visualize-header{
+    display:flex;
     width:100%;
-    height:200px;
+    height:auto;
+    flex-direction: row-reverse;
+    justify-content:space-between;
+
 }
 .storage_template{
     display:flex;
@@ -60,9 +65,112 @@ body{
     flex-direction:row;
 }
 .storage-sign{
-    width:100%;
     text-align:center;
 }
 
 .space{
+}
+
+.settings{
+    width:64px;
+    height:64px;
+    background: url('/media/icons/settings.png');
+    background-size:contain;
+    background-repeat: no-repeat;
+    margin:auto 0;
+    filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.5));
+    cursor:pointer;
+    margin-right:50px;
+}
+
+.settings:hover{
+    filter: drop-shadow(0px 0px 0px rgba(0,0,0,0.5));
+}
+.scale{
+    height:10px;
+    background:linear-gradient(0.25turn, #60ff44,#ff0000);
+    border:1px solid black;
+    box-shadow: 0px 1px 2px 2px rgba(0, 0, 0, 0.16);
+    margin-top:10px;
+}
+.title{
+    display:inline-block;
+    width:100%;
+    text-align:center;
+    font-size:20px;
+}
+.main-title{
+    font-size:26px;
+}
+.legend{
+    margin-left:50px;
+    width:350px;
+}
+.counter-container{
+    height: fit-content;
+    flex-grow: 1;
+    margin: auto;
+}
+
+.counter{
+    margin-left:60px;
+    font-size:26px;
+}
+
+.canvas-sign{
+    display:flex;
+    justify-content:space-between;
+    margin-top: -5px;
+}
+
+#full-span::before{
+    content: "";
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-right: 5px;
+    border:0.5px solid black;
+    background:linear-gradient(0.25turn,#889144,#ff0000)
+}
+
+#free-span::before{
+    content: "";
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-right: 5px;
+    border:0.5px solid black;
+    background:linear-gradient(0.25turn,#60ff44,#889144)
+}
+
+#lock-span::before{
+    content: "";
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-right: 5px;
+    border:0.5px solid black;
+    background:gray;
+}
+
+#lock-full-span::before{
+    content: "";
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-right: 5px;
+    border:0.5px solid black;
+    background:gray;
+}
+.storage-header{
+    display:flex;
+    flex-direction:row;
+    margin:0 auto;
+}
+
+.view-setting-button{
+    width:32px;
+    height:32px;
+    margin:auto 0;
+    margin-left:5px;
 }

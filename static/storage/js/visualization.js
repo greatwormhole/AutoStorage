@@ -34,14 +34,14 @@ function buildStorages(storageList){
             if (storageCell[rowNumber] == null){
                 storageCell[rowNumber] = []
                 storageCell[rowNumber][cells[j].fields.x_cell_coord] = []
-                storageCell[rowNumber][cells[j].fields.x_cell_coord][cells[j].fields.z_cell_coord]=[cells[j].fields.x_cell_size, cells[j].fields.y_cell_size, cells[j].fields.z_cell_size]
+                storageCell[rowNumber][cells[j].fields.x_cell_coord][cells[j].fields.z_cell_coord]=[cells[j].fields.visualization_x, cells[j].fields.visualization_y, cells[j].fields.z_cell_size]
             } else {
                 if (storageCell[rowNumber][cells[j].fields.x_cell_coord] == null){
                     storageCell[rowNumber][cells[j].fields.x_cell_coord] = []
-                    storageCell[rowNumber][cells[j].fields.x_cell_coord][cells[j].fields.z_cell_coord]=[cells[j].fields.x_cell_size, cells[j].fields.y_cell_size, cells[j].fields.z_cell_size]
+                    storageCell[rowNumber][cells[j].fields.x_cell_coord][cells[j].fields.z_cell_coord]=[cells[j].fields.visualization_x, cells[j].fields.visualization_y, cells[j].fields.z_cell_size]
 
                 } else {
-                    storageCell[rowNumber][cells[j].fields.x_cell_coord][cells[j].fields.z_cell_coord]=[cells[j].fields.x_cell_size, cells[j].fields.y_cell_size, cells[j].fields.z_cell_size]
+                    storageCell[rowNumber][cells[j].fields.x_cell_coord][cells[j].fields.z_cell_coord]=[cells[j].fields.visualization_x, cells[j].fields.visualization_y, cells[j].fields.z_cell_size]
                 }
             }
         }
@@ -98,7 +98,9 @@ function buildStorages(storageList){
                         $('#'+idx+'_'+rowIdx+'_st_layer').append(html)
                         i++
                     }
-                    var html = '<div class = "storageCell" style = "width:'+layer[0]*scaleXList[idx]+'px; height:'+layer[1]*scaleY+'px">'
+                    console.log(layer[0])
+                    console.log(layer[1])
+                    var html = '<div class = "storageCell" style = "width:'+layer[0]*scaleXList[idx]+'px; height:'+layer[1]*scaleXList[idx]+'px">'
                     html += '</div>'
 
                     $('#'+idx+'_'+rowIdx+'_st_layer').append(html)
@@ -124,4 +126,32 @@ function getCells(id){
         }
     })
     return responseCell
+}
+
+
+function canvasDraw(){
+    var canvas = document.getElementById('legend-canvas');
+  if (canvas.getContext){
+    var ctx = canvas.getContext('2d');
+    ctx.lineWidth = 3;
+    ctx.beginPath()
+    ctx.moveTo(0,0)
+    ctx.lineTo(0,20)
+    ctx.stroke()
+    ctx.beginPath()
+    ctx.moveTo(350,0)
+    ctx.lineTo(350,20)
+    ctx.stroke()
+
+    //скобки
+    ctx.lineWidth = 1;
+     ctx.beginPath()
+    ctx.moveTo(0,10)
+    ctx.lineTo(350,10)
+    ctx.stroke()
+    ctx.beginPath()
+    ctx.moveTo(175,10)
+    ctx.lineTo(175,0)
+    ctx.stroke()
+  }
 }

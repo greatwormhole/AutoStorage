@@ -7,6 +7,7 @@
         const storageList = '{{storage_list}}',
             getCellsUrl = "{% url 'cells' %}"
       $(document).ready(function(){
+        canvasDraw()
         buildStorages(storageList)
       })
   </script>
@@ -15,10 +16,37 @@
  <div class="content">
         <div id = "view-space">
             <div class="visualize-header">
+                <div class="settings">
+
+                </div>
+                <div class="counter-container">
+                    <span class="sign counter text" id="full-span">Занято -</span>
+                    <span class="sign counter text" id="free-span">Свободно -</span>
+                    <span class="sign counter text" id="lock-span">Заблокировано -</span>
+                    <span class="sign counter text" id="lock-full-span">Занято и заблокировано -</span>
+                </div>
+                <div class="legend">
+                    <span class="sign title main-title">Легенда</span>
+                    <span class="sign title">Индикация заполненности</span>
+                    <div class="scale">
+
+                    </div>
+                    <canvas width="350" height="20" id="legend-canvas">
+                    </canvas>
+                    <div class="canvas-sign">
+                        <span class="text" style="font-weight:600; margin-left:-11px">0%</span>
+                        <span class="text" style="font-weight:400; padding-right:25px">Свободно</span>
+                        <span class="text" style="font-weight:400; padding-left: 30px">Занято</span>
+                        <span class="text" style="font-weight:600; margin-right: -20px">100%</span>
+                    </div>
+                </div>
             </div>
             <div class="storage-view">
                 {% for storage in storage_list %}
-                    <h1 class="sign storage-sign">{{storage}}</h1>
+                    <div class="storage-header">
+                        <h1 class="sign storage-sign">{{storage}}</h1>
+                        <div class="view-setting-button"></div>
+                    </div>
                     <div class = "storage_template" id="{{storage}}">
 
                     </div>
