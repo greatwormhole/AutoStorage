@@ -150,7 +150,7 @@ def calculate(
             volume_t = 0
             for item in packer.bins[0].items:
                 volume_t += item.getVolume()
-            return (packer.bins[0].getVolume() - volume_t, len(res))
+            return [float(packer.bins[0].getVolume() - volume_t), len(res)]
         else:
             raise NotPackedError('Не удалось разместить коробки')
 

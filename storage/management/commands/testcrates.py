@@ -10,12 +10,12 @@ from storage.calculate_planning import handle_calculations
 from storage.rand_boxes import Box, Cell
 
 sim_num = 10
-crates_per_storage = 10
+crates_per_storage = 20
 test_storage_id = 6899
 
 crate_sizes = [*range(400, 1000, 100)]
 
-amounts = [10]
+amounts = [1]
 
 def concat_sizes(available_sizes: list):
     return f'''
@@ -63,7 +63,7 @@ class Command(BaseCommand):
                     storage.crates.get(id=crate.id).delete()
                     break
 
-            algorith_res = handle_calculations(
+            algorithm_res = handle_calculations(
                 cell=storage,
                 crates=crates,
                 show_volume_left=True
@@ -73,8 +73,8 @@ class Command(BaseCommand):
             rand_cell.generate_boxes(crates_per_storage, crate_sizes, 3000)
             res_rand.append((rand_cell.vol_left, len(rand_cell.boxes)))
             
-            if res is not None:
-                res.append(algorith_res)
+            if algorithm_res is not None:
+                res.append(algorithm_res)
             else:
                 failure_counter += 1
                 
@@ -89,11 +89,12 @@ class Command(BaseCommand):
         
         end = time()
         
-        self.stdout.write(f'''
+        self.stdout.write(
+            f'''
 Mean size left with packing algorithm: {round(mean_size_left / 1000000000, 3)} m^3, 
 Without packing algorithm: {round(mean_size_left_rand / 1000000000, 3)} m^3,
 algorithm runtime: {round(end - start, 2)} s, 
 algorithm failed {failure_counter} attempts out of {sim_num};
 Algorithm has packed {round(mean_crates_packed)} crates while random disposition packed {round(mean_crates_packed_rand)}.
-                          '''
-                        )
+Algorithm is better by {round((mean_crates_packed - mean_crates_packed_rand) / mean_crates_packed_rand * 100, 2)}%.
+''')
