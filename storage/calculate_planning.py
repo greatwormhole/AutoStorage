@@ -1,12 +1,20 @@
 from storage_planning.py3dbp import Packer, Bin, Item, Painter
 from .utils import fast_convert
 
+DEBUG = False
+
 class NotPackedError(Exception):
     
     def __init__(self, message):
         super().__init__(message)
         
-def calculate(crate_list: list, cell_size: list, cell_weight: float, surface_ratio: float = 0.9):
+def calculate(
+    crate_list: list,
+    cell_size: list,
+    cell_weight: float,
+    surface_ratio: float = 0.1 ,
+    show_volume_left: bool = False
+):
 
     # print(crate_list)
     # print(cell_size)
@@ -29,7 +37,7 @@ def calculate(crate_list: list, cell_size: list, cell_weight: float, surface_rat
             WHD=crate.get('size'),
             weight=crate.get('weight'),
             level=crate.get('priority', 1),
-            loadbear=crate.get('loadbear', 100),
+            loadbear=crate.get('loadbear', 1e10),
             updown=True,
             color='red'
         )
@@ -71,7 +79,8 @@ def calculate(crate_list: list, cell_size: list, cell_weight: float, surface_rat
             case _: continue
 
     packer.pack(
-        distribute_items=False,
+        bigger_first=True,
+        distribute_items=True,
         support_surface_ratio=surface_ratio,
     )
     
@@ -134,11 +143,16 @@ def calculate(crate_list: list, cell_size: list, cell_weight: float, surface_rat
             }
         )
     # print(len(res), len(crate_list), sep='*******')
-    
-    if len(res) == len(crate_list):
-        return res
-    else:
-        raise NotPackedError('Не удалось разместить коробки')
+    if not DEBUG:
+        if len(res) == len(crate_list) and not show_volume_left:
+            return res
+        elif len(res) == len(crate_list) and show_volume_left:
+            volume_t = 0
+            for item in packer.bins[0].items:
+                volume_t += item.getVolume()
+            return (packer.bins[0].getVolume() - volume_t, len(res))
+        else:
+            raise NotPackedError('Не удалось разместить коробки')
 
     print("***************************************************")
     for idx,b in enumerate(packer.bins) :
@@ -194,8 +208,8 @@ def calculate(crate_list: list, cell_size: list, cell_weight: float, surface_rat
     fig.show()
     fig.savefig()
 
-def handle_calculations(cell, crates):
-
+def handle_calculations(cell, crates, show_volume_left: bool = False):
+    
     sorting_crate_list = [
         {
             'text_id': crate.text_id,
@@ -206,6 +220,21 @@ def handle_calculations(cell, crates):
     ]
     # cell_size = [*map(float, cell.cell_size.split('x'))]
 
+    if show_volume_left:
+        try:
+            return calculate(
+                crate_list=sorting_crate_list,
+                cell_size=(
+                        cell.x_cell_size,
+                        cell.y_cell_size,
+                        cell.z_cell_size,    
+                ),
+                cell_weight=cell.mass,
+                show_volume_left=True
+            )
+        except (ZeroDivisionError, NotPackedError):
+            return None
+        
     try:
         return {
             'status': True,

@@ -207,10 +207,10 @@ class TempCrate(models.Model):
         verbose_name = 'Временная коробка'
         verbose_name_plural = 'Временные коробки'
         
-@receiver(signals.post_save, sender=Worker)
-def create_barcode(sender, instance, created, **kwargs):
-    if created:
-        generate_worker_barcode(instance.id, instance.name)
+# @receiver(signals.post_save, sender=Worker)
+# def create_barcode(sender, instance, created, **kwargs):
+#     if created:
+#         generate_worker_barcode(instance.id, instance.name)
         
 @receiver(signals.post_save, sender=Crates)
 def set_crates_text_id(sender, instance, created, **kwargs):

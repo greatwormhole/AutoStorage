@@ -33,10 +33,3 @@ class StorageFactory(DjangoModelFactory):
 
     class Meta:
         model = Storage
-
-class CrateFactory(DjangoModelFactory):
-
-    amount = factory.Faker('numerify', text='%##!')
-
-    class Meta:
-        model = Crates
