@@ -37,7 +37,6 @@ class StorageFactory(DjangoModelFactory):
 class CrateFactory(DjangoModelFactory):
 
     amount = factory.Faker('numerify', text='%##!')
-    size = factory.Faker('numerify', text='%!!!x%!!!x%!!!')
 
     class Meta:
         model = Crates
