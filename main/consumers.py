@@ -135,7 +135,6 @@ class StorageVisualizingWS(WebsocketConsumer):
             self.channel_name
         )
         self.accept()
-        delete_subscriber_cache(self.worker_id)
 
         if get_subscriber_cache() is None:
             self.thread = consumerInfinityThread(self, kwargs={'type': 'get_crates_cache'})
