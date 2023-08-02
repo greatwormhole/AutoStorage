@@ -72,7 +72,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'Apro',
         'USER': 'postgres',
-        'PASSWORD': '123qweASD',
+        'PASSWORD': 'ybrbnjc123',
         'HOST': 'localhost',
         'PORT': '5432',
     }
@@ -142,7 +142,7 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [('127.0.0.1', 6379)],
+            "hosts": [(REDIS_HOST, REDIS_PORT)],
         },
     },
 }

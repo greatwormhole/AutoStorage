@@ -1,7 +1,8 @@
 from django.urls import re_path
 
-from . import consumers
+from .consumers import THDWS, StorageVisualizingWS
 
 websocket_urlpatterns = [
-    re_path(r'ws/THD-ws/(?P<room>\w+)$', consumers.THDWS.as_asgi())
+    re_path(r'ws/THD-ws/(?P<room>\w+)$', THDWS.as_asgi()),
+    re_path(r'ws/storage-ws/(?P<id>\d+)$', StorageVisualizingWS.as_asgi())
 ]

@@ -4,16 +4,18 @@ from channels.generic.websocket import WebsocketConsumer
 import json
 from.WS_cache import WS_CACHE_CONNECTION, WS_CACHE_MESSAGE
 import threading
-from channels.layers import get_channel_layer
+
+
+from .caching import delete_subscriber_cache, set_subscriber_cache, get_subscriber_cache, get_crate_cache
 
 connectionDict = {}
 threadList = {}
 
 class consumerInfinityThread(object):
 
-    def __init__(self, obj):
+    def __init__(self, obj, kwargs):
 
-        self.threading = ConnectionThread(target=self.HMIThread)
+        self.threading = ConnectionThread(target=self.HMIThread, kwargs=kwargs)
 
         self.threading.start()
 
@@ -27,19 +29,19 @@ class consumerInfinityThread(object):
 
             self.threading.stop()
 
-    def HMIThread(self):
+    def HMIThread(self, type):
 
         while not self.threading.stopped():
 
-                time.sleep(30)
+            time.sleep(1)
+            
+            match type:
+                case 'get_crates_cache':
+                    message = json.dumps(get_crate_cache())
+                case _:
+                    message = 'true'
 
-                message = 'true'
-
-                # data = testsData.objects.all().order_by('-id')[0]
-                # message.append(data.status)
-                # message.append(data.result)
-
-                self.consumer.send(text_data=message)
+            self.consumer.send(text_data=message)
 
 class ConnectionThread(threading.Thread):
 
@@ -65,8 +67,6 @@ class THDWS(WebsocketConsumer):
         self.id = self.scope['url_route']['kwargs']['room']
 
         self.room_name = 'THD_%s' % self.id
-
-        #connectionDict[self.robot_ip] = opcConnection(self.robot_ip).connect()
 
         async_to_sync(self.channel_layer.group_add)(
             self.room_name,
@@ -121,25 +121,35 @@ class THDWS(WebsocketConsumer):
                 "message": event["message"],
             }))
 
-class StorageVisualizing(WebsocketConsumer):
+class StorageVisualizingWS(WebsocketConsumer):
     
     def connect(self):
         
-        self.room_name = 'TEST'
+        self.worker_id = int(self.scope['url_route']['kwargs']['id'])
+        self.room_name = 'storage_visualizing'
+        
+        set_subscriber_cache(self.worker_id)
         
         async_to_sync(self.channel_layer.group_add)(
             self.room_name,
             self.channel_name
         )
-        
         self.accept()
+        delete_subscriber_cache(self.worker_id)
+
+        if get_subscriber_cache() is None:
+            self.thread = consumerInfinityThread(self, kwargs={'type': 'get_crates_cache'})
+            
+        set_subscriber_cache(self.worker_id)
     
     def disconnect(self, code):
+        
+        delete_subscriber_cache(self.worker_id)
+        
+        if get_subscriber_cache() is None:
+            self.thread.infinite_stop()
         
         async_to_sync(self.channel_layer.group_discard)(
             self.room_name,
             self.channel_name
         )
-    
-    def receive(self, text_data=None, bytes_data=None):
-        return super().receive(text_data, bytes_data)
