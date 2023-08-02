@@ -1,13 +1,9 @@
 from django.db import models
-from django.db.models import signals, Q
-from django.dispatch import receiver
+from django.db.models import Q
 
-from datetime import datetime
 from functools import reduce
 
 from .validators import *
-from .utils import generate_worker_barcode
-from Apro.settings import DEBUG
 
 TEXT_ID_RANK = 7
 
@@ -207,23 +203,3 @@ class TempCrate(models.Model):
     class Meta:
         verbose_name = 'Временная коробка'
         verbose_name_plural = 'Временные коробки'
-        
-if not DEBUG:        
-    @receiver(signals.post_save, sender=Worker)
-    def create_barcode(sender, instance, created, **kwargs):
-        if created:
-            generate_worker_barcode(instance.id, instance.name)
-        
-@receiver(signals.post_save, sender=Crates)
-def set_crates_text_id(sender, instance, created, **kwargs):
-    if created:
-        zero_amount = TEXT_ID_RANK - instance.rank
-        instance.text_id = zero_amount * '0' + str(instance.id)
-        instance.save()
-    
-@receiver(signals.post_save, sender=TempCrate)
-def set_temp_crates_text_id(sender, instance, created, **kwargs):
-    if created:
-        zero_amount = TEXT_ID_RANK - instance.rank
-        instance.text_id = zero_amount * '0' + str(instance.id)
-        instance.save()
