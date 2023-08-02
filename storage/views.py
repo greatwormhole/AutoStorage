@@ -82,13 +82,14 @@ class storageVisualization(View):
 
         username = json.loads(request.COOKIES.get('AccessKey')).get('name')
         THD_num = json.loads(request.COOKIES.get('AccessKey')).get('THD')
+        worker_id = json.loads(request.COOKIES.get('AccessKey')).get('id')
         # username = "test"
         storage_list = list(set(list(Storage.objects.values_list('storage_name',flat=True))))
         if THD_num is not None:
 
             THD_ip = THD.objects.get(THD_number=THD_num).ip
 
-            context = {"internalUser": username, 'THD': THD_num, 'THD_ip': THD_ip, 'storage_list':storage_list}
+            context = {"internalUser": username, 'THD': THD_num, 'THD_ip': THD_ip, 'storage_list':storage_list, 'worker_id': worker_id}
 
         else:
 
@@ -323,7 +324,7 @@ class AllStorageList(View):
         
         data = {
             storage_name: {
-                f'{cell.x_cell_coord}_{cell.y_cell_coord}_{cell.z_cell_coord}': cell.full_percent
+                f'{cell.x_cell_coord}_{cell.y_cell_coord}_{cell.z_cell_coord}': getColor([96, 255, 68],[255,0,0],cell.full_percent)
                 for cell in storage
             }
             for storage_name in storage_names
@@ -331,3 +332,10 @@ class AllStorageList(View):
         }
         
         return JsonResponse(data=data, status=200)
+
+def getColor(first, second, percent):
+        if percent > 100:
+            return [255,0,0]
+        delta = [second[i] - first[i] for i in range(len(first))]
+        color = [first[i] + list(map(lambda x: x * percent / 100, delta))[i] for i in range(len(first))]
+        return color

@@ -40,8 +40,8 @@ class consumerInfinityThread(object):
                     message = json.dumps(get_crate_cache())
                 case _:
                     message = 'true'
-
-            self.consumer.send(text_data=message)
+            if message != 'null':
+                self.consumer.send(text_data=message)
 
 class ConnectionThread(threading.Thread):
 

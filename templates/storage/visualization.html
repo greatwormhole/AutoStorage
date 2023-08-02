@@ -5,16 +5,24 @@
   <link rel="stylesheet" href="{% static 'storage/css/visualization.css' %}">
   <script>
         const storageList = '{{storage_list}}',
-            getCellsUrl = "{% url 'cells' %}"
+            getCellsUrl = "{% url 'cells' %}",
+            storageFullnessUrl = "{% url 'storage_fullness' %}"
         var marginStep = 0,
             marginLeft = 5,
             cellInformation = [],
             maxScale = 3,
-            maxScaleSpace = 4.25
+            maxScaleSpace = 4.25,
+            wsStart = 'ws://'
+        loc = window.location;
+        if (loc.protocol == 'https:') {
+            wsStart = 'wss://'
+        }
       $(document).ready(function(){
+        var storageFullInfo = getStorageInfo()
+        console.log(storageFullInfo)
         canvasDraw()
-        buildStorages(storageList)
-        console.log($('body').css('height'))
+        buildStorages(storageList,storageFullInfo)
+        var storage_socket = new WebSocket(wsStart+window.location.hostname+':'+window.location.port+'/ws/storage-ws/'+WORKER_ID)
 
       })
   </script>

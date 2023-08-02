@@ -1,6 +1,21 @@
 function bouncer(arr) {
   return arr.filter( function(v){return !(v !== v);});
 }
+
+//color calculate
+function calculate(first, second, percentage) {
+  let result = {};
+  Object.keys(first).forEach((key) => {
+    let start = first[key];
+    let end = second[key];
+    let offset = (start - end) * percentage;
+    if(offset >= 0) {
+      Math.abs(offset);
+    }
+    result[key] = (start - offset);
+  });
+  return result;
+}
 function zeroCount(arr){
     var count = 0
     for (let i=0; i<arr.length; i++){
@@ -22,7 +37,7 @@ function zeroCountNum(arr){
     return count
 }
 //build storage plan
-function buildStorages(storageList){
+function buildStorages(storageList,storageFullInfo){
     var storageList = JSON.parse(storageList.replaceAll('&#x27;','"')),
         cellPleasesArray = [],
         cells = []
@@ -84,7 +99,6 @@ function buildStorages(storageList){
 
             lengthList = scaleXList
             scaleXList = scaleXList.map((length, idx) => (screenWidth-planLayer[idx].length*8)/(length/(zeroCount(planLayer[idx]))))
-            console.log(scaleXList)
             row.forEach(function(column, idx){
                 var columnIdx = idx
                 column.forEach(function(layer,idx){
@@ -93,26 +107,24 @@ function buildStorages(storageList){
                     htmlLayer += '</div>'
                     $('#'+rowIdx+'_st_row_'+storageName).append(htmlLayer)
                     }
-                    var i = columnIdx
 
+
+                    var color = storageFullInfo[storageName][columnIdx+'_'+rowIdx+'_'+idx],
+                    color = 'rgb('+color[0]+','+color[1]+','+color[2]+')'
 
                     if (scaleXList[idx]>maxScale){
-                        var html = '<div class = "storageCell" style = "width:'+layer[0]*maxScale+'px; height:'+layer[1]*maxScale+'px">'
-                    html += '</div>'
-
-                    $('#'+idx+'_'+rowIdx+'_st_layer_'+storageName).append(html)
+                        var html = '<div class = "storageCell" style = "width:'+layer[0]*maxScale+'px; height:'+layer[1]*maxScale+'px; background:'+color+'">'
+                        html += '</div>'
+                        $('#'+idx+'_'+rowIdx+'_st_layer_'+storageName).append(html)
                     } else{
-                    var html = '<div class = "storageCell" style = "width:'+layer[0]*scaleXList[idx]+'px; height:'+layer[1]*scaleXList[idx]+'px">'
-                    html += '</div>'
-
-                    $('#'+idx+'_'+rowIdx+'_st_layer_'+storageName).append(html)
+                        var html = '<div class = "storageCell" style = "width:'+layer[0]*scaleXList[idx]+'px; height:'+layer[1]*scaleXList[idx]+'px; background:'+color+'">'
+                        html += '</div>'
+                        $('#'+idx+'_'+rowIdx+'_st_layer_'+storageName).append(html)
                     }
+                    var i = columnIdx
                     while (planLayer[idx][i+1] == 0){
-                        console.log(lengthList[idx]/(zeroCount(planLayer[idx]))-lengthList[idx])
                         var html = '<div class = "space" style = "width:'+parseFloat((lengthList[idx]/(zeroCount(planLayer[idx]))-lengthList[idx])*scaleXList[idx]/(zeroCountNum(planLayer[idx]))+6)+'px;max-width:'+parseFloat(parseFloat($('.storageCell').css('width'))+6)+'px">'
                         html += '</div>'
-
-
                         $('#'+idx+'_'+rowIdx+'_st_layer_'+storageName).append(html)
                         i++
                     }
@@ -198,4 +210,20 @@ function OCStorage(id){
     }
     storageMargin(cellInformation[storageNameList.indexOf(storage)],storage,true)
     $('#'+id).css({'transform':'rotate(0deg)'})
+}
+
+function getStorageInfo(){
+    var cellFullnessResponse
+    $.ajax({
+        method:"GET",
+        async:false,
+        url:storageFullnessUrl,
+        success: function (response){
+            cellFullnessResponse = response
+        },
+        error: function(response){
+            alert('Загразить информацию о заполненности склада не удалось, перезагрузите страницу!')
+        }
+    })
+    return cellFullnessResponse
 }
