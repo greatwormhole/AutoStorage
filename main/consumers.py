@@ -128,7 +128,8 @@ class StorageVisualizingWS(WebsocketConsumer):
         self.worker_id = int(self.scope['url_route']['kwargs']['id'])
         self.room_name = 'storage_visualizing'
         
-        set_subscriber_cache(self.worker_id)
+        subs_cache = get_subscriber_cache()
+        print(f'Started list: {subs_cache}')
         
         async_to_sync(self.channel_layer.group_add)(
             self.room_name,
@@ -143,7 +144,11 @@ class StorageVisualizingWS(WebsocketConsumer):
     
     def disconnect(self, code):
         
+        print(f'Pre-stopped list: {get_subscriber_cache()}')
+        
         delete_subscriber_cache(self.worker_id)
+        
+        print(f'Stopped list: {get_subscriber_cache()}')
         
         if get_subscriber_cache() is None:
             self.thread.infinite_stop()

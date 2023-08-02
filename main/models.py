@@ -99,10 +99,21 @@ class Storage(models.Model):
     
     @property
     def size_left(self):
-        size = self.x_cell_size * self.y_cell_size * self.z_cell_size
+        size = self.volume
         for el in self.crates.all():
             size -= el.volume
         return size
+    
+    @property
+    def volume(self):
+        return self.x_cell_size * self.y_cell_size * self.z_cell_size
+    
+    @property
+    def full_percent(self):
+        try:
+            return round(reduce(lambda i, j: i + j, [crate.volume for crate in self.crates.all()]) / self.volume * 100)
+        except TypeError:
+            return 0
     
     class Meta:
         verbose_name = "Склад"

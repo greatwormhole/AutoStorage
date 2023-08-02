@@ -314,3 +314,20 @@ class CratePositioningView(View):
             data=crate_geometry,
             status=200,
         )
+        
+class AllStorageList(View):
+    
+    def get(self, request):
+        
+        storage_names = Storage.objects.all().values_list('storage_name', flat=True).distinct()
+        
+        data = {
+            storage_name: {
+                f'{cell.x_cell_coord}_{cell.y_cell_coord}_{cell.z_cell_coord}': cell.full_percent
+                for cell in storage
+            }
+            for storage_name in storage_names
+            if (storage := Storage.objects.filter(storage_name=storage_name))
+        }
+        
+        return JsonResponse(data=data, status=200)

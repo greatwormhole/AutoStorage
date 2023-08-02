@@ -15,7 +15,8 @@ urlpatterns = [
     path('production-storage', storagePlanView.as_view(),name="production_storage"),
     path('storage-navigation', storageNavigation.as_view(),name="storage_navigation"),
     path('storage-visualization', storageVisualization.as_view(),name="storage_visualization"),
-    path('API/storage-info', storageInfo.as_view(), name='cells')
+    path('API/storage-info', storageInfo.as_view(), name='cells'),
+    path('API/storage-list', AllStorageList.as_view(), name='storage_fullness'),
 ]
 
 if settings.DEBUG:
