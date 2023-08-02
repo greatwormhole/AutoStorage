@@ -6,9 +6,16 @@
   <script>
         const storageList = '{{storage_list}}',
             getCellsUrl = "{% url 'cells' %}"
+        var marginStep = 0,
+            marginLeft = 5,
+            cellInformation = [],
+            maxScale = 3,
+            maxScaleSpace = 4.25
       $(document).ready(function(){
         canvasDraw()
         buildStorages(storageList)
+        console.log($('body').css('height'))
+
       })
   </script>
 {% endblock %}
@@ -43,13 +50,15 @@
             </div>
             <div class="storage-view">
                 {% for storage in storage_list %}
+                <div class="storage-container">
                     <div class="storage-header">
                         <h1 class="sign storage-sign">{{storage}}</h1>
-                        <div class="view-setting-button"></div>
+                        <div class="view-setting-button close" id="{{storage}}_OC" onclick="OCStorage(this.id)" style="transform:rotate(180deg)"></div>
                     </div>
                     <div class = "storage_template" id="{{storage}}">
 
                     </div>
+                </div>
                 {% endfor %}
             </div>
         </div>

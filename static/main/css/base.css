@@ -11,6 +11,7 @@
 }
 /* general css place*/
 html{
+    position:relative;
     height:100%;
 }
 body{
@@ -29,6 +30,7 @@ body:before{
     content: url('/media/icons/pattern.webp');
     background: url('/media/icons/pattern.webp');
     opacity:0.1;
+    right:0;
 }
 .block-ui{
 display:none;
