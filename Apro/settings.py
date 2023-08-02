@@ -1,5 +1,6 @@
 from pathlib import Path
 import os
+from datetime import timedelta as td
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -122,14 +123,14 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
 # Redis app handler
 
-REDIS_HOST = '127.0.0.1'
-REDIS_PORT = '6379'
+REDIS_HOST = 'localhost'
+REDIS_PORT = 6379
 
 # Celery settings
 
-CELERY_BROKER_URL = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'
+CELERY_BROKER_URL = 'redis://' + REDIS_HOST + ':' + str(REDIS_PORT) + '/0'
 CELERY_BROKER_TRANSPORT_OPTION = {'visibility_timeout': 3600}
-CELERY_RESULT_BACKEND = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'
+CELERY_RESULT_BACKEND = 'redis://' + REDIS_HOST + ':' + str(REDIS_PORT) + '/0'
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
@@ -148,9 +149,14 @@ CHANNEL_LAYERS = {
 
 # Cache settings
 
-# CACHES = {
-#     'default': {
-#         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-#         'LOCATION': 'redis://localhost:6379',
-#     }
-# }
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': 'redis://' + REDIS_HOST + ':' + str(REDIS_PORT),
+        'TIMEOUT': int(td(minutes=30).total_seconds()),
+        'KEY_PREFIX': 'apro',
+        'OPTIONS': {
+            'db': 0,
+        }
+    }
+}
