@@ -10,6 +10,7 @@ from .caching import delete_cache_from_list, get_cache, set_cache, static_cache_
 
 connectionDict = {}
 threadList = {}
+storage_infinite_thread = None
 
 class consumerInfinityThread(object):
 
@@ -41,7 +42,10 @@ class consumerInfinityThread(object):
                 case _:
                     message = 'true'
             if message != 'null':
-                self.consumer.send(text_data=message)
+                async_to_sync(self.consumer.channel_layer.group_send)(
+                    self.consumer.room_name,
+                    {'message': message}
+                )
 
 class ConnectionThread(threading.Thread):
 
@@ -137,8 +141,8 @@ class StorageVisualizingWS(WebsocketConsumer):
         )
         self.accept()
 
-        if subs_cache is None:
-            self.thread = consumerInfinityThread(self, kwargs={'type': 'get_crates_cache'})
+        if subs_cache is None and storage_infinite_thread is None:
+            storage_infinite_thread = consumerInfinityThread(self, kwargs={'type': 'get_crates_cache'})
             
         set_cache(static_cache_keys['storage_viewers'], self.worker_id)
     
@@ -151,7 +155,7 @@ class StorageVisualizingWS(WebsocketConsumer):
         print(f'Stopped list: {get_cache(static_cache_keys["storage_viewers"])}')
         
         if get_cache(static_cache_keys['storage_viewers']) is None:
-            self.thread.infinite_stop()
+            storage_infinite_thread.infinite_stop()
         
         async_to_sync(self.channel_layer.group_discard)(
             self.room_name,
