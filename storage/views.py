@@ -321,7 +321,7 @@ class AllStorageList(View):
     def get(self, request):
         
         storage_names = Storage.objects.all().values_list('storage_name', flat=True).distinct()
-        
+        print(Storage.objects.get(storage_name='СкладМеталла').full_percent)
         data = {
             storage_name: {
                 f'{cell.x_cell_coord}_{cell.y_cell_coord}_{cell.z_cell_coord}': getColor([96, 255, 68],[255,0,0],cell.full_percent)
@@ -335,7 +335,8 @@ class AllStorageList(View):
 
 def getColor(first, second, percent):
         if percent > 100:
-            return [255,0,0]
+            return [255,0,0,100]
         delta = [second[i] - first[i] for i in range(len(first))]
         color = [first[i] + list(map(lambda x: x * percent / 100, delta))[i] for i in range(len(first))]
+        color += [percent]
         return color

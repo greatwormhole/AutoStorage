@@ -110,8 +110,37 @@ function buildStorages(storageList,storageFullInfo){
 
 
                     var color = storageFullInfo[storageName][columnIdx+'_'+rowIdx+'_'+idx],
+                        percent = color[3]
                     color = 'rgb('+color[0]+','+color[1]+','+color[2]+')'
+                    // подсчет ячеек
 
+                    if (percent > barerPercentage){
+                        var Value = parseInt($('#full-span').text().split(' ')[2])+1,
+                            storageValue = parseInt($('#'+storageName+'-full-span').text().split(' ')[2])+1
+                        if (isNaN(Value)){
+                            Value = 1
+                        }
+                        if (isNaN(storageValue)){
+                            storageValue = 1
+                        }
+
+                        $('#full-span').text('Занято - '+Value)
+                        $('#'+storageName+'-full-span').text('Занято - '+storageValue)
+                    }else{
+                        var Value = parseInt($('#free-span').text().split(' ')[2])+1,
+                            storageValue = parseInt($('#'+storageName+'-free-span').text().split(' ')[2])+1
+                        if (isNaN(Value)){
+                            Value = 1
+                        }
+                        if (isNaN(storageValue)){
+                           storageValue = 1
+                        }
+                        console.log(storageName)
+                        console.log(percent)
+                        console.log(color)
+                        $('#free-span').text('Свободно - '+Value)
+                        $('#'+storageName+'-free-span').text('Свободно - '+storageValue)
+                    }
                     if (scaleXList[idx]>maxScale){
                         var html = '<div class = "storageCell" style = "width:'+layer[0]*maxScale+'px; height:'+layer[1]*maxScale+'px; background:'+color+'">'
                         html += '</div>'

@@ -10,8 +10,9 @@
         var marginStep = 0,
             marginLeft = 5,
             cellInformation = [],
-            maxScale = 3,
+            maxScale = 0.70,
             maxScaleSpace = 4.25,
+            barerPercentage = 50,
             wsStart = 'ws://'
         loc = window.location;
         if (loc.protocol == 'https:') {
@@ -35,10 +36,10 @@
 
                 </div>
                 <div class="counter-container">
-                    <span class="sign counter text" id="full-span">Занято -</span>
-                    <span class="sign counter text" id="free-span">Свободно -</span>
-                    <span class="sign counter text" id="lock-span">Заблокировано -</span>
-                    <span class="sign counter text" id="lock-full-span">Занято и заблокировано -</span>
+                    <span class="sign counter text full-span" id="full-span">Занято -</span>
+                    <span class="sign counter text free-span" id="free-span">Свободно -</span>
+                    <span class="sign counter text lock-span" id="lock-span">Заблокировано -</span>
+                    <span class="sign counter text lock-full-span" id="lock-full-span">Занято и заблокировано -</span>
                 </div>
                 <div class="legend">
                     <span class="sign title main-title">Легенда</span>
@@ -62,6 +63,12 @@
                     <div class="storage-header">
                         <h1 class="sign storage-sign">{{storage}}</h1>
                         <div class="view-setting-button close" id="{{storage}}_OC" onclick="OCStorage(this.id)" style="transform:rotate(180deg)"></div>
+                    </div>
+                    <div class="counter-container">
+                        <span class="sign counter text full-span" id="{{storage}}-full-span" style="font-size:16px">Занято -</span>
+                        <span class="sign counter text free-span" id="{{storage}}-free-span" style="font-size:16px">Свободно -</span>
+                        <span class="sign counter text lock-span" id="{{storage}}-lock-span" style="font-size:16px">Заблокировано -</span>
+                        <span class="sign counter text lock-full-span" id="{{storage}}-lock-full-span" style="font-size:16px">Занято и заблокировано -</span>
                     </div>
                     <div class = "storage_template" id="{{storage}}">
 

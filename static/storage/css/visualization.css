@@ -119,8 +119,10 @@ body{
 }
 
 .counter{
-    margin-left:60px;
+    margin-left: 30px;
     font-size:26px;
+    margin-top:auto;
+    margin-bottom:auto;
 }
 
 .canvas-sign{
@@ -129,7 +131,7 @@ body{
     margin-top: -5px;
 }
 
-#full-span::before{
+.full-span::before{
     content: "";
     display: inline-block;
     width: 20px;
@@ -139,7 +141,7 @@ body{
     background:linear-gradient(0.25turn,#889144,#ff0000)
 }
 
-#free-span::before{
+.free-span::before{
     content: "";
     display: inline-block;
     width: 20px;
@@ -149,7 +151,7 @@ body{
     background:linear-gradient(0.25turn,#60ff44,#889144)
 }
 
-#lock-span::before{
+.lock-span::before{
     content: "";
     display: inline-block;
     width: 20px;
@@ -159,7 +161,7 @@ body{
     background:gray;
 }
 
-#lock-full-span::before{
+.lock-full-span::before{
     content: "";
     display: inline-block;
     width: 20px;
@@ -201,5 +203,18 @@ body{
     flex-wrap:wrap;
     padding:20px;
     padding-top:0px;
+    height: fit-content;
 }
 
+.counter-container{
+    display:flex;
+    flex-direction:row;
+    margin-bottom:10px;
+    margin-top:auto;
+    margin-bottom:auto;
+}
+
+span{
+    width:fit-content;
+    height:fit-content;
+}
