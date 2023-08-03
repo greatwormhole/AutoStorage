@@ -6,7 +6,7 @@ from.WS_cache import WS_CACHE_CONNECTION, WS_CACHE_MESSAGE
 import threading
 
 
-from .caching import delete_subscriber_cache, set_subscriber_cache, get_subscriber_cache, get_crate_cache
+from .caching import delete_cache, get_cache, set_cache, static_cache_keys
 
 connectionDict = {}
 threadList = {}
@@ -37,7 +37,7 @@ class consumerInfinityThread(object):
             
             match type:
                 case 'get_crates_cache':
-                    message = json.dumps(get_crate_cache())
+                    message = json.dumps(get_cache(static_cache_keys['moving_crates']))
                 case _:
                     message = 'true'
             if message != 'null':
@@ -128,7 +128,7 @@ class StorageVisualizingWS(WebsocketConsumer):
         self.worker_id = int(self.scope['url_route']['kwargs']['id'])
         self.room_name = 'storage_visualizing'
         
-        subs_cache = get_subscriber_cache()
+        subs_cache = get_cache(static_cache_keys['storage_viewers'])
         print(f'Started list: {subs_cache}')
         
         async_to_sync(self.channel_layer.group_add)(
@@ -137,20 +137,20 @@ class StorageVisualizingWS(WebsocketConsumer):
         )
         self.accept()
 
-        if get_subscriber_cache() is None:
+        if subs_cache is None:
             self.thread = consumerInfinityThread(self, kwargs={'type': 'get_crates_cache'})
             
-        set_subscriber_cache(self.worker_id)
+        set_cache(static_cache_keys['storage_viewers'], self.worker_id)
     
     def disconnect(self, code):
         
-        print(f'Pre-stopped list: {get_subscriber_cache()}')
+        print(f'Pre-stopped list: {get_cache(static_cache_keys["storage_viewers"])}')
         
-        delete_subscriber_cache(self.worker_id)
+        delete_cache(static_cache_keys['storage_viewers'], self.worker_id)
         
-        print(f'Stopped list: {get_subscriber_cache()}')
+        print(f'Stopped list: {get_cache(static_cache_keys["storage_viewers"])}')
         
-        if get_subscriber_cache() is None:
+        if get_cache(static_cache_keys['storage_viewers']) is None:
             self.thread.infinite_stop()
         
         async_to_sync(self.channel_layer.group_discard)(

@@ -95,7 +95,16 @@ class Storage(models.Model):
     visualization_y = models.IntegerField(default=20)
 
     def __str__(self):
-        return f'{self.adress}'
+        return f'Storage: {self.storage_name}, cell#{self.adress}'
+    
+    @property
+    def is_blocked(self):
+        neighbour_cells = self.neighboring_cells()
+        if len(neighbour_cells) < 4:
+            return False
+        elif len(neighbour_cells) == 4 and not False in [cell.full_percent > 80 for cell in neighbour_cells]:
+            return True
+        return False
     
     @property
     def size_left(self):
@@ -114,6 +123,17 @@ class Storage(models.Model):
             return round(reduce(lambda i, j: i + j, [crate.volume for crate in self.crates.all()]) / self.volume * 100)
         except TypeError:
             return 0
+    
+    def neighboring_cells(self):
+        return self.__class__.objects.filter(
+            Q(storage_name=self.storage_name) &
+            (
+                (Q(x_cell_coord=self.x_cell_coord - 1) & Q(y_cell_coord=self.y_cell_coord) & Q(z_cell_coord=self.z_cell_coord)) |
+                (Q(x_cell_coord=self.x_cell_coord + 1) & Q(y_cell_coord=self.y_cell_coord) & Q(z_cell_coord=self.z_cell_coord)) |
+                (Q(x_cell_coord=self.x_cell_coord) & Q(y_cell_coord=self.y_cell_coord - 1) & Q(z_cell_coord=self.z_cell_coord)) | 
+                (Q(x_cell_coord=self.x_cell_coord) & Q(y_cell_coord=self.y_cell_coord + 1) & Q(z_cell_coord=self.z_cell_coord))
+            )
+        )
     
     class Meta:
         verbose_name = "Склад"

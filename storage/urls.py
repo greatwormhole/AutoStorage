@@ -17,6 +17,7 @@ urlpatterns = [
     path('storage-visualization', storageVisualization.as_view(),name="storage_visualization"),
     path('API/storage-info', storageInfo.as_view(), name='cells'),
     path('API/storage-list', AllStorageList.as_view(), name='storage_fullness'),
+    path('API/check-blocked-cells', BlockedStoragesView.as_view(), name='check_blocked_cells'),
 ]
 
 if settings.DEBUG:

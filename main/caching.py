@@ -1,47 +1,39 @@
 from django.core.cache import cache
 
-def set_crate_cache(data):
-    
-    cached_crates = cache.get('updated_crates', None)
-    
-    if cached_crates is not None:
-        cached_crates += [data]
-    else:
-        cached_crates = [data]
-        
-    cache.set('updated_crates', cached_crates)
-    
-def get_crate_cache():
-    
-    return cache.get('updated_crates', None)
+static_cache_keys = {
+    'moving_crates': 'updated_crates',
+    'storage_viewers': 'storage_subscribers',
+    'blocked_cells': 'blocked_cells',
+}
 
-def set_subscriber_cache(id):
+def set_cache(key, data, as_list=True):
     
-    cache.delete('storage_subscribers')
-    cache.delete('updated_crates')
-    cached_users = cache.get('storage_subscribers', None)
+    cached_data = cache.get(key, None)
     
-    if cached_users is not None:
-        cached_users += [id]
+    if as_list:
+        if cached_data is not None:
+            cached_data += [data]
+        else:
+            cached_data = [data]
     else:
-        cached_users = [id]
+        cached_data = data
         
-    cache.set('storage_subscribers', cached_users)
+    cache.set(key, cached_data)
     
-def get_subscriber_cache():
+def get_cache(key, default = None):
     
-    return cache.get('storage_subscribers', None)
+    return cache.get(key, default)
 
-def delete_subscriber_cache(id):
+def delete_cache(key, data):
     
-    cached_subscribers = cache.get('storage_subscribers', None)
+    cached_data = cache.get(key, None)
     
-    if cached_subscribers is not None and cached_subscribers != []:
-        cached_subscribers.remove(id)
+    if cached_data is not None and cached_data != []:
+        cached_data.remove(data)
     else:
         raise ValueError('The cache is already empty')
     
-    if cached_subscribers != []:
-        cache.set('storage_subscribers', cached_subscribers)
+    if cached_data != []:
+        cache.set(key, cached_data)
     else:
-        cache.delete('storage_subscribers')
+        cache.delete(key)

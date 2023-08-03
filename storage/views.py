@@ -1,14 +1,17 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse
 from django.views import View
 from django.core import serializers
+
 from main.decorators import check_access
 from main.models import THD, Nomenclature, DeliveryNote, Worker, Crates, Storage, TempCrate, ProductionStorage
 from main.utils import generate_nomenclature_barcode
 from .calculate_planning import handle_calculations
+from main.caching import set_cache, get_cache, static_cache_keys
 
 import json
 from datetime import datetime as dt
+from time import time
 
 class main(View):
     @check_access()
@@ -339,3 +342,28 @@ def getColor(first, second, percent):
         delta = [second[i] - first[i] for i in range(len(first))]
         color = [first[i] + list(map(lambda x: x * percent / 100, delta))[i] for i in range(len(first))]
         return color
+    
+class BlockedStoragesView(View):
+    
+    def get(self, request):
+        
+        cached_blocked_cells = get_cache(static_cache_keys['blocked_cells'], None)
+        print(cached_blocked_cells)
+        
+        if cached_blocked_cells is not None:
+            return JsonResponse(data=cached_blocked_cells, status=200)
+        
+        storage_names = Storage.objects.all().values_list('storage_name', flat=True).distinct()
+        
+        data = {
+            storage_name: {
+                f'{cell.x_cell_coord}_{cell.y_cell_coord}_{cell.z_cell_coord}': cell.full_percent
+                for cell in storage if cell.is_blocked
+            }
+            for storage_name in storage_names
+            if (storage := Storage.objects.filter(storage_name=storage_name))
+        }
+        
+        set_cache(static_cache_keys['blocked_cells'], data, as_list=False)
+        
+        return JsonResponse(data=data, status=200)
