@@ -6,7 +6,7 @@ from.WS_cache import WS_CACHE_CONNECTION, WS_CACHE_MESSAGE
 import threading
 
 
-from .caching import delete_cache, get_cache, set_cache, static_cache_keys
+from .caching import delete_cache_from_list, get_cache, set_cache, static_cache_keys
 
 connectionDict = {}
 threadList = {}
@@ -146,7 +146,7 @@ class StorageVisualizingWS(WebsocketConsumer):
         
         print(f'Pre-stopped list: {get_cache(static_cache_keys["storage_viewers"])}')
         
-        delete_cache(static_cache_keys['storage_viewers'], self.worker_id)
+        delete_cache_from_list(static_cache_keys['storage_viewers'], self.worker_id)
         
         print(f'Stopped list: {get_cache(static_cache_keys["storage_viewers"])}')
         

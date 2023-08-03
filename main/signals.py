@@ -57,7 +57,7 @@ def on_change(instance: Crates, **kwargs):
         storage_name = instance.cell.storage_name
         blocked_neighbour_cells = [cell for cell in instance.cell.neighboring_cells() if cell.is_blocked]
         blocked_cells_data = get_cache(static_cache_keys['blocked_cells'], {})
-        print(blocked_cells_data)
+        
         for cell in blocked_neighbour_cells:
             blocked_cells_data[storage_name][f'{cell.x_cell_coord}_{cell.y_cell_coord}_{cell.z_cell_coord}'] = cell.full_percent
             

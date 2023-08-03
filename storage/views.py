@@ -348,7 +348,6 @@ class BlockedStoragesView(View):
     def get(self, request):
         
         cached_blocked_cells = get_cache(static_cache_keys['blocked_cells'], None)
-        print(cached_blocked_cells)
         
         if cached_blocked_cells is not None:
             return JsonResponse(data=cached_blocked_cells, status=200)
