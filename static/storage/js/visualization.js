@@ -4,6 +4,9 @@ function bouncer(arr) {
 
 //color calculate
 function calculate(first, second, percentage) {
+    if (percentage>1){
+        return second
+    }
   let result = {};
   Object.keys(first).forEach((key) => {
     let start = first[key];
@@ -37,7 +40,7 @@ function zeroCountNum(arr){
     return count
 }
 //build storage plan
-function buildStorages(storageList,storageFullInfo){
+function buildStorages(storageList,storageFullInfo,LockStorage){
     var storageList = JSON.parse(storageList.replaceAll('&#x27;','"')),
         cellPleasesArray = [],
         cells = []
@@ -114,6 +117,35 @@ function buildStorages(storageList,storageFullInfo){
                     color = 'rgb('+color[0]+','+color[1]+','+color[2]+')'
                     // подсчет ячеек
 
+                    if (typeof LockStorage[storageName][columnIdx+'_'+rowIdx+'_'+idx] != "undefined"){
+                        color = '#3d3d3d'
+                        var globalLockValue = parseInt($('#lock-span').text().split(' ')[2])+1,
+                            globalLockFullValue = parseInt($('#lock-full-span').text().split(' ')[2])+1,
+                            LockValue = parseInt($('#'+storageName+'-lock-span').text().split(' ')[2])+1,
+                            lockFullValue = parseInt($('#'+storageName+'-lock-full-span').text().split(' ')[2])+1
+                        if (isNaN(globalLockValue)){
+                            globalLockValue = 1
+                        }
+                        if (isNaN(LockValue)){
+                            LockValue = 1
+                        }
+                        $('#lock-span').text('Заблокировано - '+globalLockValue)
+                        $('#'+storageName+'-lock-span').text('Заблокировано - '+LockValue)
+                        if (LockStorage[storageName][columnIdx+'_'+rowIdx+'_'+idx]>barerPercentage){
+                            var lockFullValue = parseInt($('#'+storageName+'-lock-full-span').text().split(' ')[2])+1,
+                                globalLockFullValue = parseInt($('#lock-full-span').text().split(' ')[2])+1
+                            if (isNaN(lockFullValue)){
+                            lockFullValue = 1
+                            }
+                            if (isNaN(globalLockFullValue)){
+                            globalLockFullValue = 1
+                            }
+                            $('#lock-full-span').text('Занято и заблокировано - '+globalLockFullValue)
+                            $('#'+storageName+'-lock-full-span').text('Занято и заблокировано - '+lockFullValue)
+                        }
+                    }
+
+
                     if (percent > barerPercentage){
                         var Value = parseInt($('#full-span').text().split(' ')[2])+1,
                             storageValue = parseInt($('#'+storageName+'-full-span').text().split(' ')[2])+1
@@ -127,6 +159,7 @@ function buildStorages(storageList,storageFullInfo){
                         $('#full-span').text('Занято - '+Value)
                         $('#'+storageName+'-full-span').text('Занято - '+storageValue)
                     }else{
+
                         var Value = parseInt($('#free-span').text().split(' ')[2])+1,
                             storageValue = parseInt($('#'+storageName+'-free-span').text().split(' ')[2])+1
                         if (isNaN(Value)){
@@ -135,9 +168,6 @@ function buildStorages(storageList,storageFullInfo){
                         if (isNaN(storageValue)){
                            storageValue = 1
                         }
-                        console.log(storageName)
-                        console.log(percent)
-                        console.log(color)
                         $('#free-span').text('Свободно - '+Value)
                         $('#'+storageName+'-free-span').text('Свободно - '+storageValue)
                     }
@@ -146,7 +176,7 @@ function buildStorages(storageList,storageFullInfo){
                         html += '</div>'
                         $('#'+idx+'_'+rowIdx+'_st_layer_'+storageName).append(html)
                     } else{
-                        var html = '<div class = "storageCell" style = "width:'+layer[0]*scaleXList[idx]+'px; height:'+layer[1]*scaleXList[idx]+'px; background:'+color+'">'
+                        var html = '<div class = "storageCell" id = "'+rowIdx+'_'+columnIdx+'_'+idx+'_'+storageName+'_cell" style = "width:'+layer[0]*scaleXList[idx]+'px; height:'+layer[1]*scaleXList[idx]+'px; background:'+color+'">'
                         html += '</div>'
                         $('#'+idx+'_'+rowIdx+'_st_layer_'+storageName).append(html)
                     }
@@ -241,12 +271,12 @@ function OCStorage(id){
     $('#'+id).css({'transform':'rotate(0deg)'})
 }
 
-function getStorageInfo(){
+function getStorageInfo(url){
     var cellFullnessResponse
     $.ajax({
         method:"GET",
         async:false,
-        url:storageFullnessUrl,
+        url:url,
         success: function (response){
             cellFullnessResponse = response
         },
@@ -255,4 +285,18 @@ function getStorageInfo(){
         }
     })
     return cellFullnessResponse
+}
+
+
+function processMessage(message){
+    message.forEach(function(elem){
+        var percent = elem['fullness']
+        if (typeof percent != 'undefined'){
+            var color = elem['color']
+            $('#'+elem['y_coord']+'_'+elem['x_coord']+'_'+elem['z_coord']+'_'+elem['storage_name']+'_cell').css({'background':'rgb('+color[0]+','+color[1]+','+color[2]+')'})
+            console.log(elem)
+            console.log($('#'+elem['y_coord']+'_'+elem['x_coord']+'_'+elem['z_coord']+'_cell'))
+            console.log(color)
+        }
+    })
 }

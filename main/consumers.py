@@ -1,16 +1,16 @@
 import time
 from asgiref.sync import async_to_sync
-from channels.generic.websocket import WebsocketConsumer
+from channels.generic.websocket import WebsocketConsumer,AsyncWebsocketConsumer
 import json
 from.WS_cache import WS_CACHE_CONNECTION, WS_CACHE_MESSAGE
 import threading
 
 
-from .caching import delete_cache_from_list, get_cache, set_cache, static_cache_keys
+from .caching import delete_cache_from_list, get_cache, set_cache, static_cache_keys,delete_cache_dict
 
 connectionDict = {}
 threadList = {}
-storage_infinite_thread = None
+storage_infinite_thread = []
 
 class consumerInfinityThread(object):
 
@@ -30,6 +30,8 @@ class consumerInfinityThread(object):
 
             self.threading.stop()
 
+            storage_infinite_thread.pop()
+
     def HMIThread(self, type):
 
         while not self.threading.stopped():
@@ -42,10 +44,11 @@ class consumerInfinityThread(object):
                 case _:
                     message = 'true'
             if message != 'null':
-                async_to_sync(self.consumer.channel_layer.group_send)(
-                    self.consumer.room_name,
-                    {'message': message}
-                )
+                async_to_sync (self.consumer.channel_layer.group_send)(self.consumer.room_name, {
+                    "type": "chat.message",
+                    "room_id": self.consumer.room_name,
+                    "message": message,
+                })
 
 class ConnectionThread(threading.Thread):
 
@@ -64,35 +67,35 @@ class ConnectionThread(threading.Thread):
         return self._stop.is_set()
 
 
-class THDWS(WebsocketConsumer):
+class THDWS(AsyncWebsocketConsumer):
 
-    def connect(self):
+    async def connect(self):
 
         self.id = self.scope['url_route']['kwargs']['room']
 
         self.room_name = 'THD_%s' % self.id
 
-        async_to_sync(self.channel_layer.group_add)(
+        await self.channel_layer.group_add(
             self.room_name,
             self.channel_name
         )
 
-        self.accept()
+        await self.accept()
 
 
-    def disconnect(self, close_code):
+    async def disconnect(self, close_code):
 
-        async_to_sync(self.channel_layer.group_discard)(
+        await self.channel_layer.group_discard(
             self.room_name,
             self.channel_name
         )
 
 
-    def receive(self, text_data=None, bytes_data=None):
+    async def receive(self, text_data=None, bytes_data=None):
 
         text_data_json = json.loads(text_data)
 
-        async_to_sync(self.channel_layer.group_send)(self.room_name, {
+        await self.channel_layer.group_send(self.room_name, {
             "type": "chat.message",
             "room_id": self.room_name,
             "username": self.scope["user"].username,
@@ -116,18 +119,18 @@ class THDWS(WebsocketConsumer):
             print(f'ws_cache_conn: {WS_CACHE_CONNECTION}')
             return
         
-    def chat_message(self, event):
+    async def chat_message(self, event):
 
-        self.send(text_data=json.dumps(
+        await self.send(text_data=json.dumps(
             {
                 "room": event["room_id"],
                 "username": event["username"],
                 "message": event["message"],
             }))
 
-class StorageVisualizingWS(WebsocketConsumer):
+class StorageVisualizingWS(AsyncWebsocketConsumer):
     
-    def connect(self):
+    async def connect(self):
         
         self.worker_id = int(self.scope['url_route']['kwargs']['id'])
         self.room_name = 'storage_visualizing'
@@ -135,18 +138,22 @@ class StorageVisualizingWS(WebsocketConsumer):
         subs_cache = get_cache(static_cache_keys['storage_viewers'])
         print(f'Started list: {subs_cache}')
         
-        async_to_sync(self.channel_layer.group_add)(
+        await self.channel_layer.group_add(
             self.room_name,
             self.channel_name
         )
-        self.accept()
+        await self.accept()
 
-        if subs_cache is None and storage_infinite_thread is None:
-            storage_infinite_thread = consumerInfinityThread(self, kwargs={'type': 'get_crates_cache'})
-            
+        if len(storage_infinite_thread) == 0:
+            try:
+                storage_infinite_thread.pop()
+            except:
+                pass
+            storage_infinite_thread.append(consumerInfinityThread(self, kwargs={'type': 'get_crates_cache'}))
+
         set_cache(static_cache_keys['storage_viewers'], self.worker_id)
     
-    def disconnect(self, code):
+    async def disconnect(self, close_code):
         
         print(f'Pre-stopped list: {get_cache(static_cache_keys["storage_viewers"])}')
         
@@ -155,9 +162,17 @@ class StorageVisualizingWS(WebsocketConsumer):
         print(f'Stopped list: {get_cache(static_cache_keys["storage_viewers"])}')
         
         if get_cache(static_cache_keys['storage_viewers']) is None:
-            storage_infinite_thread.infinite_stop()
-        
-        async_to_sync(self.channel_layer.group_discard)(
+            storage_infinite_thread[0].infinite_stop()
+        print(storage_infinite_thread)
+        await self.channel_layer.group_discard(
             self.room_name,
             self.channel_name
         )
+    async def chat_message(self, event):
+
+        await self.send(text_data=json.dumps(
+            {
+                "room": event["room_id"],
+                "message": event["message"],
+            }))
+        delete_cache_dict(static_cache_keys['moving_crates'])

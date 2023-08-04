@@ -56,3 +56,8 @@ def delete_cache_from_list(key, data):
         cache.set(key, cached_data)
     else:
         cache.delete(key)
+
+
+def delete_cache_dict(key):
+
+    cache.delete(key)

@@ -38,7 +38,9 @@
             wsStart = 'wss://'
         }
         var auth_socket = new WebSocket(wsStart+window.location.hostname+':'+window.location.port+'/ws/THD-ws/'+USING_THD)
-
+        auth_socket.onclose = event => {
+            auth_socket = new WebSocket(wsStart+window.location.hostname+':'+window.location.port+'/ws/THD-ws/'+USING_THD)
+        };
 
         {% endif %}
         $(document).ready(function(){

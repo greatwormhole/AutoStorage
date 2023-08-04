@@ -87,6 +87,14 @@ class storageVisualization(View):
         worker_id = json.loads(request.COOKIES.get('AccessKey')).get('id')
         # username = "test"
         storage_list = list(set(list(Storage.objects.values_list('storage_name',flat=True))))
+        count_cell_list = []
+        for i in range(len(storage_list)):
+            count_cell_list.append(Storage.objects.filter(storage_name=storage_list[i]).order_by('-x_cell_coord')[0].x_cell_coord)
+        for i in range(len(storage_list) - 1):
+            for j in range(len(storage_list) - i - 1):
+                if count_cell_list[j] > count_cell_list[j + 1]:
+                    count_cell_list[j], count_cell_list[j + 1] = count_cell_list[j + 1],count_cell_list[j]
+                    storage_list[j], storage_list[j + 1] = storage_list[j + 1], storage_list[j]
         if THD_num is not None:
 
             THD_ip = THD.objects.get(THD_number=THD_num).ip
@@ -337,9 +345,10 @@ class AllStorageList(View):
 
 def getColor(first, second, percent):
         if percent > 100:
-            return [255,0,0]
+            return [255,0,0,100]
         delta = [second[i] - first[i] for i in range(len(first))]
         color = [first[i] + list(map(lambda x: x * percent / 100, delta))[i] for i in range(len(first))]
+        color.append(percent)
         return color
     
 class BlockedStoragesView(View):
@@ -365,3 +374,9 @@ class BlockedStoragesView(View):
         set_cache(static_cache_keys['blocked_cells'], data, as_list=False)
         
         return JsonResponse(data=data, status=200)
+
+class getStorageCellFullnessColorInfo(View):
+
+    def get(self,request):
+
+        return

@@ -5,7 +5,7 @@ from django.db import transaction
 
 from main.factories import *
 
-CRATE_NUM = 1000
+CRATE_NUM = 1
 WORKER_NUM = 10
 NOMENCLATURE_NUM = 20
 CELLS_PER_STORAGE = 5
@@ -13,7 +13,7 @@ STORAGE_NUM = 5
 
 STORAGES = [f'Склад {i}' for i in range(1, STORAGE_NUM + 1)]
 UNITS = ['шт', 'кг']
-crate_sizes = [500, 1000, 800]
+crate_sizes = [1500, 1500, 1500]
 
 class Command(BaseCommand):
 

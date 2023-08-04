@@ -6,7 +6,8 @@
   <script>
         const storageList = '{{storage_list}}',
             getCellsUrl = "{% url 'cells' %}",
-            storageFullnessUrl = "{% url 'storage_fullness' %}"
+            storageFullnessUrl = "{% url 'storage_fullness' %}",
+            storageLockUrl = "{% url 'check_blocked_cells' %}"
         var marginStep = 0,
             marginLeft = 5,
             cellInformation = [],
@@ -19,11 +20,24 @@
             wsStart = 'wss://'
         }
       $(document).ready(function(){
-        var storageFullInfo = getStorageInfo()
+        var storageFullInfo = getStorageInfo(storageFullnessUrl),
+            LockStorage = getStorageInfo(storageLockUrl)
         console.log(storageFullInfo)
         canvasDraw()
-        buildStorages(storageList,storageFullInfo)
+        buildStorages(storageList,storageFullInfo,LockStorage)
         var storage_socket = new WebSocket(wsStart+window.location.hostname+':'+window.location.port+'/ws/storage-ws/'+WORKER_ID)
+        $(storage_socket).on('message', function(event){
+            var data = JSON.parse(event.originalEvent.data),
+                message = JSON.parse(data['message']);
+            processMessage(message)
+        })
+        storage_socket.onclose = event => {
+            var storage_socket = new WebSocket(wsStart+window.location.hostname+':'+window.location.port+'/ws/storage-ws/'+WORKER_ID)
+            $(storage_socket).on('message', function(event){
+            var data = JSON.parse(event.originalEvent.data),
+                message = JSON.parse(data['message']);
+            })
+        };
 
       })
   </script>
