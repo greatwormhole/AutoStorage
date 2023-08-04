@@ -99,7 +99,7 @@ def on_delete(instance: Crates, **kwargs):
             'z_coord': instance.cell.z_cell_coord,
             'fullness':instance.cell.full_percent,
         }
-        
+
         storage_name = instance.cell.storage_name
         not_blocked_neighbour_cells = [cell for cell in instance.cell.neighboring_cells() if not cell.is_blocked]
 

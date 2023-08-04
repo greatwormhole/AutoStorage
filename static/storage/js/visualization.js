@@ -172,11 +172,11 @@ function buildStorages(storageList,storageFullInfo,LockStorage){
                         $('#'+storageName+'-free-span').text('Свободно - '+storageValue)
                     }
                     if (scaleXList[idx]>maxScale){
-                        var html = '<div class = "storageCell" id = "'+rowIdx+'_'+columnIdx+'_'+idx+'_'+storageName+'_cell" style = "width:'+layer[0]*maxScale+'px; height:'+layer[1]*maxScale+'px; background:'+color+'">'
+                        var html = '<div class = "storageCell" id = "'+rowIdx+'_'+columnIdx+'_'+idx+'_'+storageName+'_cell" style = "width:'+layer[0]*maxScale+'px; height:'+layer[1]*maxScale+'px; background:'+color+'">'+idx
                         html += '</div>'
                         $('#'+idx+'_'+rowIdx+'_st_layer_'+storageName).append(html)
                     } else{
-                        var html = '<div class = "storageCell" id = "'+rowIdx+'_'+columnIdx+'_'+idx+'_'+storageName+'_cell" style = "width:'+layer[0]*scaleXList[idx]+'px; height:'+layer[1]*scaleXList[idx]+'px; background:'+color+'">'
+                        var html = '<div class = "storageCell" id = "'+rowIdx+'_'+columnIdx+'_'+idx+'_'+storageName+'_cell" style = "width:'+layer[0]*scaleXList[idx]+'px; height:'+layer[1]*scaleXList[idx]+'px; background:'+color+'">'+idx
                         html += '</div>'
                         $('#'+idx+'_'+rowIdx+'_st_layer_'+storageName).append(html)
                     }
