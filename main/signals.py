@@ -6,6 +6,7 @@ from .models import Worker, Crates, TempCrate, TEXT_ID_RANK
 from .utils import generate_worker_barcode
 from .caching import set_cache, get_cache, static_cache_keys
 
+origin_cell = []
 if not DEBUG:        
     @receiver(post_save, sender=Worker)
     def create_barcode(instance, created, **kwargs):
@@ -29,19 +30,19 @@ def set_temp_crates_text_id(instance, created, **kwargs):
 @receiver(pre_save, sender=Crates)
 def pre_change(sender, instance: Crates, **kwargs):
     original_cell = None
-    
+
     if instance.id:
         original_cell = sender.objects.get(id=instance.id).cell
-        
-    instance.__original_cell = original_cell
+
+    origin_cell.append(original_cell)
 
 @receiver(pre_save, sender=Crates)
 def on_change(instance: Crates, **kwargs):
-    
+
     moved_crates_data = {}
     blocked_cells_data = {}
-    print(instance.__original_cell)
-    print(instance.cell)
+    instance.__original_cell = origin_cell[0]
+    origin_cell.pop()
     if instance.__original_cell != instance.cell:
 
         moved_crates_data = {
@@ -57,7 +58,10 @@ def on_change(instance: Crates, **kwargs):
                 'x_coord': instance.cell.x_cell_coord,
                 'y_coord': instance.cell.y_cell_coord,
                 'z_coord': instance.cell.z_cell_coord,
+                'origin_fullness':instance.__original_cell.full_percent if instance.__original_cell != None else '',
+                'fullness':instance.cell.full_percent if instance.cell != None else ''
         }
+        print(moved_crates_data)
         storage_name = instance.cell.storage_name
         blocked_neighbour_cells = [cell for cell in instance.cell.neighboring_cells() if cell.is_blocked]
         blocked_cells_data = get_cache(static_cache_keys['blocked_cells'], {})

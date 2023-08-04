@@ -375,8 +375,3 @@ class BlockedStoragesView(View):
         
         return JsonResponse(data=data, status=200)
 
-class getStorageCellFullnessColorInfo(View):
-
-    def get(self,request):
-
-        return
