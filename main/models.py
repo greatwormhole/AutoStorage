@@ -1,3 +1,4 @@
+from typing import Iterable, Optional
 from django.db import models
 from django.db.models import Q
 
@@ -174,6 +175,10 @@ class Crates(models.Model):
     def get_same_nomenclature(self):
         return self.__class__.objects.filter(nomenclature=self.nomenclature)
 
+    def save(self, *args, **kwargs):
+        print(self.id)
+        super().save(*args, **kwargs)
+    
     def __str__(self):
         return f'Коробка {self.nomenclature.title} - {self.amount} {self.nomenclature.units}'
     

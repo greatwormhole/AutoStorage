@@ -11,13 +11,6 @@ if not DEBUG:
     def create_barcode(instance, created, **kwargs):
         if created:
             generate_worker_barcode(instance.id, instance.name)
-        
-@receiver(post_save, sender=Crates)
-def set_crates_text_id(instance, created, **kwargs):
-    if created:
-        zero_amount = TEXT_ID_RANK - instance.rank
-        instance.text_id = zero_amount * '0' + str(instance.id)
-        instance.save()
     
 @receiver(post_save, sender=TempCrate)
 def set_temp_crates_text_id(instance, created, **kwargs):
@@ -29,19 +22,20 @@ def set_temp_crates_text_id(instance, created, **kwargs):
 @receiver(pre_save, sender=Crates)
 def pre_change(sender, instance: Crates, **kwargs):
     original_cell = None
-    
+
     if instance.id:
         original_cell = sender.objects.get(id=instance.id).cell
-        
+    print('PRE', instance)
     instance.__original_cell = original_cell
 
-@receiver(pre_save, sender=Crates)
+@receiver(post_save, sender=Crates)
 def on_change(instance: Crates, **kwargs):
     
+    print('POST', instance)
     moved_crates_data = {}
     blocked_cells_data = {}
-    print(instance.__original_cell)
-    print(instance.cell)
+    # print(f'Origin: {instance.__original_cell}')
+    # print(f'New: {instance.cell}')
     if instance.__original_cell != instance.cell:
 
         moved_crates_data = {
@@ -60,17 +54,20 @@ def on_change(instance: Crates, **kwargs):
         }
         storage_name = instance.cell.storage_name
         blocked_neighbour_cells = [cell for cell in instance.cell.neighboring_cells() if cell.is_blocked]
+        # print(blocked_neighbour_cells)
         blocked_cells_data = get_cache(static_cache_keys['blocked_cells'], {})
-        try:
-            for cell in blocked_neighbour_cells:
-                blocked_cells_data[storage_name][f'{cell.x_cell_coord}_{cell.y_cell_coord}_{cell.z_cell_coord}'] = cell.full_percent
+        
+        for cell in blocked_neighbour_cells:
+            blocked_cells_data[storage_name][f'{cell.x_cell_coord}_{cell.y_cell_coord}_{cell.z_cell_coord}'] = cell.full_percent
 
-            if instance.__original_cell is not None:
-                storage_name = instance.__original_cell.storage_name
-                blocked_neighbour_cells = [cell for cell in instance.__original_cell.neighboring_cells() if not cell.is_blocked]
+        if instance.__original_cell is not None:
+            storage_name = instance.__original_cell.storage_name
+            blocked_neighbour_cells = [cell for cell in instance.__original_cell.neighboring_cells() if not cell.is_blocked]
+            if blocked_neighbour_cells != []:
                 for cell in blocked_neighbour_cells:
                     blocked_cells_data[storage_name].pop(f'{cell.x_cell_coord}_{cell.y_cell_coord}_{cell.z_cell_coord}', None)
-        except:
-            pass
+        
+    # print(f'Moved crates: {moved_crates_data}')
+    # print(f'Blocked cells: {blocked_cells_data}')
     set_cache(static_cache_keys['moving_crates'], moved_crates_data)
     set_cache(static_cache_keys['blocked_cells'], blocked_cells_data, as_list=False)
