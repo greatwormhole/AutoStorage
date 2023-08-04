@@ -6,6 +6,7 @@ from .models import Worker, Crates, TempCrate, TEXT_ID_RANK
 from .utils import generate_worker_barcode
 from .caching import set_cache, get_cache, static_cache_keys
 
+origin_cell = []
 if not DEBUG:        
     @receiver(post_save, sender=Worker)
     def create_barcode(instance, created, **kwargs):
@@ -13,11 +14,18 @@ if not DEBUG:
             generate_worker_barcode(instance.id, instance.name)
     
 @receiver(post_save, sender=TempCrate)
-def set_temp_crates_text_id(instance, created, **kwargs):
+def on_save(sender, instance, created, **kwargs):
     if created:
         zero_amount = TEXT_ID_RANK - instance.rank
-        instance.text_id = zero_amount * '0' + str(instance.id)
-        instance.save()
+        txt_id = zero_amount * '0' + str(instance.id)
+        sender.objects.filter(id=instance.id).update(text_id=txt_id)
+
+@receiver(post_save, sender=Crates)
+def on_save(sender, instance, created, **kwargs):
+    if created:
+        zero_amount = TEXT_ID_RANK - instance.rank
+        txt_id = zero_amount * '0' + str(instance.id)
+        sender.objects.filter(id=instance.id).update(text_id=txt_id)
 
 @receiver(pre_save, sender=Crates)
 def pre_change(sender, instance: Crates, **kwargs):
@@ -25,19 +33,16 @@ def pre_change(sender, instance: Crates, **kwargs):
 
     if instance.id:
         original_cell = sender.objects.get(id=instance.id).cell
-    print('PRE', instance)
+
     instance.__original_cell = original_cell
 
 @receiver(post_save, sender=Crates)
 def on_change(instance: Crates, **kwargs):
-    
-    print('POST', instance)
+
     moved_crates_data = {}
     blocked_cells_data = {}
-    # print(f'Origin: {instance.__original_cell}')
-    # print(f'New: {instance.cell}')
+    
     if instance.__original_cell != instance.cell:
-
         moved_crates_data = {
                 'crate_id': instance.text_id,
                 'amount': instance.amount,
@@ -51,11 +56,17 @@ def on_change(instance: Crates, **kwargs):
                 'x_coord': instance.cell.x_cell_coord,
                 'y_coord': instance.cell.y_cell_coord,
                 'z_coord': instance.cell.z_cell_coord,
+                'origin_fullness':instance.__original_cell.full_percent if instance.__original_cell != None else '',
+                'fullness':instance.cell.full_percent if instance.cell != None else ''
         }
+
         storage_name = instance.cell.storage_name
         blocked_neighbour_cells = [cell for cell in instance.cell.neighboring_cells() if cell.is_blocked]
-        # print(blocked_neighbour_cells)
+
         blocked_cells_data = get_cache(static_cache_keys['blocked_cells'], {})
+        
+        if blocked_cells_data.get(storage_name, None) is None and len(blocked_neighbour_cells) > 0:
+            blocked_cells_data[storage_name] = {}
         
         for cell in blocked_neighbour_cells:
             blocked_cells_data[storage_name][f'{cell.x_cell_coord}_{cell.y_cell_coord}_{cell.z_cell_coord}'] = cell.full_percent
@@ -66,8 +77,6 @@ def on_change(instance: Crates, **kwargs):
             if blocked_neighbour_cells != []:
                 for cell in blocked_neighbour_cells:
                     blocked_cells_data[storage_name].pop(f'{cell.x_cell_coord}_{cell.y_cell_coord}_{cell.z_cell_coord}', None)
-        
-    # print(f'Moved crates: {moved_crates_data}')
-    # print(f'Blocked cells: {blocked_cells_data}')
+                
     set_cache(static_cache_keys['moving_crates'], moved_crates_data)
     set_cache(static_cache_keys['blocked_cells'], blocked_cells_data, as_list=False)
