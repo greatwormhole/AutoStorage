@@ -36,7 +36,7 @@ def pre_change(sender, instance: Crates, **kwargs):
 
     origin_cell.append(original_cell)
 
-@receiver(pre_save, sender=Crates)
+@receiver(post_save, sender=Crates)
 def on_change(instance: Crates, **kwargs):
 
     moved_crates_data = {}
@@ -52,6 +52,7 @@ def on_change(instance: Crates, **kwargs):
                 'cell_adress': instance.cell.adress,
                 'cell_origin_adress':instance.__original_cell.adress if instance.__original_cell != None else '',
                 'storage_name': instance.cell.storage_name,
+                'storage_name_origin':instance.__original_cell.storage_name if instance.__original_cell != None else '',
                 'x_coord_origin_cell': instance.__original_cell.x_cell_coord if instance.__original_cell != None else '',
                 'y_coord_origin_cell': instance.__original_cell.y_cell_coord if instance.__original_cell != None else '',
                 'z_coord_origin_cell': instance.__original_cell.z_cell_coord if instance.__original_cell != None else '',
@@ -61,7 +62,6 @@ def on_change(instance: Crates, **kwargs):
                 'origin_fullness':instance.__original_cell.full_percent if instance.__original_cell != None else '',
                 'fullness':instance.cell.full_percent if instance.cell != None else ''
         }
-        print(moved_crates_data)
         storage_name = instance.cell.storage_name
         blocked_neighbour_cells = [cell for cell in instance.cell.neighboring_cells() if cell.is_blocked]
         blocked_cells_data = get_cache(static_cache_keys['blocked_cells'], {})

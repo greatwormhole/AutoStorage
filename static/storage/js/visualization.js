@@ -294,19 +294,14 @@ function processMessage(message){
             origin_percent = elem['origin_fullness']
         if (typeof percent != 'undefined'){
             var color = calculate([96, 255, 68],[255,0,0], percent/100)
-            console.log(color)
+
             $('#'+elem['y_coord']+'_'+elem['x_coord']+'_'+elem['z_coord']+'_'+elem['storage_name']+'_cell').css({'background':'rgb('+color[0]+','+color[1]+','+color[2]+')'})
-            console.log({'background':'rgb('+color[0]+','+color[1]+','+color[2]+')'})
-            console.log(elem)
-            console.log($('#'+elem['y_coord']+'_'+elem['x_coord']+'_'+elem['z_coord']+'_'+elem['storage_name']+'_cell'))
-            console.log(color)
+
         }
         if (typeof origin_percent != 'undefined'){
             var color = calculate([96, 255, 68],[255,0,0], origin_percent/100)
-            $('#'+elem['y_coord_origin_cell']+'_'+elem['x_coord_origin_cell']+'_'+elem['z_coord_origin_cell']+'_'+elem['storage_name']+'_cell').css({'background':'rgb('+color[0]+','+color[1]+','+color[2]+')'})
-            console.log(elem)
-            console.log($('#'+elem['y_coord']+'_'+elem['x_coord']+'_'+elem['z_coord']+'_'+elem['storage_name']+'_cell'))
-            console.log(color)
+            $('#'+elem['y_coord_origin_cell']+'_'+elem['x_coord_origin_cell']+'_'+elem['z_coord_origin_cell']+'_'+elem['storage_name_origin']+'_cell').css({'background':'rgb('+color[0]+','+color[1]+','+color[2]+')'})
+
         }
     })
 }
