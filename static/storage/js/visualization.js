@@ -172,7 +172,7 @@ function buildStorages(storageList,storageFullInfo,LockStorage){
                         $('#'+storageName+'-free-span').text('Свободно - '+storageValue)
                     }
                     if (scaleXList[idx]>maxScale){
-                        var html = '<div class = "storageCell" style = "width:'+layer[0]*maxScale+'px; height:'+layer[1]*maxScale+'px; background:'+color+'">'
+                        var html = '<div class = "storageCell" id = "'+rowIdx+'_'+columnIdx+'_'+idx+'_'+storageName+'_cell" style = "width:'+layer[0]*maxScale+'px; height:'+layer[1]*maxScale+'px; background:'+color+'">'
                         html += '</div>'
                         $('#'+idx+'_'+rowIdx+'_st_layer_'+storageName).append(html)
                     } else{
@@ -290,13 +290,18 @@ function getStorageInfo(url){
 
 function processMessage(message){
     message.forEach(function(elem){
-        var percent = elem['fullness']
+        var percent = elem['fullness'],
+            origin_percent = elem['origin_fullness']
         if (typeof percent != 'undefined'){
-            var color = elem['color']
+            var color = calculate([96, 255, 68],[255,0,0], percent/100)
+
             $('#'+elem['y_coord']+'_'+elem['x_coord']+'_'+elem['z_coord']+'_'+elem['storage_name']+'_cell').css({'background':'rgb('+color[0]+','+color[1]+','+color[2]+')'})
-            console.log(elem)
-            console.log($('#'+elem['y_coord']+'_'+elem['x_coord']+'_'+elem['z_coord']+'_cell'))
-            console.log(color)
+
+        }
+        if (typeof origin_percent != 'undefined'){
+            var color = calculate([96, 255, 68],[255,0,0], origin_percent/100)
+            $('#'+elem['y_coord_origin_cell']+'_'+elem['x_coord_origin_cell']+'_'+elem['z_coord_origin_cell']+'_'+elem['storage_name_origin']+'_cell').css({'background':'rgb('+color[0]+','+color[1]+','+color[2]+')'})
+
         }
     })
 }

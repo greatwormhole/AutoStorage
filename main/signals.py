@@ -50,6 +50,7 @@ def on_change(instance: Crates, **kwargs):
                 'cell_adress': instance.cell.adress,
                 'cell_origin_adress':instance.__original_cell.adress if instance.__original_cell != None else '',
                 'storage_name': instance.cell.storage_name,
+                'storage_name_origin':instance.__original_cell.storage_name if instance.__original_cell != None else '',
                 'x_coord_origin_cell': instance.__original_cell.x_cell_coord if instance.__original_cell != None else '',
                 'y_coord_origin_cell': instance.__original_cell.y_cell_coord if instance.__original_cell != None else '',
                 'z_coord_origin_cell': instance.__original_cell.z_cell_coord if instance.__original_cell != None else '',

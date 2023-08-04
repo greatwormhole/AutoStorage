@@ -13,7 +13,7 @@ STORAGE_NUM = 5
 
 STORAGES = [f'Склад {i}' for i in range(1, STORAGE_NUM + 1)]
 UNITS = ['шт', 'кг']
-crate_sizes = [1500, 1500, 1500]
+crate_sizes = [3000, 3000, 3000]
 
 class Command(BaseCommand):
 
