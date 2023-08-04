@@ -1,6 +1,6 @@
 from Apro.settings import DEBUG
 from django.dispatch import receiver
-from django.db.models.signals import pre_save, post_save
+from django.db.models.signals import pre_save, post_save, post_delete
 from storage.views import getColor
 from .models import Worker, Crates, TempCrate, TEXT_ID_RANK
 from .utils import generate_worker_barcode
@@ -47,6 +47,7 @@ def on_change(instance: Crates, **kwargs):
                 'crate_id': instance.text_id,
                 'amount': instance.amount,
                 'articule': instance.nomenclature.article,
+                'status': 'moved',
                 'cell_adress': instance.cell.adress,
                 'cell_origin_adress':instance.__original_cell.adress if instance.__original_cell != None else '',
                 'storage_name': instance.cell.storage_name,
@@ -80,4 +81,33 @@ def on_change(instance: Crates, **kwargs):
                     blocked_cells_data[storage_name].pop(f'{cell.x_cell_coord}_{cell.y_cell_coord}_{cell.z_cell_coord}', None)
                 
     set_cache(static_cache_keys['moving_crates'], moved_crates_data)
+    set_cache(static_cache_keys['blocked_cells'], blocked_cells_data, as_list=False)
+    
+@receiver(post_delete, sender=Crates)
+def on_delete(instance: Crates, **kwargs):
+    
+    new_cell_data = {}
+    blocked_cells_data = {}
+    
+    if instance.cell is not None:
+        new_cell_data = {
+            'status': 'deleted',
+            'cell_adress': instance.cell.adress,
+            'storage_name': instance.cell.storage_name,
+            'x_coord': instance.cell.x_cell_coord,
+            'y_coord': instance.cell.y_cell_coord,
+            'z_coord': instance.cell.z_cell_coord,
+            'fullness':instance.cell.full_percent,
+        }
+        
+        storage_name = instance.cell.storage_name
+        not_blocked_neighbour_cells = [cell for cell in instance.cell.neighboring_cells() if not cell.is_blocked]
+
+        blocked_cells_data = get_cache(static_cache_keys['blocked_cells'], {})
+        
+        if not_blocked_neighbour_cells != []:
+            for cell in not_blocked_neighbour_cells:
+                blocked_cells_data[storage_name].pop(f'{cell.x_cell_coord}_{cell.y_cell_coord}_{cell.z_cell_coord}', None)
+    
+    set_cache(static_cache_keys['moving_crates'], new_cell_data)
     set_cache(static_cache_keys['blocked_cells'], blocked_cells_data, as_list=False)
