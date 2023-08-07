@@ -11,6 +11,7 @@ from main.models import THD, Nomenclature, DeliveryNote, Worker, Crates, Storage
 from main.utils import generate_nomenclature_barcode
 from .calculate_planning import handle_calculations
 from main.caching import get_cache, set_cache, static_cache_keys
+from storage.management.commands.createstorage import _is_valid
 
 import json
 from datetime import datetime as dt
@@ -127,24 +128,56 @@ class storageInfo(View):
             
                 storage = Storage.objects.filter(storage_name=storage_name)
                 coords = list(storage.values_list('y_cell_coord', 'x_cell_coord', 'z_cell_coord'))
+                y_of_storage = list(storage.values_list('y_cell_coord', flat=True).distinct().order_by('y_cell_coord'))
+                x_of_storage = list(storage.values_list('x_cell_coord', flat=True).distinct().order_by('x_cell_coord'))
+                z_of_storage = list(storage.values_list('z_cell_coord', flat=True).distinct().order_by('z_cell_coord'))
                 
-                for y, x, z in coords:
-                    cell = storage.get(
-                        Q(x_cell_coord=x) &
-                        Q(y_cell_coord=y) &
-                        Q(z_cell_coord=z) &
-                        Q(storage_name=storage_name)
-                    )
-                    if data.get(storage_name, None) is None:
-                        data[storage_name] = {}
-                    if data[storage_name].get(y, None) is None:
-                        data[storage_name][y] = {}
-                    if data[storage_name][y].get(x, None) is None:
-                        data[storage_name][y][x] = {}
-                    if data[storage_name][y][x].get(z, None) is None:
-                        data[storage_name][y][x][z] = {}
+                for y in y_of_storage:
+                    for x in x_of_storage:
+                        for z in z_of_storage:
+                            # print(y_of_storage)
+                            # print(x_of_storage)
+                            # print(z_of_storage)
+                            # sleep(1)
+                            if data.get(storage_name, None) is None:
+                                data[storage_name] = []
+                            if len(data[storage_name]) <= y:
+                                data[storage_name].append([])
+                            if len(data[storage_name][y]) <= x:
+                                data[storage_name][y].append([])
+                            
+                            if True in _is_valid(x, y):
+                                print(y, x, z)
+                                if len(data[storage_name][y][x]) <= z:
+                                    data[storage_name][y][x].append([])
+                                cell = storage.get(
+                                    Q(x_cell_coord=x) &
+                                    Q(y_cell_coord=y) &
+                                    Q(z_cell_coord=z) &
+                                    Q(storage_name=storage_name)
+                                )
+                                data[storage_name][y][x][z].append([cell.visualization_y, cell.visualization_x, cell.visualization_z, cell.full_percent])
+                            else:
+                                data[storage_name][y][x].append(None)
+                            
+                            
+                # for y, x, z in coords:
+                #     cell = storage.get(
+                #         Q(x_cell_coord=x) &
+                #         Q(y_cell_coord=y) &
+                #         Q(z_cell_coord=z) &
+                #         Q(storage_name=storage_name)
+                #     )
+                #     if data.get(storage_name, None) is None:
+                #         data[storage_name] = {}
+                #     if data[storage_name].get(y, None) is None:
+                #         data[storage_name][y] = {}
+                #     if data[storage_name][y].get(x, None) is None:
+                #         data[storage_name][y][x] = {}
+                #     if data[storage_name][y][x].get(z, None) is None:
+                #         data[storage_name][y][x][z] = {}
                         
-                    data[storage_name][y][x][z] = [cell.visualization_y, cell.visualization_x, cell.visualization_z, cell.full_percent]
+                #     data[storage_name][y][x][z] = [cell.visualization_y, cell.visualization_x, cell.visualization_z, cell.full_percent]
                     # sleep(1)
                     # print(cell)
                     # print(y, x, z)

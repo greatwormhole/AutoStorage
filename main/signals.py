@@ -38,13 +38,19 @@ def pre_change(sender, instance: Crates, **kwargs):
     instance.__original_cell = original_cell
     
 # @receiver(pre_save, sender=Storage)
-# def pre_change(sender, instance: Crates, **kwargs):
-#     original_cell = None
+# def pre_change(sender, instance: Storage, **kwargs):
+#     original_y = None
+#     original_x = None
+#     original_z = None
 
 #     if instance.id:
-#         original_cell = sender.objects.get(id=instance.id).cell
+#         original_y = instance.y_cell_coord
+#         original_x = instance.x_cell_coord
+#         original_z = instance.z_cell_coord
 
-#     instance.__original_cell = original_cell
+#     instance.__original_y = original_y
+#     instance.__original_x = original_x
+#     instance.__original_z = original_z
 
 @receiver(post_save, sender=Crates)
 def on_change(instance: Crates, **kwargs):
