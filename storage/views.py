@@ -3,6 +3,7 @@ from django.http import JsonResponse, HttpResponse
 from django.views import View
 from django.core import serializers
 from django.db.models import Q
+from django.core.exceptions import ObjectDoesNotExist
 
 from time import sleep
 
@@ -134,70 +135,30 @@ class storageInfo(View):
                 for y in y_of_storage:
                     for x in x_of_storage:
                         for z in z_of_storage:
-                            # print(y_of_storage)
-                            # print(x_of_storage)
-                            # print(z_of_storage)
+                            print(y, x, z)
                             # sleep(1)
+                            
+                            if data.get(storage_name, None) is None:
+                                data[storage_name] = []
+                            if len(data[storage_name]) <= y:
+                                data[storage_name].append([])
                             try:
-                                if data.get(storage_name, None) is None:
-                                    data[storage_name] = []
-                                if len(data[storage_name]) <= y:
-                                    data[storage_name].append([])
-                                if len(data[storage_name][y]) <= x:
-                                    data[storage_name][y].append([])
-                                if len(data[storage_name][y][x]) <= z:
-                                    data[storage_name][y][x].append([])
-                                    print(y, x, z)
                                 cell = storage.get(
                                     Q(x_cell_coord=x) &
                                     Q(y_cell_coord=y) &
                                     Q(z_cell_coord=z) &
                                     Q(storage_name=storage_name)
                                 )
-                                data[storage_name][y][x][z].append([cell.visualization_y, cell.visualization_x, cell.visualization_z, cell.full_percent])
-                            except:
-                                data[storage_name][y][x].append(None)
-                            
-                            
-                # for y, x, z in coords:
-                #     cell = storage.get(
-                #         Q(x_cell_coord=x) &
-                #         Q(y_cell_coord=y) &
-                #         Q(z_cell_coord=z) &
-                #         Q(storage_name=storage_name)
-                #     )
-                #     if data.get(storage_name, None) is None:
-                #         data[storage_name] = {}
-                #     if data[storage_name].get(y, None) is None:
-                #         data[storage_name][y] = {}
-                #     if data[storage_name][y].get(x, None) is None:
-                #         data[storage_name][y][x] = {}
-                #     if data[storage_name][y][x].get(z, None) is None:
-                #         data[storage_name][y][x][z] = {}
-                        
-                #     data[storage_name][y][x][z] = [cell.visualization_y, cell.visualization_x, cell.visualization_z, cell.full_percent]
-                    # sleep(1)
-                    # print(cell)
-                    # print(y, x, z)
-                    # print(y_of_storage)
-                    # print(x_of_storage)
-                    # print(z_of_storage)
-                
-                # for y in y_of_storage:
-                #     for x in x_of_storage:
-                #         for z in z_of_storage:
-                #             cell = storage.get(
-                #                 Q(x_cell_coord=x) &
-                #                 Q(y_cell_coord=y) &
-                #                 Q(z_cell_coord=z) &
-                #                 Q(storage_name=storage_name)
-                #             )
-                #             sleep(1)
-                #             print(cell)
-                #             print(y, x, z)
-                #             print(y_of_storage)
-                #             print(x_of_storage)
-                #             print(z_of_storage)
+                            except ObjectDoesNotExist:
+                                data[storage_name][y].append(None)
+                            # print(data[storage_name][y])
+                            if len(data[storage_name][y]) <= x:
+                                data[storage_name][y].append([])
+                            if data[storage_name][y][-1] is None:
+                                continue
+                            if len(data[storage_name][y][x]) <= z:
+                                data[storage_name][y][x].append([])
+                            data[storage_name][y][x][z].append([cell.visualization_y, cell.visualization_x, cell.visualization_z, cell.full_percent])
         
         # data = {
         #     storage_name: {
