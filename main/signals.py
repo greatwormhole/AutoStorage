@@ -1,12 +1,13 @@
-from Apro.settings import DEBUG
 from django.dispatch import receiver
 from django.db.models.signals import pre_save, post_save, post_delete
+from django.db.models import Q
+
 from storage.views import getColor
-from .models import Worker, Crates, TempCrate, TEXT_ID_RANK
+from Apro.settings import DEBUG
+from .models import Worker, Crates, TempCrate, TEXT_ID_RANK, Storage
 from .utils import generate_worker_barcode
 from .caching import set_cache, get_cache, static_cache_keys
 
-origin_cell = []
 if not DEBUG:        
     @receiver(post_save, sender=Worker)
     def create_barcode(instance, created, **kwargs):
@@ -35,6 +36,15 @@ def pre_change(sender, instance: Crates, **kwargs):
         original_cell = sender.objects.get(id=instance.id).cell
 
     instance.__original_cell = original_cell
+    
+# @receiver(pre_save, sender=Storage)
+# def pre_change(sender, instance: Crates, **kwargs):
+#     original_cell = None
+
+#     if instance.id:
+#         original_cell = sender.objects.get(id=instance.id).cell
+
+#     instance.__original_cell = original_cell
 
 @receiver(post_save, sender=Crates)
 def on_change(instance: Crates, **kwargs):
@@ -59,8 +69,10 @@ def on_change(instance: Crates, **kwargs):
                 'x_coord': instance.cell.x_cell_coord,
                 'y_coord': instance.cell.y_cell_coord,
                 'z_coord': instance.cell.z_cell_coord,
-                'origin_fullness':instance.__original_cell.full_percent if instance.__original_cell != None else '',
-                'fullness':instance.cell.full_percent if instance.cell != None else ''
+                'origin_fullness': instance.__original_cell.full_percent if instance.__original_cell != None else '',
+                'fullness': instance.cell.full_percent if instance.cell != None else '',
+                'is_blocked': instance.cell.is_blocked,
+                'is_blocked_origin': instance.__original_cell.is_blocked,
         }
 
         storage_name = instance.cell.storage_name
@@ -99,6 +111,35 @@ def on_change(instance: Crates, **kwargs):
                 
     set_cache(static_cache_keys['moving_crates'], moved_crates_data)
     set_cache(static_cache_keys['blocked_cells'], blocked_cells_data, as_list=False)
+    
+# @receiver(post_save, sender=Storage)
+# def on_change(instance: Storage, **kwargs):
+    
+#     storage_names = Storage.objects.all().values_list('storage_name', flat=True).distinct()
+#     data = {}
+    
+#     for storage_name in storage_names:
+        
+#         storage = Storage.objects.filter(storage_name=storage_name)
+#         coords = list(storage.values_list('y_cell_coord', 'x_cell_coord', 'z_cell_coord'))
+        
+#         for y, x, z in coords:
+#             cell = storage.get(
+#                 Q(x_cell_coord=x) &
+#                 Q(y_cell_coord=y) &
+#                 Q(z_cell_coord=z) &
+#                 Q(storage_name=storage_name)
+#             )
+#             if data.get(storage_name, None) is None:
+#                 data[storage_name] = {}
+#             if data[storage_name].get(y, None) is None:
+#                 data[storage_name][y] = {}
+#             if data[storage_name][y].get(x, None) is None:
+#                 data[storage_name][y][x] = {}
+#             if data[storage_name][y][x].get(z, None) is None:
+#                 data[storage_name][y][x][z] = {}
+                
+#             data[storage_name][y][x][z] = [cell.visualization_y, cell.visualization_x, cell.visualization_z, cell.full_percent]
     
 @receiver(post_delete, sender=Crates)
 def on_delete(instance: Crates, **kwargs):

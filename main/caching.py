@@ -4,7 +4,7 @@ static_cache_keys = {
     'moving_crates': 'updated_crates',
     'storage_viewers': 'storage_subscribers',
     'blocked_cells': 'blocked_cells',
-    'full_info_cells': 'full_info_cells'
+    'full_info_cells': 'full_info_cells',
 }
 
 def set_cache(key, data, as_list=True):
