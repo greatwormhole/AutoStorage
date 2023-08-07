@@ -41,6 +41,7 @@ def on_change(instance: Crates, **kwargs):
 
     moved_crates_data = {}
     blocked_cells_data = {}
+    full_cell_info_data = {}
     
     if instance.__original_cell != instance.cell:
         moved_crates_data = {
@@ -66,6 +67,7 @@ def on_change(instance: Crates, **kwargs):
         blocked_neighbour_cells = [cell for cell in instance.cell.neighboring_cells() if cell.is_blocked]
 
         blocked_cells_data = get_cache(static_cache_keys['blocked_cells'], {})
+        full_cell_info_data = get_cache(static_cache_keys['full_info_cells'], {})
         
         if blocked_cells_data.get(storage_name, None) is None and len(blocked_neighbour_cells) > 0:
             blocked_cells_data[storage_name] = {}
@@ -73,12 +75,27 @@ def on_change(instance: Crates, **kwargs):
         for cell in blocked_neighbour_cells:
             blocked_cells_data[storage_name][f'{cell.x_cell_coord}_{cell.y_cell_coord}_{cell.z_cell_coord}'] = cell.full_percent
 
+        full_cell_info_data[instance.cell.storage_name][instance.cell.y_cell_coord][instance.cell.x_cell_coord][instance.cell.z_cell_coord] = [
+            instance.cell.visualization_y,
+            instance.cell.visualization_x,
+            instance.cell.visualization_z,
+            instance.cell.full_percent,
+        ]
+
         if instance.__original_cell is not None:
             storage_name = instance.__original_cell.storage_name
             blocked_neighbour_cells = [cell for cell in instance.__original_cell.neighboring_cells() if not cell.is_blocked]
+            
             if blocked_neighbour_cells != []:
                 for cell in blocked_neighbour_cells:
                     blocked_cells_data[storage_name].pop(f'{cell.x_cell_coord}_{cell.y_cell_coord}_{cell.z_cell_coord}', None)
+                    
+            full_cell_info_data[instance.__original_cell.storage_name][instance.__original_cell.y_cell_coord][instance.__original_cell.x_cell_coord][instance.__original_cell.z_cell_coord] = [
+            instance.__original_cell.visualization_y,
+            instance.__original_cell.visualization_x,
+            instance.__original_cell.visualization_z,
+            instance.__original_cell.full_percent,
+        ]
                 
     set_cache(static_cache_keys['moving_crates'], moved_crates_data)
     set_cache(static_cache_keys['blocked_cells'], blocked_cells_data, as_list=False)

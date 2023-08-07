@@ -1,7 +1,10 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse
 from django.views import View
 from django.core import serializers
+from django.db.models import Q
+
+from time import sleep
 
 from main.decorators import check_access
 from main.models import THD, Nomenclature, DeliveryNote, Worker, Crates, Storage, TempCrate, ProductionStorage
@@ -110,15 +113,91 @@ class storageVisualization(View):
 
 class storageInfo(View):
 
-    def get (self, request):
-        id = request.GET.get('data')
-
-        data = Storage.objects.filter(storage_name=id)
-
-        response = HttpResponse(serializers.serialize('json', data), content_type='application/json')
-        # response.set_cookie('AccessKey', json.dumps({'id': 1}))
-
-        return response
+    def get(self, request):
+        
+        cached = get_cache(static_cache_keys['full_info_cells'], None)
+        
+        if cached is not None:
+            return JsonResponse(data=cached, status=200)
+        
+        storage_names = Storage.objects.all().values_list('storage_name', flat=True).distinct()
+        data = {}
+        
+        for storage_name in storage_names:
+            
+                storage = Storage.objects.filter(storage_name=storage_name)
+                coords = list(storage.values_list('y_cell_coord', 'x_cell_coord', 'z_cell_coord'))
+                
+                for y, x, z in coords:
+                    cell = storage.get(
+                        Q(x_cell_coord=x) &
+                        Q(y_cell_coord=y) &
+                        Q(z_cell_coord=z) &
+                        Q(storage_name=storage_name)
+                    )
+                    if data.get(storage_name, None) is None:
+                        data[storage_name] = {}
+                    if data[storage_name].get(y, None) is None:
+                        data[storage_name][y] = {}
+                    if data[storage_name][y].get(x, None) is None:
+                        data[storage_name][y][x] = {}
+                    if data[storage_name][y][x].get(z, None) is None:
+                        data[storage_name][y][x][z] = {}
+                        
+                    data[storage_name][y][x][z] = [cell.visualization_y, cell.visualization_x, cell.visualization_z, cell.full_percent]
+                    # sleep(1)
+                    # print(cell)
+                    # print(y, x, z)
+                    # print(y_of_storage)
+                    # print(x_of_storage)
+                    # print(z_of_storage)
+                
+                # for y in y_of_storage:
+                #     for x in x_of_storage:
+                #         for z in z_of_storage:
+                #             cell = storage.get(
+                #                 Q(x_cell_coord=x) &
+                #                 Q(y_cell_coord=y) &
+                #                 Q(z_cell_coord=z) &
+                #                 Q(storage_name=storage_name)
+                #             )
+                #             sleep(1)
+                #             print(cell)
+                #             print(y, x, z)
+                #             print(y_of_storage)
+                #             print(x_of_storage)
+                #             print(z_of_storage)
+        
+        # data = {
+        #     storage_name: {
+        #         y: {
+        #             x: {
+        #                 z: [
+        #                     cell.visualization_y,
+        #                     cell.visualization_x,
+        #                     cell.visualization_z,
+        #                     cell.full_percent,
+        #                 ]
+        #                 for z in [*map(lambda i: i[2], coords)]
+        #                 if (cell := storage.get(
+        #                     Q(x_cell_coord=x) &
+        #                     Q(y_cell_coord=y) &
+        #                     Q(z_cell_coord=z) &
+        #                     Q(storage_name=storage_name)
+        #                 ))
+        #             }
+        #             for x in [*map(lambda i: i[1], coords)]
+        #         }
+        #         for y in [*map(lambda i: i[0], coords)]
+        #     }
+        #     for storage_name in storage_names
+        #     if (storage := Storage.objects.filter(storage_name=storage_name)) and
+        #     (coords := list(storage.values_list('y_cell_coord', 'x_cell_coord', 'z_cell_coord')))
+        # }
+        
+        set_cache(static_cache_keys['full_info_cells'], data, as_list=False)
+        
+        return JsonResponse(data=data, status=200)
 
 class NomenclatureView(View):
 
@@ -374,4 +453,3 @@ class BlockedStoragesView(View):
         set_cache(static_cache_keys['blocked_cells'], data, as_list=False)
         
         return JsonResponse(data=data, status=200)
-

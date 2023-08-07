@@ -93,6 +93,7 @@ class Storage(models.Model):
     mass = models.PositiveIntegerField(default=700)
     visualization_x = models.IntegerField(default=20)
     visualization_y = models.IntegerField(default=20)
+    visualization_z = models.IntegerField(default=3000)
 
     def __str__(self):
         return f'Storage: {self.storage_name}, cell#{self.adress}'
