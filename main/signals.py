@@ -105,7 +105,7 @@ def on_delete(instance: Crates, **kwargs):
 
         blocked_cells_data = get_cache(static_cache_keys['blocked_cells'], {})
         
-        if not_blocked_neighbour_cells != []:
+        if blocked_cells_data.get(storage_name, None) is not None and len(not_blocked_neighbour_cells) > 0:
             for cell in not_blocked_neighbour_cells:
                 blocked_cells_data[storage_name].pop(f'{cell.x_cell_coord}_{cell.y_cell_coord}_{cell.z_cell_coord}', None)
     
