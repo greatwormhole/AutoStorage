@@ -118,8 +118,8 @@ class storageInfo(View):
         
         cached = get_cache(static_cache_keys['full_info_cells'], None)
         
-        if cached is not None:
-            return JsonResponse(data=cached, status=200)
+        # if cached is not None:
+        #     return JsonResponse(data=cached, status=200)
         
         storage_names = Storage.objects.all().values_list('storage_name', flat=True).distinct()
         data = {}
@@ -127,7 +127,6 @@ class storageInfo(View):
         for storage_name in storage_names:
             
                 storage = Storage.objects.filter(storage_name=storage_name)
-                coords = list(storage.values_list('y_cell_coord', 'x_cell_coord', 'z_cell_coord'))
                 y_of_storage = list(storage.values_list('y_cell_coord', flat=True).distinct().order_by('y_cell_coord'))
                 x_of_storage = list(storage.values_list('x_cell_coord', flat=True).distinct().order_by('x_cell_coord'))
                 z_of_storage = list(storage.values_list('z_cell_coord', flat=True).distinct().order_by('z_cell_coord'))
@@ -139,17 +138,16 @@ class storageInfo(View):
                             # print(x_of_storage)
                             # print(z_of_storage)
                             # sleep(1)
-                            if data.get(storage_name, None) is None:
-                                data[storage_name] = []
-                            if len(data[storage_name]) <= y:
-                                data[storage_name].append([])
-                            if len(data[storage_name][y]) <= x:
-                                data[storage_name][y].append([])
-                            
-                            if True in _is_valid(x, y):
-                                print(y, x, z)
+                            try:
+                                if data.get(storage_name, None) is None:
+                                    data[storage_name] = []
+                                if len(data[storage_name]) <= y:
+                                    data[storage_name].append([])
+                                if len(data[storage_name][y]) <= x:
+                                    data[storage_name][y].append([])
                                 if len(data[storage_name][y][x]) <= z:
                                     data[storage_name][y][x].append([])
+                                    print(y, x, z)
                                 cell = storage.get(
                                     Q(x_cell_coord=x) &
                                     Q(y_cell_coord=y) &
@@ -157,7 +155,7 @@ class storageInfo(View):
                                     Q(storage_name=storage_name)
                                 )
                                 data[storage_name][y][x][z].append([cell.visualization_y, cell.visualization_x, cell.visualization_z, cell.full_percent])
-                            else:
+                            except:
                                 data[storage_name][y][x].append(None)
                             
                             
