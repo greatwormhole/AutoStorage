@@ -127,6 +127,18 @@ function zeroCountNum(arr){
     }
     return count
 }
+function appendNumbers(count, storageName, type){
+    for (let i = 0; i<count; i++){
+        switch (type){
+            case 'row':
+                $('#'+storageName+'-row-numbers').append('<span>'+i+'</span>')
+                break
+            case 'column':
+                $('#'+storageName+'-column-numbers').append('<span>'+i+'</span>')
+                break
+        }
+    }
+}
 //build storage plan
 function buildStorages(storageList,LockStorage,storageInfo){
     var cellPleasesArray = [],
@@ -142,7 +154,10 @@ function buildStorages(storageList,LockStorage,storageInfo){
             screenWidth = parseInt($('#view-space').css('width')),
             height = storageCell.map((elem) => elem[0][0][1]).reduce((partialSum, a) => partialSum + a, 0)*Math.max.apply(Math,bouncer(storageCell.map((elem) => Math.max.apply(Math, elem.map((elem) => elem.length))))),
             scaleY = screenWidth * 1 / height
-
+            columnCount = storageCell.length
+            rowCount = Math.max.apply(Math, storageCell.map((elem)=>elem.length))
+        appendNumbers(columnCount, storageName, 'column')
+        appendNumbers(rowCount, storageName, 'row')
         storageCell.forEach(function(row,idx){
             var htmlRow = '<div class = "storageRow" id = "'+idx+'_st_row_'+storageName+'">',
                     rowIdx = idx
@@ -214,10 +229,7 @@ function buildStorages(storageList,LockStorage,storageInfo){
         })
         counter(LockStorage,storageList)
        storageMargin(storageCell,storageName,false)
-
-
     }
-
 }
 function storageMargin(storageCell,storageName, isUnMargin){
     storageCell.forEach(function(row,idx){
@@ -320,8 +332,6 @@ function processMessage(message,storageList){
             var color = calculate([96, 255, 68],[255,0,0], percent/100)
             if (elem['is_blocked'] == true){
                 color = [61,61,61]
-
-
             }
             $('#'+elem['y_coord']+'_'+elem['x_coord']+'_'+elem['z_coord']+'_'+elem['storage_name']+'_cell').css({'background':'rgb('+color[0]+','+color[1]+','+color[2]+')'})
         }

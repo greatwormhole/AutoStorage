@@ -153,7 +153,7 @@ CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
         'LOCATION': 'redis://' + REDIS_HOST + ':' + str(REDIS_PORT),
-        'TIMEOUT': int(td(minutes=30).total_seconds()),
+        'TIMEOUT': int(td(hours=24).total_seconds()),
         'KEY_PREFIX': 'apro',
         'OPTIONS': {
             'db': 0,
