@@ -1,7 +1,80 @@
 function bouncer(arr) {
   return arr.filter( function(v){return !(v !== v);});
 }
+function null2empty(array){
+    array.forEach(function(elem, idx){
+        var yIdx = idx
+        elem.forEach(function(elem,idx){
+            if (elem == null){
+            delete array[yIdx][idx]
+        }
+        })
 
+    })
+    return array
+}
+//counter edit
+function counter(LockStorage){
+    var $cells = $('.storageCell'),
+        globalLockValue = 0,
+        globalLockFullValue = 0,
+        LockValue = {},
+        lockFullValue = {},
+        globalFullValue = 0,
+        fullValue = {},
+        globalEmptyValue = 0,
+        emptyValue = {}
+
+    $cells.each(function(elem){
+        var percent = percentUsingColor([96, 255, 68],[255,0,0],$($cells[elem]).css('background-color').replace('rgb(','').replace(')','').split(',')),
+            id = $cells[elem].id,
+            storageName = id.split('_')[3]
+
+        if ($($cells[elem]).css('background-color') == 'rgb(61, 61, 61)'){
+            percent = LockStorage[storageName][id.split('_')[1]+'_'+id.split('_')[0]+'_'+id.split('_')[2]]/100
+
+        }
+        if (percent>barerPercentage/100 && typeof LockStorage[storageName][id.split('_')[1]+'_'+id.split('_')[0]+'_'+id.split('_')[2]] == 'undefined'){
+            globalFullValue++
+
+            dictWrite(fullValue, storageName)
+        } else if (percent<barerPercentage/100 && typeof LockStorage[storageName][id.split('_')[1]+'_'+id.split('_')[0]+'_'+id.split('_')[2]] == 'undefined'){
+            globalEmptyValue++
+            dictWrite(emptyValue, storageName)
+        } else if (percent>barerPercentage/100 && typeof LockStorage[storageName][id.split('_')[1]+'_'+id.split('_')[0]+'_'+id.split('_')[2]] != 'undefined'){
+            console.log(percent)
+            globalLockFullValue++
+            dictWrite(lockFullValue, storageName)
+
+            $($cells[elem]).css('background','#3d3d3d')
+        } else if (percent<barerPercentage/100 && typeof LockStorage[storageName][id.split('_')[1]+'_'+id.split('_')[0]+'_'+id.split('_')[2]] != 'undefined'){
+            globalLockValue++
+            dictWrite(LockValue, storageName)
+
+            $($cells[elem]).css('background','#3d3d3d')
+        }
+    })
+
+    $('#lock-span').text('Заблокировано - '+globalLockValue)
+    $('#lock-full-span').text('Занято и заблокировано - '+globalLockFullValue)
+    $('#full-span').text('Занято - '+globalFullValue)
+    $('#free-span').text('Свободно - '+globalEmptyValue)
+    placeCount(fullValue, '-full-span', 'Занято - ')
+    placeCount(emptyValue, '-free-span', 'Свободно - ')
+    placeCount(LockValue,'-lock-span','Заблокировано - ')
+    placeCount(lockFullValue, '-lock-full-span','Занято и заблокировано - ')
+}
+//percentUsingColor
+function percentUsingColor(first, second, present){
+  let firstColor = first[0];
+  let secondColor = second[0];
+  let presentColor = parseInt(present[0]);
+  if (presentColor>255){
+        return 1
+    }
+  var result = (presentColor-firstColor)/(secondColor-firstColor)
+  return result;
+}
 //color calculate
 function calculate(first, second, percentage) {
     if (percentage>1){
@@ -40,33 +113,17 @@ function zeroCountNum(arr){
     return count
 }
 //build storage plan
-function buildStorages(storageList,storageFullInfo,LockStorage){
+function buildStorages(storageList,storageFullInfo,LockStorage,storageInfo){
     var storageList = JSON.parse(storageList.replaceAll('&#x27;','"')),
         cellPleasesArray = [],
         cells = []
     for (let i=0; i<storageList.length; i++){
-        cells = getCells(storageList[i])
-        var storageCell = [],
+        var storageCell = null2empty(storageInfo[storageList[i]]),
             rowNumber,
             storageName=storageList[i]
-        for (let j = 0; j<cells.length; j++){
-            rowNumber = cells[j].fields.y_cell_coord
-            if (storageCell[rowNumber] == null){
-                storageCell[rowNumber] = []
-                storageCell[rowNumber][cells[j].fields.x_cell_coord] = []
-                storageCell[rowNumber][cells[j].fields.x_cell_coord][cells[j].fields.z_cell_coord]=[cells[j].fields.visualization_x, cells[j].fields.visualization_y, cells[j].fields.z_cell_size]
-            } else {
-                if (storageCell[rowNumber][cells[j].fields.x_cell_coord] == null){
-                    storageCell[rowNumber][cells[j].fields.x_cell_coord] = []
-                    storageCell[rowNumber][cells[j].fields.x_cell_coord][cells[j].fields.z_cell_coord]=[cells[j].fields.visualization_x, cells[j].fields.visualization_y, cells[j].fields.z_cell_size]
-
-                } else {
-                    storageCell[rowNumber][cells[j].fields.x_cell_coord][cells[j].fields.z_cell_coord]=[cells[j].fields.visualization_x, cells[j].fields.visualization_y, cells[j].fields.z_cell_size]
-                }
-            }
-        }
         cellPleasesArray.push(storageCell)
         cellInformation = cellPleasesArray
+        console.log(storageCell)
         var storageDiv = $('#' + storageList[i]),
             screenWidth = parseInt($('#view-space').css('width')),
             height = storageCell.map((elem) => elem[0][0][1]).reduce((partialSum, a) => partialSum + a, 0)*Math.max.apply(Math,bouncer(storageCell.map((elem) => Math.max.apply(Math, elem.map((elem) => elem.length))))),
@@ -112,65 +169,10 @@ function buildStorages(storageList,storageFullInfo,LockStorage){
                     }
 
 
-                    var color = storageFullInfo[storageName][columnIdx+'_'+rowIdx+'_'+idx],
-                        percent = color[3]
+                    var color = calculate([96, 255, 68],[255,0,0],storageCell[rowIdx][columnIdx][idx][3]),
+                        percent = storageCell[rowIdx][columnIdx][idx][3]
                     color = 'rgb('+color[0]+','+color[1]+','+color[2]+')'
-                    // подсчет ячеек
 
-                    if (typeof LockStorage[storageName][columnIdx+'_'+rowIdx+'_'+idx] != "undefined"){
-                        color = '#3d3d3d'
-                        var globalLockValue = parseInt($('#lock-span').text().split(' ')[2])+1,
-                            globalLockFullValue = parseInt($('#lock-full-span').text().split(' ')[2])+1,
-                            LockValue = parseInt($('#'+storageName+'-lock-span').text().split(' ')[2])+1,
-                            lockFullValue = parseInt($('#'+storageName+'-lock-full-span').text().split(' ')[2])+1
-                        if (isNaN(globalLockValue)){
-                            globalLockValue = 1
-                        }
-                        if (isNaN(LockValue)){
-                            LockValue = 1
-                        }
-                        $('#lock-span').text('Заблокировано - '+globalLockValue)
-                        $('#'+storageName+'-lock-span').text('Заблокировано - '+LockValue)
-                        if (LockStorage[storageName][columnIdx+'_'+rowIdx+'_'+idx]>barerPercentage){
-                            var lockFullValue = parseInt($('#'+storageName+'-lock-full-span').text().split(' ')[2])+1,
-                                globalLockFullValue = parseInt($('#lock-full-span').text().split(' ')[2])+1
-                            if (isNaN(lockFullValue)){
-                            lockFullValue = 1
-                            }
-                            if (isNaN(globalLockFullValue)){
-                            globalLockFullValue = 1
-                            }
-                            $('#lock-full-span').text('Занято и заблокировано - '+globalLockFullValue)
-                            $('#'+storageName+'-lock-full-span').text('Занято и заблокировано - '+lockFullValue)
-                        }
-                    }
-
-
-                    if (percent > barerPercentage){
-                        var Value = parseInt($('#full-span').text().split(' ')[2])+1,
-                            storageValue = parseInt($('#'+storageName+'-full-span').text().split(' ')[2])+1
-                        if (isNaN(Value)){
-                            Value = 1
-                        }
-                        if (isNaN(storageValue)){
-                            storageValue = 1
-                        }
-
-                        $('#full-span').text('Занято - '+Value)
-                        $('#'+storageName+'-full-span').text('Занято - '+storageValue)
-                    }else{
-
-                        var Value = parseInt($('#free-span').text().split(' ')[2])+1,
-                            storageValue = parseInt($('#'+storageName+'-free-span').text().split(' ')[2])+1
-                        if (isNaN(Value)){
-                            Value = 1
-                        }
-                        if (isNaN(storageValue)){
-                           storageValue = 1
-                        }
-                        $('#free-span').text('Свободно - '+Value)
-                        $('#'+storageName+'-free-span').text('Свободно - '+storageValue)
-                    }
                     if (scaleXList[idx]>maxScale){
                         var html = '<div class = "storageCell" id = "'+rowIdx+'_'+columnIdx+'_'+idx+'_'+storageName+'_cell" style = "width:'+layer[0]*maxScale+'px; height:'+layer[1]*maxScale+'px; background:'+color+'">'+idx
                         html += '</div>'

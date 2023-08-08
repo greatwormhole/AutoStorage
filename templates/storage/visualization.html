@@ -20,11 +20,13 @@
             wsStart = 'wss://'
         }
       $(document).ready(function(){
-        var storageFullInfo = getStorageInfo(storageFullnessUrl),
-            LockStorage = getStorageInfo(storageLockUrl)
-        console.log(storageFullInfo)
+
+        var storageFullInfo = getStorageInfo(getCellsUrl),
+            LockStorage = getStorageInfo(storageLockUrl),
+            storageInfo = getStorageInfo(getCellsUrl)
+        console.log(storageInfo)
         canvasDraw()
-        buildStorages(storageList,storageFullInfo,LockStorage)
+        buildStorages(storageList,storageFullInfo,LockStorage,storageInfo)
         var storage_socket = new WebSocket(wsStart+window.location.hostname+':'+window.location.port+'/ws/storage-ws/'+WORKER_ID)
         $(storage_socket).on('message', function(event){
             var data = JSON.parse(event.originalEvent.data),

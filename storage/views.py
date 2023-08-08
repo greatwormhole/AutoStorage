@@ -129,41 +129,35 @@ class storageInfo(View):
             
                 storage = Storage.objects.filter(storage_name=storage_name)
                 y_of_storage = list(storage.values_list('y_cell_coord', flat=True).distinct().order_by('y_cell_coord'))
-                x_of_storage = list(range(max(list(storage.values_list('x_cell_coord', flat=True))) + 1))
+                x_of_storage = list(storage.values_list('x_cell_coord', flat=True).distinct().order_by('x_cell_coord'))
                 z_of_storage = list(storage.values_list('z_cell_coord', flat=True).distinct().order_by('z_cell_coord'))
-                print(y_of_storage)
-                print(x_of_storage)
-                print(z_of_storage)
-                if data.get(storage_name, None) is None:
-                    data[storage_name] = []
                 
                 for y in y_of_storage:
-                    if len(data[storage_name]) <= y:
-                        data[storage_name].append([])
-                    
                     for x in x_of_storage:
-                        
-                        tmp = storage.filter(
-                            Q(x_cell_coord=x) &
-                            Q(y_cell_coord=y) &
-                            Q(storage_name=storage_name)
-                        )
-                        print(list(tmp))
-                        
-                        if list(tmp) == []:
-                            data[storage_name][y].append(None)
-                            continue
-                        else:
-                            data[storage_name][y].append([])
-                        
                         for z in z_of_storage:
                             print(y, x, z)
+                            # sleep(1)
+                            
+                            if data.get(storage_name, None) is None:
+                                data[storage_name] = []
+                            if len(data[storage_name]) <= y:
+                                data[storage_name].append([])
+                            try:
+                                cell = storage.get(
+                                    Q(x_cell_coord=x) &
+                                    Q(y_cell_coord=y) &
+                                    Q(z_cell_coord=z) &
+                                    Q(storage_name=storage_name)
+                                )
+                            except ObjectDoesNotExist:
+                                data[storage_name][y].append(None)
+                            # print(data[storage_name][y])
+                            if len(data[storage_name][y]) <= x:
+                                data[storage_name][y].append([])
+                            if data[storage_name][y][-1] is None:
+                                continue
                             if len(data[storage_name][y][x]) <= z:
                                 data[storage_name][y][x].append([])
-                            try:
-                                cell = tmp.get(z_cell_coord=z)
-                            except ObjectDoesNotExist:
-                                data[storage_name][y][x][z].append(None)
                             data[storage_name][y][x][z].append([cell.visualization_y, cell.visualization_x, cell.visualization_z, cell.full_percent])
         
         # data = {
