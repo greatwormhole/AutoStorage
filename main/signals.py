@@ -77,7 +77,7 @@ def on_change(instance: Crates, **kwargs):
         for cell in blocked_neighbour_cells:
             blocked_cells_data[storage_name][f'{cell.x_cell_coord}_{cell.y_cell_coord}_{cell.z_cell_coord}'] = cell.full_percent
 
-        full_cell_info_data[instance.cell.storage_name][instance.cell.y_cell_coord][instance.cell.x_cell_coord][instance.cell.z_cell_coord] = [
+        full_cell_info_data[instance.cell.storage_name][instance.cell.y_cell_coord][instance.cell.x_cell_coord][instance.cell.z_cell_coord][0] = [
             instance.cell.visualization_y,
             instance.cell.visualization_x,
             instance.cell.visualization_z,
@@ -92,7 +92,7 @@ def on_change(instance: Crates, **kwargs):
                 for cell in blocked_neighbour_cells:
                     blocked_cells_data[storage_name].pop(f'{cell.x_cell_coord}_{cell.y_cell_coord}_{cell.z_cell_coord}', None)
                     
-            full_cell_info_data[instance.__original_cell.storage_name][instance.__original_cell.y_cell_coord][instance.__original_cell.x_cell_coord][instance.__original_cell.z_cell_coord] = [
+            full_cell_info_data[instance.__original_cell.storage_name][instance.__original_cell.y_cell_coord][instance.__original_cell.x_cell_coord][instance.__original_cell.z_cell_coord][0] = [
             instance.__original_cell.visualization_y,
             instance.__original_cell.visualization_x,
             instance.__original_cell.visualization_z,
@@ -137,7 +137,7 @@ def on_delete(instance: Crates, **kwargs):
             for cell in not_blocked_neighbour_cells:
                 blocked_cells_data[storage_name].pop(f'{cell.x_cell_coord}_{cell.y_cell_coord}_{cell.z_cell_coord}', None)
                 
-        full_cell_info_data[instance.cell.storage_name][instance.cell.y_cell_coord][instance.cell.x_cell_coord][instance.cell.z_cell_coord] = [
+        full_cell_info_data[instance.cell.storage_name][instance.cell.y_cell_coord][instance.cell.x_cell_coord][instance.cell.z_cell_coord][0] = [
             instance.cell.visualization_y,
             instance.cell.visualization_x,
             instance.cell.visualization_z,
