@@ -115,6 +115,7 @@ def on_delete(instance: Crates, **kwargs):
     
     new_cell_data = {}
     blocked_cells_data = {}
+    full_cell_info_data = {}
     
     if instance.cell is not None:
         new_cell_data = {
@@ -144,9 +145,9 @@ def on_delete(instance: Crates, **kwargs):
             instance.cell.full_percent,
         ]
     
-    set_cache(static_cache_keys['moving_crates'], new_cell_data)
-    set_cache(static_cache_keys['blocked_cells'], blocked_cells_data, as_list=False)
-    set_cache(static_cache_keys['full_info_cells'], full_cell_info_data, as_list=False)
+        set_cache(static_cache_keys['moving_crates'], new_cell_data)
+        set_cache(static_cache_keys['blocked_cells'], blocked_cells_data, as_list=False)
+        set_cache(static_cache_keys['full_info_cells'], full_cell_info_data, as_list=False)
     
 @receiver(post_delete, sender=Storage)
 def on_delete(instance: Storage, **kwargs):
