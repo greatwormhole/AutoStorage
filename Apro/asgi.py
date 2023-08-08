@@ -1,14 +1,18 @@
-import os
 from django.core.asgi import get_asgi_application
 from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.auth import AuthMiddlewareStack
+
+import os
+from time import time
 
 import main.routing
 from main.caching import set_cache, get_cache, static_cache_keys
 from storage.storage_visual import full_cell_info, blocked_cell_info
 
 def setup():
-    
+
+    start = time()
+
     cached_info = get_cache(static_cache_keys['full_info_cells'], None)
     cached_blocked = get_cache(static_cache_keys['blocked_cells'], None)
 
@@ -19,6 +23,8 @@ def setup():
     if cached_blocked is None:
         data = blocked_cell_info()
         set_cache(static_cache_keys['blocked_cells'], data, as_list=False)
+
+    print(f'Setup in {time() - start} s')
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Apro.settings')
 
