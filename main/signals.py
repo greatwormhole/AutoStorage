@@ -36,20 +36,20 @@ def pre_change(sender, instance: Crates, **kwargs):
 
     instance.__original_cell = original_cell
     
-@receiver(pre_save, sender=Storage)
-def pre_change(sender, instance: Storage, **kwargs):
-    original_y = None
-    original_x = None
-    original_z = None
+# @receiver(pre_save, sender=Storage)
+# def pre_change(sender, instance: Storage, **kwargs):
+#     original_y = None
+#     original_x = None
+#     original_z = None
 
-    if instance.id:
-        original_y = instance.y_cell_coord
-        original_x = instance.x_cell_coord
-        original_z = instance.z_cell_coord
+#     if instance.id:
+#         original_y = instance.y_cell_coord
+#         original_x = instance.x_cell_coord
+#         original_z = instance.z_cell_coord
 
-    instance.__original_y = original_y
-    instance.__original_x = original_x
-    instance.__original_z = original_z
+#     instance.__original_y = original_y
+#     instance.__original_x = original_x
+#     instance.__original_z = original_z
 
 @receiver(post_save, sender=Crates)
 def on_change(instance: Crates, **kwargs):
@@ -118,12 +118,12 @@ def on_change(instance: Crates, **kwargs):
     set_cache(static_cache_keys['blocked_cells'], blocked_cells_data, as_list=False)
     set_cache(static_cache_keys['full_info_cells'], full_cell_info_data, as_list=False)
     
-@receiver(post_save, sender=Storage)
-def on_change(instance: Storage, **kwargs):
+# @receiver(post_save, sender=Storage)
+# def on_change(instance: Storage, **kwargs):
     
-    data = full_cell_info()
+#     data = full_cell_info()
     
-    set_cache(static_cache_keys['full_info_cells'], data, as_list=False)
+#     set_cache(static_cache_keys['full_info_cells'], data, as_list=False)
     
 @receiver(post_delete, sender=Crates)
 def on_delete(instance: Crates, **kwargs):
@@ -146,13 +146,22 @@ def on_delete(instance: Crates, **kwargs):
         not_blocked_neighbour_cells = [cell for cell in instance.cell.neighboring_cells() if not cell.is_blocked]
 
         blocked_cells_data = get_cache(static_cache_keys['blocked_cells'], {})
+        full_cell_info_data = get_cache(static_cache_keys['full_info_cells'], {})
         
         if blocked_cells_data.get(storage_name, None) is not None and len(not_blocked_neighbour_cells) > 0:
             for cell in not_blocked_neighbour_cells:
                 blocked_cells_data[storage_name].pop(f'{cell.x_cell_coord}_{cell.y_cell_coord}_{cell.z_cell_coord}', None)
+                
+        full_cell_info_data[instance.cell.storage_name][instance.cell.y_cell_coord][instance.cell.x_cell_coord][instance.cell.z_cell_coord] = [
+            instance.cell.visualization_y,
+            instance.cell.visualization_x,
+            instance.cell.visualization_z,
+            instance.cell.full_percent,
+        ]
     
     set_cache(static_cache_keys['moving_crates'], new_cell_data)
     set_cache(static_cache_keys['blocked_cells'], blocked_cells_data, as_list=False)
+    set_cache(static_cache_keys['full_info_cells'], full_cell_info_data, as_list=False)
     
 # @receiver(post_delete, sender=Storage)
 # def on_delete(instance: Storage, **kwargs):

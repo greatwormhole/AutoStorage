@@ -377,3 +377,25 @@ class BlockedStoragesView(View):
         set_cache(static_cache_keys['blocked_cells'], data, as_list=False)
         
         return JsonResponse(data=data, status=200)
+    
+class CellContentView(View):
+    
+    def get(self, request):
+        
+        storage_name = request.GET.get('name')
+        x_cell_coord = request.GET.get('x')
+        y_cell_coord = request.GET.get('y')
+        z_cell_coord = request.GET.get('z')
+        
+        cell = Storage.objects.get(
+            storage_name=storage_name,
+            x_cell_coord=x_cell_coord,
+            y_cell_coord=y_cell_coord,
+            z_cell_coord=z_cell_coord
+        )
+        
+        data = {
+            
+        }
+        
+        return JsonResponse(data=data, status=200)
