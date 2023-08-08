@@ -14,7 +14,7 @@
             maxScale = 2,
             maxScaleSpace = 4.25,
             barerPercentage = 50,
-            wsStart = 'ws://'
+            wsStart = 'ws://',
         loc = window.location;
         if (loc.protocol == 'https:') {
             wsStart = 'wss://'
@@ -30,7 +30,7 @@
         $(storage_socket).on('message', function(event){
             var data = JSON.parse(event.originalEvent.data),
                 message = JSON.parse(data['message']);
-            processMessage(message,LockStorage)
+            processMessage(message)
         })
         storage_socket.onclose = event => {
             var storage_socket = new WebSocket(wsStart+window.location.hostname+':'+window.location.port+'/ws/storage-ws/'+WORKER_ID)

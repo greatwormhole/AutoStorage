@@ -182,8 +182,7 @@ function buildStorages(storageList,LockStorage,storageInfo){
                         percent = storageCell[rowIdx][columnIdx][idx][0][3]
                     color = 'rgb('+color[0]+','+color[1]+','+color[2]+')'
 
-                    if (typeof LockStorage[storageName][rowIdx+'_'+columnIdx+'_'+idx]!='undefined'){
-                        console.log(LockStorage[storageName][rowIdx+'_'+columnIdx+'_'+idx])
+                    if (typeof LockStorage[storageName][columnIdx+'_'+rowIdx+'_'+idx]!='undefined'){
                         color = 'rgb(61,61, 61);'
                     }
                     if (scaleXList[idx]>maxScale){
@@ -304,21 +303,25 @@ function getStorageInfo(url){
 }
 
 
-function processMessage(message,LockStorage){
+function processMessage(message){
+    LockStorage = getStorageInfo(storageLockUrl)
     message.forEach(function(elem){
         var percent = elem['fullness'],
             origin_percent = elem['origin_fullness']
         if (typeof percent != 'undefined'){
             var color = calculate([96, 255, 68],[255,0,0], percent/100)
             if (elem['is_blocked'] == true){
-                color = 'rgb(61, 61, 61);'
+                color = [61,61,61]
+
+
             }
             $('#'+elem['y_coord']+'_'+elem['x_coord']+'_'+elem['z_coord']+'_'+elem['storage_name']+'_cell').css({'background':'rgb('+color[0]+','+color[1]+','+color[2]+')'})
         }
         if (typeof origin_percent != 'undefined'){
             var color = calculate([96, 255, 68],[255,0,0], origin_percent/100)
             if (elem['is_blocked_origin'] == true){
-                color = 'rgb(61, 61, 61);'
+                color = [61,61,61]
+
             }
             $('#'+elem['y_coord_origin_cell']+'_'+elem['x_coord_origin_cell']+'_'+elem['z_coord_origin_cell']+'_'+elem['storage_name_origin']+'_cell').css({'background':'rgb('+color[0]+','+color[1]+','+color[2]+')'})
         }
