@@ -5,6 +5,8 @@ static_cache_keys = {
     'storage_viewers': 'storage_subscribers',
     'blocked_cells': 'blocked_cells',
     'full_info_cells': 'full_info_cells',
+    'ws_messages': 'ws_messages',
+    'ws_connections': 'ws_connections',
 }
 
 def set_cache(key, data, as_list=True):

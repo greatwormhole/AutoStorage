@@ -74,3 +74,18 @@ def full_cell_info():
         # }
         
     return data
+
+def blocked_cell_info():
+    
+    storage_names = Storage.objects.all().values_list('storage_name', flat=True).distinct()
+    
+    data = {
+        storage_name: {
+            f'{cell.x_cell_coord}_{cell.y_cell_coord}_{cell.z_cell_coord}': cell.full_percent
+            for cell in storage if cell.is_blocked
+        }
+        for storage_name in storage_names
+        if (storage := Storage.objects.filter(storage_name=storage_name))
+    }
+
+    return data

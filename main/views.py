@@ -1,16 +1,12 @@
-from django.http import JsonResponse, HttpResponse, FileResponse
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
 from django.views import View
 from django.core import serializers
-from django.db import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
-
-import os
 
 from .decorators import check_access
 from .WS_cache import WS_CACHE_CONNECTION
 from .models import Worker, THD, Crates, Storage, ProductionStorage
-from Apro.settings import MEDIA_ROOT
 
 import json
 

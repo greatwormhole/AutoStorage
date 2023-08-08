@@ -1,14 +1,14 @@
 from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse
 from django.views import View
-from django.core import serializers
+from django.core import serializers, exceptions
 
 from main.decorators import check_access
 from main.models import THD, Nomenclature, DeliveryNote, Worker, Crates, Storage, TempCrate, ProductionStorage
 from main.utils import generate_nomenclature_barcode
 from .calculate_planning import handle_calculations
 from main.caching import get_cache, set_cache, static_cache_keys
-from storage.storage_visual import full_cell_info
+from storage.storage_visual import full_cell_info, blocked_cell_info
 
 import json
 from datetime import datetime as dt
@@ -363,16 +363,7 @@ class BlockedStoragesView(View):
         if cached_blocked_cells is not None:
             return JsonResponse(data=cached_blocked_cells, status=200)
         
-        storage_names = Storage.objects.all().values_list('storage_name', flat=True).distinct()
-        
-        data = {
-            storage_name: {
-                f'{cell.x_cell_coord}_{cell.y_cell_coord}_{cell.z_cell_coord}': cell.full_percent
-                for cell in storage if cell.is_blocked
-            }
-            for storage_name in storage_names
-            if (storage := Storage.objects.filter(storage_name=storage_name))
-        }
+        data = blocked_cell_info()
         
         set_cache(static_cache_keys['blocked_cells'], data, as_list=False)
         
@@ -387,12 +378,15 @@ class CellContentView(View):
         y_cell_coord = request.GET.get('y')
         z_cell_coord = request.GET.get('z')
         
-        cell = Storage.objects.get(
-            storage_name=storage_name,
-            x_cell_coord=x_cell_coord,
-            y_cell_coord=y_cell_coord,
-            z_cell_coord=z_cell_coord
-        )
+        try:
+            cell = Storage.objects.get(
+                storage_name=storage_name,
+                x_cell_coord=x_cell_coord,
+                y_cell_coord=y_cell_coord,
+                z_cell_coord=z_cell_coord
+            )
+        except exceptions.ObjectDoesNotExist:
+            return JsonResponse({'status': False, 'error': 'Ячейки с такими координатами не существует'}, status=404)
         
         crates = cell.crates.all()
         

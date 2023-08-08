@@ -5,15 +5,20 @@ from channels.auth import AuthMiddlewareStack
 
 import main.routing
 from main.caching import set_cache, get_cache, static_cache_keys
-from storage.storage_visual import full_cell_info
+from storage.storage_visual import full_cell_info, blocked_cell_info
 
 def setup():
     
-    cached = get_cache(static_cache_keys['full_info_cells'], None)
+    cached_info = get_cache(static_cache_keys['full_info_cells'], None)
+    cached_blocked = get_cache(static_cache_keys['blocked_cells'], None)
 
-    if cached is None:
+    if cached_info is None:
         data = full_cell_info()
         set_cache(static_cache_keys['full_info_cells'], data, as_list=False)
+        
+    if cached_blocked is None:
+        data = blocked_cell_info()
+        set_cache(static_cache_keys['blocked_cells'], data, as_list=False)
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Apro.settings')
 
@@ -28,4 +33,4 @@ application = ProtocolTypeRouter({
 
 })
 
-# setup()
+setup()
