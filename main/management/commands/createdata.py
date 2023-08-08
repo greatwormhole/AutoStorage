@@ -5,7 +5,7 @@ from django.db import transaction
 
 from main.factories import *
 
-CRATE_NUM = 1
+CRATE_NUM = 1000
 WORKER_NUM = 10
 NOMENCLATURE_NUM = 20
 CELLS_PER_STORAGE = 5

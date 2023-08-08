@@ -78,7 +78,7 @@ def on_change(instance: Crates, **kwargs):
                 'origin_fullness': instance.__original_cell.full_percent if instance.__original_cell != None else '',
                 'fullness': instance.cell.full_percent if instance.cell != None else '',
                 'is_blocked': instance.cell.is_blocked,
-                'is_blocked_origin': instance.__original_cell.is_blocked,
+                'is_blocked_origin': instance.__original_cell.is_blocked if instance.__original_cell != None else '',
         }
 
         storage_name = instance.cell.storage_name

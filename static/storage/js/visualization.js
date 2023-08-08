@@ -1,6 +1,18 @@
 function bouncer(arr) {
   return arr.filter( function(v){return !(v !== v);});
 }
+function dictWrite(dict, key){
+    if (typeof dict[key] == 'undefined'){
+        dict[key] = 1
+    } else {
+        dict[key]++
+    }
+}
+function placeCount(dict,id,text){
+    Object.keys(dict).forEach((key) => {
+        $('#'+key+id).text(text+dict[key])
+    })
+}
 function null2empty(array){
     array.forEach(function(elem, idx){
         var yIdx = idx
@@ -42,16 +54,11 @@ function counter(LockStorage){
             globalEmptyValue++
             dictWrite(emptyValue, storageName)
         } else if (percent>barerPercentage/100 && typeof LockStorage[storageName][id.split('_')[1]+'_'+id.split('_')[0]+'_'+id.split('_')[2]] != 'undefined'){
-            console.log(percent)
             globalLockFullValue++
             dictWrite(lockFullValue, storageName)
-
-            $($cells[elem]).css('background','#3d3d3d')
         } else if (percent<barerPercentage/100 && typeof LockStorage[storageName][id.split('_')[1]+'_'+id.split('_')[0]+'_'+id.split('_')[2]] != 'undefined'){
             globalLockValue++
             dictWrite(LockValue, storageName)
-
-            $($cells[elem]).css('background','#3d3d3d')
         }
     })
 
@@ -113,7 +120,7 @@ function zeroCountNum(arr){
     return count
 }
 //build storage plan
-function buildStorages(storageList,storageFullInfo,LockStorage,storageInfo){
+function buildStorages(storageList,LockStorage,storageInfo){
     var storageList = JSON.parse(storageList.replaceAll('&#x27;','"')),
         cellPleasesArray = [],
         cells = []
@@ -123,7 +130,6 @@ function buildStorages(storageList,storageFullInfo,LockStorage,storageInfo){
             storageName=storageList[i]
         cellPleasesArray.push(storageCell)
         cellInformation = cellPleasesArray
-        console.log(storageCell)
         var storageDiv = $('#' + storageList[i]),
             screenWidth = parseInt($('#view-space').css('width')),
             height = storageCell.map((elem) => elem[0][0][1]).reduce((partialSum, a) => partialSum + a, 0)*Math.max.apply(Math,bouncer(storageCell.map((elem) => Math.max.apply(Math, elem.map((elem) => elem.length))))),
@@ -147,21 +153,24 @@ function buildStorages(storageList,storageFullInfo,LockStorage,storageInfo){
                 for (let j=0; j<row[i].length; j++){
                     if (typeof countLayer[j] == 'undefined'){
                         countLayer[j] = 1
-                        scaleXList[j] = row[i][j][0]
+                        scaleXList[j] = parseInt(row[i][j][0])
                         planLayer.push([1])
                     } else {
                         countLayer[j] += 1
-                        scaleXList[j] += row[i][j][0]
+                        scaleXList[j] += parseInt(row[i][j][0])
                         planLayer[j].push(1)
                     }
                 }
             }
 
             lengthList = scaleXList
+
             scaleXList = scaleXList.map((length, idx) => (screenWidth-planLayer[idx].length*8)/(length/(zeroCount(planLayer[idx]))))
+
             row.forEach(function(column, idx){
                 var columnIdx = idx
                 column.forEach(function(layer,idx){
+
                     if ($('#'+idx+'_'+rowIdx+'_st_layer_'+storageName).length==0){
                     var htmlLayer = '<div id="'+idx+'_'+rowIdx+'_st_layer_'+storageName+'" class="storageLayer">'
                     htmlLayer += '</div>'
@@ -169,16 +178,20 @@ function buildStorages(storageList,storageFullInfo,LockStorage,storageInfo){
                     }
 
 
-                    var color = calculate([96, 255, 68],[255,0,0],storageCell[rowIdx][columnIdx][idx][3]),
-                        percent = storageCell[rowIdx][columnIdx][idx][3]
+                    var color = calculate([96, 255, 68],[255,0,0],storageCell[rowIdx][columnIdx][idx][0][3]/100),
+                        percent = storageCell[rowIdx][columnIdx][idx][0][3]
                     color = 'rgb('+color[0]+','+color[1]+','+color[2]+')'
 
+                    if (typeof LockStorage[storageName][rowIdx+'_'+columnIdx+'_'+idx]!='undefined'){
+                        console.log(LockStorage[storageName][rowIdx+'_'+columnIdx+'_'+idx])
+                        color = 'rgb(61,61, 61);'
+                    }
                     if (scaleXList[idx]>maxScale){
-                        var html = '<div class = "storageCell" id = "'+rowIdx+'_'+columnIdx+'_'+idx+'_'+storageName+'_cell" style = "width:'+layer[0]*maxScale+'px; height:'+layer[1]*maxScale+'px; background:'+color+'">'+idx
+                        var html = '<div class = "storageCell" id = "'+rowIdx+'_'+columnIdx+'_'+idx+'_'+storageName+'_cell" style = "width:'+layer[0][0]*maxScale+'px; height:'+layer[0][1]*maxScale+'px; background:'+color+'">'+idx
                         html += '</div>'
                         $('#'+idx+'_'+rowIdx+'_st_layer_'+storageName).append(html)
                     } else{
-                        var html = '<div class = "storageCell" id = "'+rowIdx+'_'+columnIdx+'_'+idx+'_'+storageName+'_cell" style = "width:'+layer[0]*scaleXList[idx]+'px; height:'+layer[1]*scaleXList[idx]+'px; background:'+color+'">'+idx
+                        var html = '<div class = "storageCell" id = "'+rowIdx+'_'+columnIdx+'_'+idx+'_'+storageName+'_cell" style = "width:'+layer[0][0]*scaleXList[idx]+'px; height:'+layer[0][1]*scaleXList[idx]+'px; background:'+color+'">'+idx
                         html += '</div>'
                         $('#'+idx+'_'+rowIdx+'_st_layer_'+storageName).append(html)
                     }
@@ -192,6 +205,7 @@ function buildStorages(storageList,storageFullInfo,LockStorage,storageInfo){
                 })
             })
         })
+        counter(LockStorage)
        storageMargin(storageCell,storageName,false)
 
 
@@ -290,20 +304,24 @@ function getStorageInfo(url){
 }
 
 
-function processMessage(message){
+function processMessage(message,LockStorage){
     message.forEach(function(elem){
         var percent = elem['fullness'],
             origin_percent = elem['origin_fullness']
         if (typeof percent != 'undefined'){
             var color = calculate([96, 255, 68],[255,0,0], percent/100)
-
+            if (elem['is_blocked'] == true){
+                color = 'rgb(61, 61, 61);'
+            }
             $('#'+elem['y_coord']+'_'+elem['x_coord']+'_'+elem['z_coord']+'_'+elem['storage_name']+'_cell').css({'background':'rgb('+color[0]+','+color[1]+','+color[2]+')'})
-
         }
         if (typeof origin_percent != 'undefined'){
             var color = calculate([96, 255, 68],[255,0,0], origin_percent/100)
+            if (elem['is_blocked_origin'] == true){
+                color = 'rgb(61, 61, 61);'
+            }
             $('#'+elem['y_coord_origin_cell']+'_'+elem['x_coord_origin_cell']+'_'+elem['z_coord_origin_cell']+'_'+elem['storage_name_origin']+'_cell').css({'background':'rgb('+color[0]+','+color[1]+','+color[2]+')'})
-
         }
     })
+    counter(LockStorage)
 }

@@ -116,50 +116,57 @@ class storageVisualization(View):
 class storageInfo(View):
 
     def get(self, request):
-        
+
         cached = get_cache(static_cache_keys['full_info_cells'], None)
-        
-        # if cached is not None:
-        #     return JsonResponse(data=cached, status=200)
-        
+
+        if cached is not None:
+            return JsonResponse(data=cached, status=200)
+
         storage_names = Storage.objects.all().values_list('storage_name', flat=True).distinct()
         data = {}
-        
+
         for storage_name in storage_names:
-            
-                storage = Storage.objects.filter(storage_name=storage_name)
-                y_of_storage = list(storage.values_list('y_cell_coord', flat=True).distinct().order_by('y_cell_coord'))
-                x_of_storage = list(storage.values_list('x_cell_coord', flat=True).distinct().order_by('x_cell_coord'))
-                z_of_storage = list(storage.values_list('z_cell_coord', flat=True).distinct().order_by('z_cell_coord'))
-                
-                for y in y_of_storage:
-                    for x in x_of_storage:
-                        for z in z_of_storage:
-                            print(y, x, z)
-                            # sleep(1)
-                            
-                            if data.get(storage_name, None) is None:
-                                data[storage_name] = []
-                            if len(data[storage_name]) <= y:
-                                data[storage_name].append([])
-                            try:
-                                cell = storage.get(
-                                    Q(x_cell_coord=x) &
-                                    Q(y_cell_coord=y) &
-                                    Q(z_cell_coord=z) &
-                                    Q(storage_name=storage_name)
-                                )
-                            except ObjectDoesNotExist:
-                                data[storage_name][y].append(None)
-                            # print(data[storage_name][y])
-                            if len(data[storage_name][y]) <= x:
-                                data[storage_name][y].append([])
-                            if data[storage_name][y][-1] is None:
-                                continue
-                            if len(data[storage_name][y][x]) <= z:
-                                data[storage_name][y][x].append([])
-                            data[storage_name][y][x][z].append([cell.visualization_y, cell.visualization_x, cell.visualization_z, cell.full_percent])
-        
+
+            storage = Storage.objects.filter(storage_name=storage_name)
+            y_of_storage = list(storage.values_list('y_cell_coord', flat=True).distinct().order_by('y_cell_coord'))
+            x_of_storage = list(range(max(list(storage.values_list('x_cell_coord', flat=True))) + 1))
+            z_of_storage = list(storage.values_list('z_cell_coord', flat=True).distinct().order_by('z_cell_coord'))
+            #print(y_of_storage)
+            #print(x_of_storage)
+            #print(z_of_storage)
+            if data.get(storage_name, None) is None:
+                data[storage_name] = []
+
+            for y in y_of_storage:
+                if len(data[storage_name]) <= y:
+                    data[storage_name].append([])
+
+                for x in x_of_storage:
+
+                    tmp = storage.filter(
+                        Q(x_cell_coord=x) &
+                        Q(y_cell_coord=y) &
+                        Q(storage_name=storage_name)
+                    )
+                    #print(list(tmp))
+
+                    if list(tmp) == []:
+                        data[storage_name][y].append(None)
+                        continue
+                    else:
+                        data[storage_name][y].append([])
+
+                    for z in z_of_storage:
+                        #print(y, x, z)
+                        try:
+                            cell = tmp.get(z_cell_coord=z)
+                        except ObjectDoesNotExist:
+                            continue
+                        if len(data[storage_name][y][x]) <= z:
+                            data[storage_name][y][x].append([])
+                        data[storage_name][y][x][z].append(
+                            [cell.visualization_y, cell.visualization_x, cell.visualization_z, cell.full_percent])
+
         # data = {
         #     storage_name: {
         #         y: {
@@ -186,11 +193,10 @@ class storageInfo(View):
         #     if (storage := Storage.objects.filter(storage_name=storage_name)) and
         #     (coords := list(storage.values_list('y_cell_coord', 'x_cell_coord', 'z_cell_coord')))
         # }
-        
-        set_cache(static_cache_keys['full_info_cells'], data, as_list=False)
-        
-        return JsonResponse(data=data, status=200)
 
+        set_cache(static_cache_keys['full_info_cells'], data, as_list=False)
+
+        return JsonResponse(data=data, status=200)
 class NomenclatureView(View):
 
     """
