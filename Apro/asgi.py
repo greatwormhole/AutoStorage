@@ -5,7 +5,7 @@ from channels.auth import AuthMiddlewareStack
 
 import main.routing
 from main.caching import set_cache, get_cache, static_cache_keys
-from main.storage_visual import full_cell_info
+from storage.storage_visual import full_cell_info
 
 def setup():
     
@@ -28,4 +28,4 @@ application = ProtocolTypeRouter({
 
 })
 
-setup()
+# setup()

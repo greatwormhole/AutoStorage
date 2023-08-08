@@ -1,13 +1,11 @@
 from django.dispatch import receiver
 from django.db.models.signals import pre_save, post_save, post_delete
-from django.db.models import Q
-from django.core.exceptions import ObjectDoesNotExist
 
 from Apro.settings import DEBUG
 from .models import Worker, Crates, TempCrate, TEXT_ID_RANK, Storage
 from .utils import generate_worker_barcode
 from .caching import set_cache, get_cache, static_cache_keys
-from main.storage_visual import full_cell_info
+from storage.storage_visual import full_cell_info
 
 if not DEBUG:        
     @receiver(post_save, sender=Worker)

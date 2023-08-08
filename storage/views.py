@@ -8,7 +8,7 @@ from main.models import THD, Nomenclature, DeliveryNote, Worker, Crates, Storage
 from main.utils import generate_nomenclature_barcode
 from .calculate_planning import handle_calculations
 from main.caching import get_cache, set_cache, static_cache_keys
-from main.storage_visual import full_cell_info
+from storage.storage_visual import full_cell_info
 
 import json
 from datetime import datetime as dt
@@ -118,77 +118,7 @@ class storageInfo(View):
         if cached is not None:
             return JsonResponse(data=cached, status=200)
 
-        storage_names = Storage.objects.all().values_list('storage_name', flat=True).distinct()
-        data = {}
-
-        for storage_name in storage_names:
-
-            storage = Storage.objects.filter(storage_name=storage_name)
-            y_of_storage = list(storage.values_list('y_cell_coord', flat=True).distinct().order_by('y_cell_coord'))
-            x_of_storage = list(range(max(list(storage.values_list('x_cell_coord', flat=True))) + 1))
-            z_of_storage = list(storage.values_list('z_cell_coord', flat=True).distinct().order_by('z_cell_coord'))
-            #print(y_of_storage)
-            #print(x_of_storage)
-            #print(z_of_storage)
-            if data.get(storage_name, None) is None:
-                data[storage_name] = []
-
-            for y in y_of_storage:
-                if len(data[storage_name]) <= y:
-                    data[storage_name].append([])
-
-                for x in x_of_storage:
-
-                    tmp = storage.filter(
-                        Q(x_cell_coord=x) &
-                        Q(y_cell_coord=y) &
-                        Q(storage_name=storage_name)
-                    )
-                    #print(list(tmp))
-
-                    if list(tmp) == []:
-                        data[storage_name][y].append(None)
-                        continue
-                    else:
-                        data[storage_name][y].append([])
-
-                    for z in z_of_storage:
-                        #print(y, x, z)
-                        try:
-                            cell = tmp.get(z_cell_coord=z)
-                        except ObjectDoesNotExist:
-                            continue
-                        if len(data[storage_name][y][x]) <= z:
-                            data[storage_name][y][x].append([])
-                        data[storage_name][y][x][z].append(
-                            [cell.visualization_y, cell.visualization_x, cell.visualization_z, cell.full_percent])
-
-        # data = {
-        #     storage_name: {
-        #         y: {
-        #             x: {
-        #                 z: [
-        #                     cell.visualization_y,
-        #                     cell.visualization_x,
-        #                     cell.visualization_z,
-        #                     cell.full_percent,
-        #                 ]
-        #                 for z in [*map(lambda i: i[2], coords)]
-        #                 if (cell := storage.get(
-        #                     Q(x_cell_coord=x) &
-        #                     Q(y_cell_coord=y) &
-        #                     Q(z_cell_coord=z) &
-        #                     Q(storage_name=storage_name)
-        #                 ))
-        #             }
-        #             for x in [*map(lambda i: i[1], coords)]
-        #         }
-        #         for y in [*map(lambda i: i[0], coords)]
-        #     }
-        #     for storage_name in storage_names
-        #     if (storage := Storage.objects.filter(storage_name=storage_name)) and
-        #     (coords := list(storage.values_list('y_cell_coord', 'x_cell_coord', 'z_cell_coord')))
-        # }
+        data = full_cell_info()
 
         set_cache(static_cache_keys['full_info_cells'], data, as_list=False)
 
