@@ -19,7 +19,7 @@ def setup():
     if cached_info is None:
         data = full_cell_info()
         set_cache(static_cache_keys['full_info_cells'], data, as_list=False)
-        
+
     if cached_blocked is None:
         data = blocked_cell_info()
         set_cache(static_cache_keys['blocked_cells'], data, as_list=False)
