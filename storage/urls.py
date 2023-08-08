@@ -18,6 +18,7 @@ urlpatterns = [
     path('API/storage-info', storageInfo.as_view(), name='cells'),
     path('API/storage-list', AllStorageList.as_view(), name='storage_fullness'),
     path('API/check-blocked-cells', BlockedStoragesView.as_view(), name='check_blocked_cells'),
+    path('API/cell-content', CellContentView.as_view(), name='get_cell_content'),
 ]
 
 if settings.DEBUG:

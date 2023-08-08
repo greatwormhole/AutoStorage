@@ -394,8 +394,6 @@ class CellContentView(View):
             z_cell_coord=z_cell_coord
         )
         
-        data = {
-            
-        }
+        crates = cell.crates.all()
         
-        return JsonResponse(data=data, status=200)
+        return HttpResponse(serializers.serialize('json', crates), content_type='application/json')
