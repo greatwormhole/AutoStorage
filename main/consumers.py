@@ -36,13 +36,14 @@ class consumerInfinityThread(object):
 
         while not self.threading.stopped():
 
-            time.sleep(1)
-            
+            time.sleep(30)
             match type:
                 case 'get_crates_cache':
                     message = json.dumps(get_cache(static_cache_keys['moving_crates']))
                 case _:
                     message = 'true'
+            delete_cache_dict(static_cache_keys['moving_crates'])
+
             if message != 'null':
                 async_to_sync (self.consumer.channel_layer.group_send)(self.consumer.room_name, {
                     "type": "chat.message",
@@ -175,4 +176,4 @@ class StorageVisualizingWS(AsyncWebsocketConsumer):
                 "room": event["room_id"],
                 "message": event["message"],
             }))
-        delete_cache_dict(static_cache_keys['moving_crates'])
+

@@ -4,11 +4,12 @@
   <script  src="{% static 'storage/js/visualization.js' %}" rel="stylesheet" ></script>
   <link rel="stylesheet" href="{% static 'storage/css/visualization.css' %}">
   <script>
-        const storageList = '{{storage_list}}',
+        const storageListStr = '{{storage_list}}',
             getCellsUrl = "{% url 'cells' %}",
             storageFullnessUrl = "{% url 'storage_fullness' %}",
             storageLockUrl = "{% url 'check_blocked_cells' %}"
         var marginStep = 0,
+            storageList = JSON.parse(storageListStr.replaceAll('&#x27;','"')),
             marginLeft = 5,
             cellInformation = [],
             maxScale = 2,
@@ -23,14 +24,13 @@
 
         var LockStorage = getStorageInfo(storageLockUrl),
             storageInfo = getStorageInfo(getCellsUrl)
-        console.log(storageInfo)
         canvasDraw()
         buildStorages(storageList,LockStorage,storageInfo)
         var storage_socket = new WebSocket(wsStart+window.location.hostname+':'+window.location.port+'/ws/storage-ws/'+WORKER_ID)
         $(storage_socket).on('message', function(event){
             var data = JSON.parse(event.originalEvent.data),
                 message = JSON.parse(data['message']);
-            processMessage(message)
+            processMessage(message,storageList)
         })
         storage_socket.onclose = event => {
             var storage_socket = new WebSocket(wsStart+window.location.hostname+':'+window.location.port+'/ws/storage-ws/'+WORKER_ID)

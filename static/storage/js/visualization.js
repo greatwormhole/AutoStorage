@@ -1,3 +1,4 @@
+
 function bouncer(arr) {
   return arr.filter( function(v){return !(v !== v);});
 }
@@ -7,6 +8,9 @@ function dictWrite(dict, key){
     } else {
         dict[key]++
     }
+}
+function dictWriteNull(dict, key){
+     dict[key] = 0
 }
 function placeCount(dict,id,text){
     Object.keys(dict).forEach((key) => {
@@ -26,7 +30,7 @@ function null2empty(array){
     return array
 }
 //counter edit
-function counter(LockStorage){
+function counter(LockStorage,storageList){
     var $cells = $('.storageCell'),
         globalLockValue = 0,
         globalLockFullValue = 0,
@@ -36,12 +40,16 @@ function counter(LockStorage){
         fullValue = {},
         globalEmptyValue = 0,
         emptyValue = {}
-
+    storageList.forEach(function(elem){
+        LockValue[elem] = 0
+        lockFullValue[elem] = 0
+        fullValue[elem] = 0
+        emptyValue[elem] = 0
+    })
     $cells.each(function(elem){
         var percent = percentUsingColor([96, 255, 68],[255,0,0],$($cells[elem]).css('background-color').replace('rgb(','').replace(')','').split(',')),
             id = $cells[elem].id,
             storageName = id.split('_')[3]
-
         if ($($cells[elem]).css('background-color') == 'rgb(61, 61, 61)'){
             percent = LockStorage[storageName][id.split('_')[1]+'_'+id.split('_')[0]+'_'+id.split('_')[2]]/100
 
@@ -121,9 +129,9 @@ function zeroCountNum(arr){
 }
 //build storage plan
 function buildStorages(storageList,LockStorage,storageInfo){
-    var storageList = JSON.parse(storageList.replaceAll('&#x27;','"')),
-        cellPleasesArray = [],
+    var cellPleasesArray = [],
         cells = []
+
     for (let i=0; i<storageList.length; i++){
         var storageCell = null2empty(storageInfo[storageList[i]]),
             rowNumber,
@@ -204,7 +212,7 @@ function buildStorages(storageList,LockStorage,storageInfo){
                 })
             })
         })
-        counter(LockStorage)
+        counter(LockStorage,storageList)
        storageMargin(storageCell,storageName,false)
 
 
@@ -275,7 +283,7 @@ function canvasDraw(){
 
 function OCStorage(id){
     var storage=id.replace('_OC',''),
-        storageNameList = JSON.parse(storageList.replaceAll('&#x27;','"'))
+        storageNameList = storageList
     if ($('#'+id).css('transform') == 'none' || $('#'+id).css('transform') == 'matrix(1, 0, 0, 1, 0, 0)'){
         $('#'+storage).children().css({'margin-top':'0px','margin-bottom':'0px'})
         storageMargin(cellInformation[storageNameList.indexOf(storage)],storage,false)
@@ -303,7 +311,7 @@ function getStorageInfo(url){
 }
 
 
-function processMessage(message){
+function processMessage(message,storageList){
     LockStorage = getStorageInfo(storageLockUrl)
     message.forEach(function(elem){
         var percent = elem['fullness'],
@@ -326,5 +334,5 @@ function processMessage(message){
             $('#'+elem['y_coord_origin_cell']+'_'+elem['x_coord_origin_cell']+'_'+elem['z_coord_origin_cell']+'_'+elem['storage_name_origin']+'_cell').css({'background':'rgb('+color[0]+','+color[1]+','+color[2]+')'})
         }
     })
-    counter(LockStorage)
+    counter(LockStorage,storageList)
 }
