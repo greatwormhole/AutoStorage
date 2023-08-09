@@ -40,8 +40,6 @@ function addRow(){
     html += '<span id="'+id+'_unit"></span>'
     html += '</td>'
     html += '<td>'
-    html += '<button class="print-mark-button">'
-    html += '</button>'
     html += '<button class="delete-row-button" id = "'+id+'_delete" onclick="deleteTableRow(this.id)">'
     html += '</button>'
     html += '</td>'
@@ -79,3 +77,51 @@ function addRow(){
         } else {return true}
     })
     }
+//delete row
+
+function deleteTableRow(id){
+    let isDelete = confirm("Удалить строку номенклатуры?");
+    if (isDelete){
+        $('#'+id.split("_")[0]).remove()
+    }
+}
+// save note
+function saveDefProdNote(){
+    var dataItems = [],
+        data = {}
+    let isSave = confirm("Уверены что хотите сохранить акт выбраковки?");
+    if (isSave){
+        if (typeof $($('.main-table-row')[$('.main-table-row').length-1]).attr('id') == 'undefined'){
+            return alert('Накладная заполнена не полностью!')
+        }
+        for (let i = 0; i<=parseInt($($('.main-table-row')[$('.main-table-row').length-1]).attr('id')); i++){
+            var articule = $('#'+i+'_articule_span').text(),
+                nomenclature = $('#'+i+'_select_nomenclature').val(),
+                count = $('#'+i+'_count').val(),
+                unit = $('#'+i+'_unit').text()
+            var dataRow = {'articule':articule, 'nomenclature':nomenclature, 'count':count, 'unit':unit}
+            console.log($('#'+i+'_articule_span').length)
+            if(articule == '' || nomenclature == 'Добавьте номенклатуру!' || count == '' || unit == ''){
+                return alert('Акт заполнен не полностью!')
+            }
+            dataItems.push(dataRow)
+        }
+        data = {"worker_id": $('#worker_id').text(),
+                "datetime": $('#date').text(),
+                "dataItems":dataItems
+                }
+        $.ajax({
+                method:"POST",
+                async: true,
+                url: defectiveProdSaveActUrl,
+                data: JSON.stringify({'data': data}),
+                success: function (response){
+                    window.onbeforeunload = null;
+                    location.reload()
+                },
+                error: function (request){
+                    alert('Ошибка при сохранении, попробуйте позже!')
+                }
+        })
+    }
+}

@@ -4,7 +4,8 @@ var pathList = {
     'broken-parts-in': brokenPartsIn,
     'parts-in-factory': productionStorage,
     'search':storageNavigation,
-    'visualise-storage':storageVisualizationUrl
+    'visualise-storage':storageVisualizationUrl,
+    'flaw-send':brokenPartsIn
 }
 function redirect(idList){
 
@@ -65,8 +66,8 @@ $(document).ready(function(){
     if (JSON.parse(rights)["quality_control_right"] == true){
         var html = "<div class = 'rights'>"
         html += "<h2 class = 'text'>Отдел качества</h2>"
-        html += "<button class = 'quality'>"
-        html += "<div class = 'consignment-note-sign' id = 'flaw-send'></div>"
+        html += "<button class = 'quality' id = 'flaw-send'>"
+        html += "<div class = 'consignment-note-sign'></div>"
         html += "<span class = 'text' >Внести бракованные изделия.</span>"
         html += "</button>"
         html += "<button class = 'quality'>"
@@ -75,6 +76,7 @@ $(document).ready(function(){
         html += "</button>"
         html += "</div>"
         $('#button-panel').append(html)
+        redirect(['flaw-send'])
     }
 
 })

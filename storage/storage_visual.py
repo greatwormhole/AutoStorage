@@ -39,7 +39,6 @@ def full_cell_info():
                 for z in z_of_storage:
                     try:
                         cell = tmp.get(z_cell_coord=z)
-                        print(y, x, z)
                     except ObjectDoesNotExist:
                         continue
                     if len(data[storage_name][y][x]) <= z:

@@ -9,6 +9,13 @@ from .utils import generate_worker_barcode
 from .caching import set_cache, get_cache, static_cache_keys
 from storage.storage_visual import full_cell_info
 
+def rank(id):
+    counter = 0
+    while id != 0:
+        id //= 10
+        counter += 1
+    return counter
+
 if not DEBUG:        
     @receiver(post_save, sender=Worker)
     def create_barcode(instance, created, **kwargs):
@@ -18,7 +25,9 @@ if not DEBUG:
 @receiver(post_save, sender=RejectionAct)
 def on_change(instance, created, **kwargs):
     if created:
-        generate_worker_barcode(instance.id, dt.strftime(instance.datetime, '%d-%m-%Y %H:%M:%S'))
+        zero_amount = TEXT_ID_RANK - rank(instance.id)
+        text_id = zero_amount * '0' + str(instance.id)
+        generate_worker_barcode(text_id, dt.strftime(instance.datetime, '%d-%m-%Y %H:%M:%S'))
     
 @receiver(post_save, sender=TempCrate)
 def on_save(sender, instance, created, **kwargs):

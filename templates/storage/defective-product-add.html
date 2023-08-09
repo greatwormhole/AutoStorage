@@ -54,7 +54,8 @@
     <script>
         var nomenclature = {}
         const getNomenclature = "{% url 'get_all_nomenclature' %}",
-              home = "{% url 'home' %}"
+              home = "{% url 'home' %}",
+              defectiveProdSaveActUrl = "{% url 'save_rejection_act' %}"
         $(document).ready(function(){
             $('#date').text(new Date().toLocaleDateString() + ' '+ new Date().toLocaleTimeString())
             nomenclature = ajaxGet(getNomenclature)
@@ -71,7 +72,7 @@
         <div id = "view-space">
             <div class="note-header">
                 <h3 class="sign main-sign">Акт выбраковки.</h3>
-                <button class="save-button" onclick=""></button>
+                <button class="save-button" onclick="saveDefProdNote()"></button>
             </div>
             <h5 class="sign">Общие сведения.</h5>
             <div class="scroll-table" style="height:70px; margin-bottom:0px;">

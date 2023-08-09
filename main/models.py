@@ -87,7 +87,7 @@ class RejectionAct(models.Model):
     article_list = models.TextField(null=True, blank=True)
     
     def __str__(self):
-        return ''
+        return f'{self.datetime}'
     
     class Meta:
         verbose_name = 'Акт выбраковки'
@@ -203,7 +203,7 @@ class Flaw(models.Model):
     decision = models.BooleanField(blank=True, null=True)
     
     def __str__(self):
-        return f'{self.nomenclature}'
+        return self.nomenclature.title
     
     class Meta:
         verbose_name = "Брак"
@@ -246,3 +246,15 @@ class TempCrate(models.Model):
     class Meta:
         verbose_name = 'Временная коробка'
         verbose_name_plural = 'Временные коробки'
+
+
+class settings(models.Model):
+    setting_name = models.CharField(max_length=250)
+    value = models.CharField(max_length=250)
+
+    def __str__(self):
+        return self.setting_name
+
+    class Meta:
+        verbose_name = 'Настройки'
+        verbose_name_plural = 'Настройки'

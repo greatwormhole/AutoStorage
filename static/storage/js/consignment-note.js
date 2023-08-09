@@ -150,6 +150,9 @@ function saveConsignmentNote(){
         data = {}
     let isSave = confirm("Уверены что хотите сохранить накладную?");
     if (isSave){
+        if (typeof $($('.main-table-row')[$('.main-table-row').length-1]).attr('id') == 'undefined'){
+            return alert('Накладная заполнена не полностью!')
+        }
         for (let i = 0; i<=parseInt($($('.main-table-row')[$('.main-table-row').length-1]).attr('id')); i++){
             var articule = $('#'+i+'_articule_span').text(),
                 nomenclature = $('#'+i+'_select_nomenclature').val(),
@@ -179,7 +182,7 @@ function saveConsignmentNote(){
                     location.href = home
                 },
                 error: function (request){
-
+                    alert('Ошибка при сохранении, попробуйте позже!')
                 }
             })
     }
