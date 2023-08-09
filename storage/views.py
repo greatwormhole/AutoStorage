@@ -389,7 +389,7 @@ class CellContentView(View):
             return JsonResponse({'status': False, 'error': 'Ячейки с такими координатами не существует'}, status=404)
         
         crates = cell.crates.all()
-        
+        print(crates)
         data = [
             {
                 'id': crate.text_id,
@@ -402,5 +402,5 @@ class CellContentView(View):
             }
             for crate in crates
         ]
-        
-        return JsonResponse(data=data, status=200)
+        print(data)
+        return JsonResponse(data=data, status=200, safe=False)

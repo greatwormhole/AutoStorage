@@ -7,7 +7,8 @@
         const storageListStr = '{{storage_list}}',
             getCellsUrl = "{% url 'cells' %}",
             storageFullnessUrl = "{% url 'storage_fullness' %}",
-            storageLockUrl = "{% url 'check_blocked_cells' %}"
+            storageLockUrl = "{% url 'check_blocked_cells' %}",
+            getCellContentUrl = "{% url 'get_cell_content' %}"
         var marginStep = 0,
             storageList = JSON.parse(storageListStr.replaceAll('&#x27;','"')),
             marginLeft = 5,
@@ -16,6 +17,7 @@
             maxScaleSpace = 4.25,
             barerPercentage = 50,
             wsStart = 'ws://',
+            percentForRow = 0.8
         loc = window.location;
         if (loc.protocol == 'https:') {
             wsStart = 'wss://'
@@ -39,7 +41,14 @@
                 message = JSON.parse(data['message']);
             })
         };
-
+        $(document).keyup(function(e) {
+            if (e.key === "Escape") {
+                if (typeof $('.create-info').attr('id') != 'undefined'){
+                    $('#'+$('.create-info').attr('id').replace('_visualizeInfo','')).css({'border':'1px solid gray'})
+                }
+                $('.create-info').remove()
+            }
+        });
       })
   </script>
 {% endblock %}

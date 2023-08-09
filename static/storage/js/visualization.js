@@ -230,6 +230,70 @@ function buildStorages(storageList,LockStorage,storageInfo){
         counter(LockStorage,storageList)
        storageMargin(storageCell,storageName,false)
     }
+    //информация о коробках в ячейке
+    $('.storageCell').on('click', function(event){
+        var id = event.target.id,
+            data = getCellContent(id),
+            parentWidth = parseInt($(event.target).parent().css('width')),
+            localX = event.target.offsetLeft
+        console.log(data)
+        const localY = event.target.offsetTop+parseInt($(event.target).css('height'))
+        if (parentWidth*0.25>localX ){
+            localX = event.target.offsetLeft
+        } else if(parentWidth*0.25<localX && parentWidth*0.75>localX){
+            console.log('ds')
+            localX = event.target.offsetLeft - 125 + parseInt($(event.target).css('width'))/2
+        } else if(parentWidth*0.75<localX){
+            localX = event.target.offsetLeft - 250 + parseInt($(event.target).css('width'))
+
+        }
+        if (typeof $('.create-info').attr('id') != 'undefined'){
+            $('#'+$('.create-info').attr('id').replace('_visualizeInfo','')).css({'border':'1px solid gray'})
+        }
+        $('.create-info').remove()
+        $(event.target).css({'border':'3px solid gold'})
+
+        var html = '<div id = "'+id+'_visualizeInfo" class="create-info" style="left:'+localX+'px;top:'+localY+'px">'
+        html+='<h6>Список номенклатуры в ячейке:</h6>'
+        html+='<div class="scroll-table">'
+        html+='<table>'
+        html+='<thead>'
+        html+='<tr>'
+        html+='<th>Номенклатура'
+        html+='</th>'
+        html+='<th>Кол-во'
+        html+='</th>'
+        html+='</tr>'
+        html+='</thead>'
+        html+='<tbody>'
+        if(data.length == 0){
+            html+='<tr>'
+            html+='<td style="width:100%">Пустая ячейка'
+            html+='</td>'
+            html+='<td style="width:100%">Пустая ячейка'
+            html+='</td>'
+            html+='</tr>'
+        }else{
+        for (let i=0;i<data.length;i++){
+            html+='<tr>'
+            html+='<td title="'+data[i].title+'">'+data[i].title
+            html+='</td>'
+            html+='<td>'+data[i].amount+data[i].units
+            html+='</td>'
+            html+='</tr>'
+
+        }
+        }
+        html+='</tbody>'
+        html+='</table>'
+        html+='</div>'
+        html+='</div>'
+
+        if ($('#'+id+'_visualizeInfo').length != 0){
+            return
+        }
+        $('#'+id.split('_')[3]).append(html)
+    })
 }
 function storageMargin(storageCell,storageName, isUnMargin){
     storageCell.forEach(function(row,idx){
@@ -240,7 +304,7 @@ function storageMargin(storageCell,storageName, isUnMargin){
                         var prevRowHeight = parseFloat($('#'+parseInt(idx-1)+'_'+rowIdx+'_st_layer_'+storageName).css('height'))
                         if (typeof prevRowHeight != 'undefined'){
                             if(!isUnMargin){
-                                $('#'+idx+'_'+rowIdx+'_st_layer_'+storageName).css({'margin-top':'-'+prevRowHeight*0.8+'px','margin-left': idx*marginLeft+'px'})
+                                $('#'+idx+'_'+rowIdx+'_st_layer_'+storageName).css({'margin-top':'-'+prevRowHeight*percentForRow+'px','margin-left': idx*marginLeft+'px'})
                             } else{
                                 $('#'+idx+'_'+rowIdx+'_st_layer_'+storageName).css({'margin-top':'0px','margin-left': '0px'})
                             }
@@ -346,3 +410,22 @@ function processMessage(message,storageList){
     })
     counter(LockStorage,storageList)
 }
+
+function getCellContent(cell){
+    var x = cell.split('_')[1],
+        y = cell.split('_')[0],
+        z = cell.split('_')[2],
+        storageName = cell.split('_')[3],
+        responseCreates = []
+    $.ajax({
+        method:"GET",
+        async:false,
+        url: getCellContentUrl,
+        data: {"x":x, "y":y, "z":z, "name":storageName},
+        success: function(response){
+            responseCreates = response
+        }
+    })
+    return responseCreates
+}
+
