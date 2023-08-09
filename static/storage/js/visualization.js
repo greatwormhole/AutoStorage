@@ -429,3 +429,51 @@ function getCellContent(cell){
     return responseCreates
 }
 
+//settings open
+function viewSettings(){
+    if ($('#prompt-block-UI').css('display') != 'none'){
+        return
+    }
+    if ($('#prompt-name').text() == 'Настройки'){
+        return $('#prompt-block-UI').show()
+    }
+    $('#prompt').css({'flex-direction':'column',
+                      'border':'1px solid gray',
+                      'background-color':'white',
+                      'border-radius':'5px 5px 5px 5px'})
+    var html = '<div class = "prompt-row " id = "consignment-note-prompt-row">'
+    html += '<h5 class = "margined settings-title" style="margin-bottom: 0px;">Параметры отображения</h5>'
+    html += '</div>'
+    html += '<div class = "prompt-row " id = "consignment-note-prompt-row">'
+    html += '<h6>Отображение складов</h6>'
+    html += '</div>'
+    html += '<div class = "prompt-row " id = "consignment-note-prompt-row">'
+    html += '<div class = "storage-visualize-settings">'
+    for (let i =0 ; i<storageList.length;i++){
+        html += '<div>'
+        html += '<input type = "checkbox" id = "'+storageList[i]+'_settings_check" class="settings-check" checked>'
+        html += '<label for="'+storageList[i]+'_settings_check">'+storageList[i]+'</label>'
+        html += '</div>'
+    }
+    html += '</div>'
+    html += '</div>'
+
+    $('#prompt-content').append(html)
+    $('#prompt-name').text('Настройки')
+    $('#prompt-block-UI').show()
+    $('.settings-check').prop('checked')
+    $('#prompt-close').attr('onclick', 'hidePromptVis()')
+    $('.settings-check').on('change', function(event){
+        var value = $(event.target).is(':checked'),
+            id = event.target.id
+        if (value){
+            $('#'+id.replace('_settings_check','')+'-container').css({'display':'flex'})
+            return
+        }
+        $('#'+id.replace('_settings_check','')+'-container').css({'display':'none'})
+    })
+}
+
+function hidePromptVis(){
+    $('#prompt-block-UI').hide()
+}

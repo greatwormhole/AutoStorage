@@ -98,8 +98,21 @@ body{
     cursor:pointer;
     margin-right:50px;
 }
-
+.search{
+    width:64px;
+    height:64px;
+    background: url('/media/icons/search-icon.png');
+    background-size:contain;
+    background-repeat: no-repeat;
+    margin:auto 0;
+    filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.5));
+    cursor:pointer;
+    margin-right:20px;
+}
 .settings:hover{
+    filter: drop-shadow(0px 0px 0px rgba(0,0,0,0.5));
+}
+.search:hover{
     filter: drop-shadow(0px 0px 0px rgba(0,0,0,0.5));
 }
 .scale{
@@ -310,4 +323,39 @@ span{
 .scroll-table tbody td {
     border-bottom:1px solid #9a9a9a;
     height:20px;
+}
+.settings-title{
+    width:100%;
+    text-align:center;
+}
+.storage-visualize-settings{
+    width:calc(100% - 20px);
+    margin: 0 10px;
+    border:0.5px solid black;
+    border-radius:5px 5px 5px 5px;
+    display:flex;
+    flex-direction:row;
+    flex-wrap:wrap;
+}
+.storage-visualize-settings input{
+    width:20px;
+    height:20px;
+    margin:5px;
+    margin-left:30px;
+    margin-right:10px;
+    margin-top:15px;
+}
+.storage-visualize-settings label{
+    font-size:18px;
+    margin-top:13px;
+}
+#main{
+    height: 100vh;
+}
+.prompt-row h6{
+    margin-left:18px;
+    margin-bottom: -8px;
+    z-index: 10000;
+    position: absolute;
+    background-color: white;
 }

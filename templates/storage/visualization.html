@@ -56,7 +56,10 @@
  <div class="content">
         <div id = "view-space">
             <div class="visualize-header">
-                <div class="settings">
+                <div class="settings" onclick="viewSettings()">
+
+                </div>
+                <div class="search">
 
                 </div>
                 <div class="counter-container">
@@ -83,9 +86,10 @@
             </div>
             <div class="storage-view">
                 {% for storage in storage_list %}
-                <div class="storage-container">
+                <div class="storage-container" id="{{storage}}-container">
                     <div class="storage-header">
                         <h1 class="sign storage-sign">{{storage}}</h1>
+
                         <div class="view-setting-button close" id="{{storage}}_OC" onclick="OCStorage(this.id)" style="transform:rotate(180deg)"></div>
                     </div>
                     <div class="counter-container">
