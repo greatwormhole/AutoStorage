@@ -1,8 +1,10 @@
 from django.dispatch import receiver
 from django.db.models.signals import pre_save, post_save, post_delete
 
+from datetime import datetime as dt
+
 from Apro.settings import DEBUG
-from .models import Worker, Crates, TempCrate, TEXT_ID_RANK, Storage
+from .models import Worker, Crates, TempCrate, TEXT_ID_RANK, Storage, RejectionAct
 from .utils import generate_worker_barcode
 from .caching import set_cache, get_cache, static_cache_keys
 from storage.storage_visual import full_cell_info
@@ -12,6 +14,11 @@ if not DEBUG:
     def create_barcode(instance, created, **kwargs):
         if created:
             generate_worker_barcode(instance.id, instance.name)
+            
+@receiver(post_save, sender=RejectionAct)
+def on_change(instance, created, **kwargs):
+    if created:
+        generate_worker_barcode(instance.id, dt.strftime(instance.datetime, '%d-%m-%Y %H:%M:%S'))
     
 @receiver(post_save, sender=TempCrate)
 def on_save(sender, instance, created, **kwargs):

@@ -203,7 +203,7 @@ class Flaw(models.Model):
     decision = models.BooleanField(blank=True, null=True)
     
     def __str__(self):
-        return self.nomenclature
+        return f'{self.nomenclature}'
     
     class Meta:
         verbose_name = "Брак"
