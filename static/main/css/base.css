@@ -20,6 +20,15 @@ body{
     height: 100%;
 
 }
+label{
+    user-select:none;
+}
+#prompt h6{
+    user-select:none;
+}
+#prompt h5{
+    user-select:none;
+}
 body:before{
     width:100%;
     height:100%;
