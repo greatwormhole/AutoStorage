@@ -390,4 +390,17 @@ class CellContentView(View):
         
         crates = cell.crates.all()
         
-        return HttpResponse(serializers.serialize('json', crates), content_type='application/json')
+        data = [
+            {
+                'id': crate.text_id,
+                'amount': crate.amount,
+                'size': crate.size,
+                'cell_id': crate.cell.adress,
+                'article': crate.nomenclature.article,
+                'title': crate.nomenclature.title,
+                'units': crate.nomenclature.units,
+            }
+            for crate in crates
+        ]
+        
+        return JsonResponse(data=data, status=200)
