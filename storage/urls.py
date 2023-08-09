@@ -19,6 +19,7 @@ urlpatterns = [
     path('API/storage-list', AllStorageList.as_view(), name='storage_fullness'),
     path('API/check-blocked-cells', BlockedStoragesView.as_view(), name='check_blocked_cells'),
     path('API/cell-content', CellContentView.as_view(), name='get_cell_content'),
+    path('API/save-rejection-act', ReceiveRejectionActView.as_view(), name='save_rejection_act'),
 ]
 
 if settings.DEBUG:

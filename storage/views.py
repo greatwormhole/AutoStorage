@@ -4,7 +4,7 @@ from django.views import View
 from django.core import serializers, exceptions
 
 from main.decorators import check_access
-from main.models import THD, Nomenclature, DeliveryNote, Worker, Crates, Storage, TempCrate, ProductionStorage
+from main.models import THD, Nomenclature, DeliveryNote, Worker, Crates, Storage, TempCrate, ProductionStorage, RejectionAct
 from main.utils import generate_nomenclature_barcode
 from .calculate_planning import handle_calculations
 from main.caching import get_cache, set_cache, static_cache_keys
@@ -169,8 +169,6 @@ class SaveConsignmentNote(View):
             provider = post_data.get('provider'),
             article_list = consignment_note_body
         )
-
-        delivery_note.save()
 
         return HttpResponse(status=200)
 
@@ -402,5 +400,35 @@ class CellContentView(View):
             }
             for crate in crates
         ]
-        print(data)
+        
         return JsonResponse(data=data, status=200, safe=False)
+    
+class ReceiveRejectionActView(View):
+    
+    def post(self, request):
+        
+        post_data = json.loads(request.body).get('data', None)
+        access_key = json.loads(request.COOKIES.get('AccessKey', None))
+        request_id = access_key.get('id', None)
+
+        if request_id is None:
+            return JsonResponse({'status': False, 'error': 'POST запрос составлен неверно'}, status=400)
+        
+        worker = Worker.objects.filter(id=request_id)
+
+        if not worker:
+            return JsonResponse({'status': False, 'error': 'Данного работника нет в базе'}, status=404)
+        
+        worker = worker[0]
+
+        rejection_act_body = f"""{post_data.get('dataItems')}"""
+
+        if rejection_act_body == '[]':
+            return JsonResponse({'status': False, 'error': 'Пустой акт отбраковки'}, status=404)
+
+        rejection_act = RejectionAct.objects.create(
+            worker = worker,
+            article_list = rejection_act_body,
+        )
+
+        return HttpResponse(status=201)

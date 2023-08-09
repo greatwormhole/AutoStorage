@@ -80,6 +80,18 @@ class DeliveryNote(models.Model):
     class Meta:
         verbose_name = "Накладная"
         verbose_name_plural = "Накладные"
+        
+class RejectionAct(models.Model):
+    datetime = models.DateTimeField(auto_now_add=True)
+    worker = models.ForeignKey(Worker, on_delete=models.RESTRICT)
+    article_list = models.TextField(null=True, blank=True)
+    
+    def __str__(self):
+        return ''
+    
+    class Meta:
+        verbose_name = 'Акт выбраковки'
+        verbose_name_plural = 'Акты выбраковки'
 
 class Storage(models.Model):
     adress = models.PositiveIntegerField(primary_key=True)
@@ -183,11 +195,10 @@ class Crates(models.Model):
         verbose_name_plural = "Коробки"
     
 class Flaw(models.Model):
-    id = models.PositiveBigIntegerField()
+    datetime = models.DateTimeField(primary_key=True, auto_now_add=True)
     nomenclature = models.ForeignKey(Nomenclature, on_delete=models.RESTRICT)
     amount = models.FloatField()
-    datetime = models.DateTimeField(primary_key=True, auto_now_add=True)
-    worker_add = models.ForeignKey(Worker, on_delete=models.RESTRICT, related_name='worker_addition')
+    rejection_act = models.ForeignKey(RejectionAct, on_delete=models.CASCADE, null=True)
     worker_decision = models.ForeignKey(Worker, on_delete=models.RESTRICT, related_name='worker_decision', blank=True)
     decision = models.BooleanField(blank=True)
     
