@@ -4,7 +4,7 @@ from django.views import View
 from django.core import serializers, exceptions
 
 from main.decorators import check_access
-from main.models import THD, Nomenclature, DeliveryNote, Worker, Crates, Storage, TempCrate, ProductionStorage, RejectionAct
+from main.models import THD, Nomenclature, DeliveryNote, Worker, Crates, Storage, TempCrate, ProductionStorage, RejectionAct, Flaw
 from main.utils import generate_nomenclature_barcode
 from .calculate_planning import handle_calculations
 from main.caching import get_cache, set_cache, static_cache_keys
@@ -421,14 +421,22 @@ class ReceiveRejectionActView(View):
         
         worker = worker[0]
 
-        rejection_act_body = f"""{post_data.get('dataItems')}"""
+        rejection_act_body = post_data.get('dataItems')
 
         if rejection_act_body == '[]':
             return JsonResponse({'status': False, 'error': 'Пустой акт отбраковки'}, status=404)
 
         rejection_act = RejectionAct.objects.create(
             worker = worker,
-            article_list = rejection_act_body,
+            article_list = f'{rejection_act_body}',
         )
+        
+        for el in rejection_act_body:
+            nomenclature = Nomenclature.objects.get(article=el['articule'])
+            Flaw.objects.create(
+                nomenclature=nomenclature,
+                amount=el['count'],
+                rejection_act=rejection_act,
+            )
 
         return HttpResponse(status=201)

@@ -199,8 +199,8 @@ class Flaw(models.Model):
     nomenclature = models.ForeignKey(Nomenclature, on_delete=models.RESTRICT)
     amount = models.FloatField()
     rejection_act = models.ForeignKey(RejectionAct, on_delete=models.CASCADE, null=True)
-    worker_decision = models.ForeignKey(Worker, on_delete=models.RESTRICT, related_name='worker_decision', blank=True)
-    decision = models.BooleanField(blank=True)
+    worker_decision = models.ForeignKey(Worker, on_delete=models.RESTRICT, related_name='worker_decision', blank=True, null=True)
+    decision = models.BooleanField(blank=True, null=True)
     
     def __str__(self):
         return self.nomenclature
