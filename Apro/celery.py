@@ -20,6 +20,10 @@ app.conf.beat_schedule = {
         'task': 'plan.tasks.month_plan',
         'schedule': crontab(day_of_month='1', minute=0, hour='8-10'),
     },
+    'rejections_acts_checking': {
+        'task': 'main.tasks.check_rejection_acts',
+        'schedule': crontab(hour='*/1'),
+    },
 
 }
 
