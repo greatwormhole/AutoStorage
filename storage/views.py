@@ -267,6 +267,7 @@ class CratePositioningView(View):
 
     def post(self, request):
 
+        cells = None
         crate_geometry = None
         request_crate_id = json.loads(request.body).get('id', None)
 
@@ -286,21 +287,33 @@ class CratePositioningView(View):
         new_crate = new_crate.first()
 
         # Id ячеек с коробками с одинаковой номенклатурой
-        same_nom_cells = Crates.objects.\
-            get(text_id=request_crate_id).\
-            get_same_nomenclature().values('cell_id').\
+        same_nom_cells = new_crate.\
+            get_same_nomenclature().\
+            values('cell_id').\
             distinct()
         
-        # Список доступных ячеек в убывающем порядке
-        cells = sorted(
-            [
-                available_cell for cell_dct in filter(lambda celldct: celldct['cell_id'] is not None, same_nom_cells)
-                if (available_cell := Storage.objects.get(adress=cell_dct['cell_id'])) # Задаем локальную переменную внутри list comrehension
-                if available_cell.size_left > new_crate.volume # Добавляем ячейку в список только если объем коробки меньше свободного объема ячейки
-            ],
-            key=lambda cell: cell.size_left,
-            reverse=True # Изменить этот параметр, если нужно заполнять сначала самые загруженные
-        )
+        if not same_nom_cells:
+            storage_name = new_crate.nomenclature.comment
+            all_storage_cells = Storage.objects.filter(storage_name=storage_name)
+            cells = sorted(
+                [
+                    cell for cell in all_storage_cells
+                    if cell.size_left > new_crate.volume # Добавляем ячейку в список только если объем коробки меньше свободного объема ячейки
+                ],
+                key=lambda cell: cell.size_left,
+                reverse=True # Изменить этот параметр, если нужно заполнять сначала самые загруженные
+            )
+        else:
+            # Список доступных ячеек в убывающем порядке
+            cells = sorted(
+                [
+                    available_cell for cell_dct in filter(lambda celldct: celldct['cell_id'] is not None, same_nom_cells)
+                    if (available_cell := Storage.objects.get(adress=cell_dct['cell_id'])) # Задаем локальную переменную внутри list comrehension
+                    if available_cell.size_left > new_crate.volume # Добавляем ячейку в список только если объем коробки меньше свободного объема ячейки
+                ],
+                key=lambda cell: cell.size_left,
+                reverse=True # Изменить этот параметр, если нужно заполнять сначала самые загруженные
+            )
 
         # Цикл while чтобы найти место в ячейках с одинаковой номенклатурой пока есть подходящие ячейки
         while cells != []:

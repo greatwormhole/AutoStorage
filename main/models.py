@@ -14,6 +14,7 @@ class Nomenclature(models.Model):
     maximum = models.FloatField(null=True, blank=True, verbose_name='Максимум продукции')
     minimum = models.FloatField(null=True, blank=True, verbose_name='Минимум продукцииё')
     mass = models.FloatField(blank=True, null=True, verbose_name='Масса одного изделия')
+    comment = models.CharField(max_length=50, null=True)
 
     def __str__(self):
         return self.title
