@@ -16,7 +16,7 @@ def rank(id):
         counter += 1
     return counter
 
-if not DEBUG:        
+if not DEBUG:
     @receiver(post_save, sender=Worker)
     def create_barcode(instance, created, **kwargs):
         if created:
@@ -28,13 +28,6 @@ def on_change(instance, created, **kwargs):
         zero_amount = TEXT_ID_RANK - rank(instance.id)
         text_id = zero_amount * '0' + str(instance.id)
         generate_worker_barcode(text_id, dt.strftime(instance.datetime, '%d-%m-%Y %H:%M:%S'))
-    
-@receiver(post_save, sender=TempCrate)
-def on_save(sender, instance, created, **kwargs):
-    if created:
-        zero_amount = TEXT_ID_RANK - instance.rank
-        txt_id = zero_amount * '0' + str(instance.id)
-        sender.objects.filter(id=instance.id).update(text_id=txt_id)
 
 @receiver(pre_save, sender=Crates)
 def pre_change(sender, instance: Crates, **kwargs):
@@ -47,11 +40,6 @@ def pre_change(sender, instance: Crates, **kwargs):
 
 @receiver(post_save, sender=Crates)
 def on_change(instance: Crates, created, sender, **kwargs):
-    
-    if created:
-        zero_amount = TEXT_ID_RANK - instance.rank
-        txt_id = zero_amount * '0' + str(instance.id)
-        sender.objects.filter(id=instance.id).update(text_id=txt_id)
         
     moved_crates_data = {}
     blocked_cells_data = get_cache(static_cache_keys['blocked_cells'], {})
@@ -109,7 +97,9 @@ def on_change(instance: Crates, created, sender, **kwargs):
             instance.__original_cell.visualization_z,
             instance.__original_cell.full_percent,
         ]
-                
+    print(moved_crates_data)
+    print(blocked_cells_data)
+    print(full_cell_info_data)
     set_cache(static_cache_keys['moving_crates'], moved_crates_data)
     set_cache(static_cache_keys['blocked_cells'], blocked_cells_data, as_list=False)
     set_cache(static_cache_keys['full_info_cells'], full_cell_info_data, as_list=False)
