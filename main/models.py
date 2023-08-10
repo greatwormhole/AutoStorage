@@ -243,7 +243,13 @@ class TempCrate(models.Model):
             id //= 10
             counter += 1
         return counter
-    
+
+    @property
+    def volume(self):
+        return self.crate.volume
+    def get_same_nomenclature(self):
+        return self.crate.get_same_nomenclature()
+
     class Meta:
         verbose_name = 'Временная коробка'
         verbose_name_plural = 'Временные коробки'

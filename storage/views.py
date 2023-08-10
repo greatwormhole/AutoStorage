@@ -291,8 +291,9 @@ class CratePositioningView(View):
             get_same_nomenclature().\
             values('cell_id').\
             distinct()
+
         
-        if not same_nom_cells:
+        if same_nom_cells[0]['cell_id'] is None:
             storage_name = new_crate.nomenclature.comment
             all_storage_cells = Storage.objects.filter(storage_name=storage_name)
             cells = sorted(
