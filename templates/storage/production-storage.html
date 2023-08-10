@@ -1,0 +1,43 @@
+{% extends 'main/base.html' %}
+{% block link %}
+{% load static %}
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script  src="{% static 'storage/js/production-storage.js' %}" rel="stylesheet" ></script>
+    <link rel="stylesheet" href="{% static 'storage/css/production-storage.css' %}">
+
+    <script>
+        const updateInfoUrl = '{% url 'production_storage' %}'
+        var nomenclature = {}
+        $(document).ready(function(){
+            updateInfo()
+        })
+    </script>
+{% endblock %}
+{% block content %}
+ <div class="content">
+        <div id = "view-space">
+            <div class="note-header">
+                <h3 class="sign main-sign">Список МЦ на производстве.</h3>
+                <button class="search-button" onclick="promptShow()"></button>
+            </div>
+            <div class="scroll-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>
+                                Номенклатура
+                            </th>
+                            <th>
+                                Количество
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="storage-list">
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+ </div>
+{% endblock %}

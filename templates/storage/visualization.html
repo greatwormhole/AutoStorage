@@ -1,0 +1,110 @@
+{% extends 'main/base.html' %}
+{% block link %}
+{% load static %}
+  <script  src="{% static 'storage/js/visualization.js' %}" rel="stylesheet" ></script>
+  <link rel="stylesheet" href="{% static 'storage/css/visualization.css' %}">
+  <script>
+        const storageListStr = '{{storage_list}}',
+            getCellsUrl = "{% url 'cells' %}",
+            storageFullnessUrl = "{% url 'storage_fullness' %}",
+            storageLockUrl = "{% url 'check_blocked_cells' %}",
+            getCellContentUrl = "{% url 'get_cell_content' %}"
+        var marginStep = 0,
+            storageList = JSON.parse(storageListStr.replaceAll('&#x27;','"')),
+            marginLeft = 5,
+            cellInformation = [],
+            maxScale = 2,
+            maxScaleSpace = 4.25,
+            barerPercentage = 50,
+            wsStart = 'ws://',
+            percentForRow = 0.8
+        loc = window.location;
+        if (loc.protocol == 'https:') {
+            wsStart = 'wss://'
+        }
+      $(document).ready(function(){
+
+        var LockStorage = getStorageInfo(storageLockUrl),
+            storageInfo = getStorageInfo(getCellsUrl)
+        canvasDraw()
+        buildStorages(storageList,LockStorage,storageInfo)
+        var storage_socket = new WebSocket(wsStart+window.location.hostname+':'+window.location.port+'/ws/storage-ws/'+WORKER_ID)
+        $(storage_socket).on('message', function(event){
+            var data = JSON.parse(event.originalEvent.data),
+                message = JSON.parse(data['message']);
+            processMessage(message,storageList)
+        })
+        storage_socket.onclose = event => {
+            var storage_socket = new WebSocket(wsStart+window.location.hostname+':'+window.location.port+'/ws/storage-ws/'+WORKER_ID)
+            $(storage_socket).on('message', function(event){
+            var data = JSON.parse(event.originalEvent.data),
+                message = JSON.parse(data['message']);
+            })
+        };
+        $(document).keyup(function(e) {
+            if (e.key === "Escape") {
+                if (typeof $('.create-info').attr('id') != 'undefined'){
+                    $('#'+$('.create-info').attr('id').replace('_visualizeInfo','')).css({'border':'1px solid gray'})
+                }
+                $('.create-info').remove()
+            }
+        });
+      })
+  </script>
+{% endblock %}
+{% block content %}
+ <div class="content">
+        <div id = "view-space">
+            <div class="visualize-header">
+                <div class="settings" onclick="viewSettings()">
+
+                </div>
+                <div class="search">
+
+                </div>
+                <div class="counter-container">
+                    <span class="sign counter text full-span" id="full-span">Занято -</span>
+                    <span class="sign counter text free-span" id="free-span">Свободно -</span>
+                    <span class="sign counter text lock-span" id="lock-span">Заблокировано -</span>
+                    <span class="sign counter text lock-full-span" id="lock-full-span">Занято и заблокировано -</span>
+                </div>
+                <div class="legend">
+                    <span class="sign title main-title">Легенда</span>
+                    <span class="sign title">Индикация заполненности</span>
+                    <div class="scale">
+
+                    </div>
+                    <canvas width="350" height="20" id="legend-canvas">
+                    </canvas>
+                    <div class="canvas-sign">
+                        <span class="text" style="font-weight:600; margin-left:-11px">0%</span>
+                        <span class="text" style="font-weight:400; padding-right:25px">Свободно</span>
+                        <span class="text" style="font-weight:400; padding-left: 30px">Занято</span>
+                        <span class="text" style="font-weight:600; margin-right: -20px">100%</span>
+                    </div>
+                </div>
+            </div>
+            <div class="storage-view">
+                {% for storage in storage_list %}
+                <div class="storage-container" id="{{storage}}-container">
+                    <div class="storage-header">
+                        <h1 class="sign storage-sign">{{storage}}</h1>
+
+                        <div class="view-setting-button close" id="{{storage}}_OC" onclick="OCStorage(this.id)" style="transform:rotate(180deg)"></div>
+                    </div>
+                    <div class="counter-container">
+                        <span class="sign counter text full-span" id="{{storage}}-full-span" style="font-size:16px">Занято -</span>
+                        <span class="sign counter text free-span" id="{{storage}}-free-span" style="font-size:16px">Свободно -</span>
+                        <span class="sign counter text lock-span" id="{{storage}}-lock-span" style="font-size:16px">Заблокировано -</span>
+                        <span class="sign counter text lock-full-span" id="{{storage}}-lock-full-span" style="font-size:16px">Занято и заблокировано -</span>
+                    </div>
+                    <div class = "storage_template" id="{{storage}}">
+                        <div id = "{{storage}}-column-numbers" class="column-numbers"></div>
+                        <div id = "{{storage}}-row-numbers" class="row-numbers"></div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+ </div>
+{% endblock %}

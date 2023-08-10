@@ -2,8 +2,13 @@ from django.shortcuts import redirect
 from django.core.exceptions import PermissionDenied
 import json
 
-def check_access(action=None):
-        
+def check_access(action: str | None = None):
+    
+    """
+    Декоратор для проверки уровня доступа зарегистрированного сотрудника к определенному контенту,
+    параметром ``action`` передается уровень прав сотрудника согласно базе данных
+    """
+
     def inner_func(view_func):
 
         def wrapper(self, request, *args, **kwargs):
@@ -21,12 +26,12 @@ def check_access(action=None):
                     'quality_control_right': False,
                 }
 
-                response = redirect('base')
+                response = redirect('home')
                 response.set_cookie(key='AccessKey', value=json.dumps(cookie))
 
                 return response
             
-            if action is None or access_key.get(action):
+            if action is None or access_key.get(action, False) or access_key.get('name', None) not in ('NA', None):
                 return view_func(self, request, *args, **kwargs)
             else:
                 raise PermissionDenied('У вас нет прав, чтобы выполнить это действие')

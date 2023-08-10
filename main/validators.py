@@ -18,4 +18,10 @@ class ArticleJSONValidator(BaseValidator):
         try:
             validate(input_value, schema)
         except ValidationError:
-            raise DjangoValidationError("Provided data failed JSON schema check")
+            raise DjangoValidationError("Данные не соответствую заданному формату JSON")
+        
+def validate_no_spaces(value):
+    if len(value.split(' ')) != 1:
+        raise DjangoValidationError(
+            f'В названии {value} не должно быть пробелов'
+        )

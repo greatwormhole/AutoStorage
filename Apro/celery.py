@@ -8,13 +8,22 @@ app = Celery('Apro')
 app.config_from_object('django.conf:settings', namespace='CELERY')
 app.autodiscover_tasks()
 app.conf.beat_schedule = {
-    #'save_db': {
-    #'task':'main.tasks.save_db',
-        #'schedule': crontab(minute='*/1')},
-    'test': {
-    'task':'plan.tasks.test',
-           'schedule': crontab(minute='*/1')
-    }
+    'shift_result': {
+        'task': 'plan.tasks.shift_result',
+        'schedule': crontab(minute='*/5', hour='8-10'),
+    },
+    'day_plan': {
+        'task': 'plan.tasks.day_plan',
+        'schedule': crontab(minute='*/5', hour = '11-12'),
+    },
+    'month_plan': {
+        'task': 'plan.tasks.month_plan',
+        'schedule': crontab(day_of_month='1', minute=0, hour='8-10'),
+    },
+    'rejections_acts_checking': {
+        'task': 'main.tasks.check_rejection_acts',
+        'schedule': crontab(hour='*/1'),
+    },
 
 }
 
