@@ -212,7 +212,9 @@ class SaveCrateView(View):
         )
         crate.save()
         
-        generate_nomenclature_barcode(crate.text_id, crate.nomenclature.title)
+        changed_crate = Crates.objects.get(id=crate.id)
+        
+        generate_nomenclature_barcode(changed_crate.text_id, changed_crate.nomenclature.title)
 
         return HttpResponse(status=200)
     
@@ -230,8 +232,10 @@ class SaveTempCrateView(View):
             size = data.get('dimensions'),
         )
         temp_crate.save()
+        
+        changed_temp_crate = Crates.objects.get(id=temp_crate.id)
 
-        generate_nomenclature_barcode(temp_crate.text_id, crate.text_id)
+        generate_nomenclature_barcode(changed_temp_crate.text_id, crate.text_id)
 
         return HttpResponse(status=200)
     
