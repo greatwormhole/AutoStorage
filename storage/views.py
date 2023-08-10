@@ -1,10 +1,12 @@
+import time
+
 from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse
 from django.views import View
 from django.core import serializers, exceptions
 
 from main.decorators import check_access
-from main.models import THD, Nomenclature, DeliveryNote, Worker, Crates, Storage, TempCrate, ProductionStorage, RejectionAct, Flaw
+from main.models import THD, Nomenclature, DeliveryNote, Worker, Crates, Storage, TempCrate, ProductionStorage, RejectionAct, Flaw, TEXT_ID_RANK
 from main.utils import generate_nomenclature_barcode
 from .calculate_planning import handle_calculations
 from main.caching import get_cache, set_cache, static_cache_keys
@@ -210,11 +212,14 @@ class SaveCrateView(View):
             size = data.get('dimensions'),
             nomenclature = nomenclature,
         )
+
         crate.save()
         
         changed_crate = Crates.objects.get(id=crate.id)
-        
-        generate_nomenclature_barcode(changed_crate.text_id, changed_crate.nomenclature.title)
+        zero_amount = TEXT_ID_RANK - changed_crate.rank
+        txt_id = zero_amount * '0' + str(changed_crate.id)
+        Crates.objects.filter(id=changed_crate.id).update(text_id=txt_id)
+        generate_nomenclature_barcode(txt_id, changed_crate.nomenclature.title)
 
         return HttpResponse(status=200)
     
@@ -223,7 +228,7 @@ class SaveTempCrateView(View):
     def post(self, request):
 
         data = json.loads(request.body).get('data')
-        print(data)
+
         crate = Crates.objects.get(id=int(data.get('id')))
 
         temp_crate = TempCrate.objects.create(
@@ -234,8 +239,11 @@ class SaveTempCrateView(View):
         temp_crate.save()
         
         changed_temp_crate = Crates.objects.get(id=temp_crate.id)
-
-        generate_nomenclature_barcode(changed_temp_crate.text_id, crate.text_id)
+        zero_amount = TEXT_ID_RANK - changed_temp_crate.rank
+        txt_id = zero_amount * '0' + str(changed_temp_crate.id)
+        Crates.objects.filter(id=changed_temp_crate.id).update(text_id=txt_id)
+        generate_nomenclature_barcode(txt_id, changed_temp_crate.nomenclature.title)
+        generate_nomenclature_barcode(txt_id, crate.text_id)
 
         return HttpResponse(status=200)
     
