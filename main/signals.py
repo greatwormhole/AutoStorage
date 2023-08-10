@@ -54,8 +54,8 @@ def on_change(instance: Crates, created, sender, **kwargs):
         sender.objects.filter(id=instance.id).update(text_id=txt_id)
         
     moved_crates_data = {}
-    blocked_cells_data = {}
-    full_cell_info_data = {}
+    blocked_cells_data = get_cache(static_cache_keys['blocked_cells'], {})
+    full_cell_info_data = get_cache(static_cache_keys['full_info_cells'], {})
     
     if instance.__original_cell != instance.cell:
         moved_crates_data = {
@@ -81,9 +81,6 @@ def on_change(instance: Crates, created, sender, **kwargs):
 
         storage_name = instance.cell.storage_name
         blocked_neighbour_cells = [cell for cell in instance.cell.neighboring_cells() if cell.is_blocked]
-
-        blocked_cells_data = get_cache(static_cache_keys['blocked_cells'], {})
-        full_cell_info_data = get_cache(static_cache_keys['full_info_cells'], {})
         
         if blocked_cells_data.get(storage_name, None) is None and len(blocked_neighbour_cells) > 0:
             blocked_cells_data[storage_name] = {}
