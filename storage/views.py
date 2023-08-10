@@ -219,7 +219,7 @@ class SaveCrateView(View):
         zero_amount = TEXT_ID_RANK - changed_crate.rank
         txt_id = zero_amount * '0' + str(changed_crate.id)
         Crates.objects.filter(id=changed_crate.id).update(text_id=txt_id)
-        generate_nomenclature_barcode(txt_id, changed_crate.nomenclature.title)
+        # generate_nomenclature_barcode(txt_id, changed_crate.nomenclature.title)
 
         return HttpResponse(status=200)
     
@@ -273,8 +273,13 @@ class CratePositioningView(View):
         if request_crate_id is None:
             return JsonResponse({'status': False, 'error': 'POST запрос составлен неверно'}, status=400)
         
-        new_crate = Crates.objects.filter(text_id=request_crate_id)
-
+        new_crate = None
+        
+        if request_crate_id.startswith('TC'):
+            new_crate = TempCrate.objects.filter(text_id=request_crate_id)
+        else:
+            new_crate = Crates.objects.filter(text_id=request_crate_id)
+            
         if not new_crate:
             return JsonResponse({'status': False, 'error': 'Коробки с таким id нет в базе'})
         
