@@ -36,13 +36,6 @@ def on_save(sender, instance, created, **kwargs):
         txt_id = zero_amount * '0' + str(instance.id)
         sender.objects.filter(id=instance.id).update(text_id=txt_id)
 
-@receiver(post_save, sender=Crates)
-def on_save(sender, instance, created, **kwargs):
-    if created:
-        zero_amount = TEXT_ID_RANK - instance.rank
-        txt_id = zero_amount * '0' + str(instance.id)
-        sender.objects.filter(id=instance.id).update(text_id=txt_id)
-
 @receiver(pre_save, sender=Crates)
 def pre_change(sender, instance: Crates, **kwargs):
     original_cell = None
@@ -53,8 +46,13 @@ def pre_change(sender, instance: Crates, **kwargs):
     instance.__original_cell = original_cell
 
 @receiver(post_save, sender=Crates)
-def on_change(instance: Crates, **kwargs):
-
+def on_change(instance: Crates, created, sender, **kwargs):
+    
+    if created:
+        zero_amount = TEXT_ID_RANK - instance.rank
+        txt_id = zero_amount * '0' + str(instance.id)
+        sender.objects.filter(id=instance.id).update(text_id=txt_id)
+        
     moved_crates_data = {}
     blocked_cells_data = {}
     full_cell_info_data = {}

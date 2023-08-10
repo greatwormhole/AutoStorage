@@ -129,7 +129,7 @@ class MainView(View):
             return JsonResponse({'status': False, 'error': 'ТСД с таким ip нет в базе'}, status=404)
 
         thd = thds.first()
-        
+
         if thd.worker is not None:
             login_data = {
                 'status': True,
@@ -140,7 +140,7 @@ class MainView(View):
                 'quality_control_right': thd.worker.quality_control_right,
             }
             logged_in = True
-
+        
         return JsonResponse({'status': True, 'is_comp': thd.is_comp, 'id':thd.THD_number, 'login': login_data, 'is_logged_in': logged_in}, status=200)
     
 class THDSelect(View):

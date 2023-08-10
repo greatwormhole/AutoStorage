@@ -252,7 +252,9 @@ def handle_calculations(cell, crates, show_volume_left: bool = False):
                 'width': cell.x_cell_size,
                 'height': cell.y_cell_size,
                 'depth': cell.z_cell_size,
-                # 'x_cell_coord'
+                # 'x_cell_coord': cell.x_cell_coord,
+                # 'y_cell_coord': cell.y_cell_coord,
+                # 'z_cell_coord': cell.z_cell_coord,
             },
         }
     except (ZeroDivisionError, NotPackedError):

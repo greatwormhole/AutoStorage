@@ -211,7 +211,7 @@ class SaveCrateView(View):
             nomenclature = nomenclature,
         )
         crate.save()
-
+        
         generate_nomenclature_barcode(crate.text_id, crate.nomenclature.title)
 
         return HttpResponse(status=200)
