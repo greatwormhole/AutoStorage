@@ -40,10 +40,6 @@ def pre_change(sender, instance: Crates, **kwargs):
 
 @receiver(post_save, sender=Crates)
 def on_change(instance: Crates, created, sender, **kwargs):
-        
-    moved_crates_data = {}
-    blocked_cells_data = get_cache(static_cache_keys['blocked_cells'], {})
-    full_cell_info_data = get_cache(static_cache_keys['full_info_cells'], {})
     
     if instance.__original_cell != instance.cell:
         moved_crates_data = {
@@ -67,6 +63,9 @@ def on_change(instance: Crates, created, sender, **kwargs):
                 'is_blocked_origin': instance.__original_cell.is_blocked if instance.__original_cell != None else '',
         }
 
+        blocked_cells_data = get_cache(static_cache_keys['blocked_cells'], {})
+        full_cell_info_data = get_cache(static_cache_keys['full_info_cells'], {})
+        
         storage_name = instance.cell.storage_name
         blocked_neighbour_cells = [cell for cell in instance.cell.neighboring_cells() if cell.is_blocked]
         
@@ -97,9 +96,10 @@ def on_change(instance: Crates, created, sender, **kwargs):
             instance.__original_cell.visualization_z,
             instance.__original_cell.full_percent,
         ]
-    set_cache(static_cache_keys['moving_crates'], moved_crates_data)
-    set_cache(static_cache_keys['blocked_cells'], blocked_cells_data, as_list=False)
-    set_cache(static_cache_keys['full_info_cells'], full_cell_info_data, as_list=False)
+            
+        set_cache(static_cache_keys['moving_crates'], moved_crates_data)
+        set_cache(static_cache_keys['blocked_cells'], blocked_cells_data, as_list=False)
+        set_cache(static_cache_keys['full_info_cells'], full_cell_info_data, as_list=False)
     
 @receiver(post_save, sender=Storage)
 def on_change(instance: Storage, **kwargs):

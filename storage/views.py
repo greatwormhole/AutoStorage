@@ -219,7 +219,7 @@ class SaveCrateView(View):
         zero_amount = TEXT_ID_RANK - changed_crate.rank
         txt_id = zero_amount * '0' + str(changed_crate.id)
         Crates.objects.filter(id=changed_crate.id).update(text_id=txt_id)
-        # generate_nomenclature_barcode(txt_id, changed_crate.nomenclature.title)
+        generate_nomenclature_barcode(txt_id, changed_crate.nomenclature.title)
 
         return HttpResponse(status=200)
     
