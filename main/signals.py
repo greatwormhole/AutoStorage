@@ -97,9 +97,6 @@ def on_change(instance: Crates, created, sender, **kwargs):
             instance.__original_cell.visualization_z,
             instance.__original_cell.full_percent,
         ]
-    print(moved_crates_data)
-    print(blocked_cells_data)
-    print(full_cell_info_data)
     set_cache(static_cache_keys['moving_crates'], moved_crates_data)
     set_cache(static_cache_keys['blocked_cells'], blocked_cells_data, as_list=False)
     set_cache(static_cache_keys['full_info_cells'], full_cell_info_data, as_list=False)

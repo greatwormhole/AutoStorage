@@ -229,7 +229,7 @@ class SaveTempCrateView(View):
 
         data = json.loads(request.body).get('data')
 
-        crate = Crates.objects.get(id=int(data.get('id')))
+        crate = Crates.objects.filter(id=int(data.get('id')))[0]
 
         temp_crate = TempCrate.objects.create(
             crate = crate,
@@ -238,11 +238,10 @@ class SaveTempCrateView(View):
         )
         temp_crate.save()
         
-        changed_temp_crate = Crates.objects.get(id=temp_crate.id)
+        changed_temp_crate = TempCrate.objects.get(id=temp_crate.id)
         zero_amount = TEXT_ID_RANK - changed_temp_crate.rank
-        txt_id = zero_amount * '0' + str(changed_temp_crate.id)
-        Crates.objects.filter(id=changed_temp_crate.id).update(text_id=txt_id)
-        generate_nomenclature_barcode(txt_id, changed_temp_crate.nomenclature.title)
+        txt_id = 'TC'+zero_amount * '0' + str(changed_temp_crate.id)
+        TempCrate.objects.filter(id=changed_temp_crate.id).update(text_id=txt_id)
         generate_nomenclature_barcode(txt_id, crate.text_id)
 
         return HttpResponse(status=200)
